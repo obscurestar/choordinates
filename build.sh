@@ -6,18 +6,24 @@
 SRC=`find . -name "*.java" -print 2> /dev/null`
 JAR_NAME="dischord.jar"
 EXE=""
+OUTDIR="./bin"
+
+[[ -d $OUTDIR ]] || mkdir $OUTDIR
 
 echo COMPILING
 #Who needs compilation error handling anyhow?
 for file in $SRC
 do
-    javac $file
+    javac -d $OUTDIR $file
     EXE="$EXE$(basename $file .java).class "
 done
 
 echo PACKAGING
 #The following line doesn't work.  Fix this with CMake or something later.
 #jar cfe $JAR_NAME DisChord $EXE
+
+cd $OUTDIR
+
 jar cfe dischord.jar DisChord ./*.class
 
 echo LAUNCHING JAR
