@@ -1,7 +1,0 @@
-#!/bin/bash
-
-JAR_NAME="dischord.jar"
-
-pushd .
-cd bin
-java -jar $JAR_NAME

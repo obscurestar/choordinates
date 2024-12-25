@@ -1,4 +1,5 @@
-import java.awt.Color;
+package dischord;
+
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import javax.swing.*;
@@ -44,6 +45,9 @@ public class DisChord {
                 menuBar.add(windowMenu);
                 frame.setJMenuBar(menuBar);
                 frame.setVisible(true);
+                Data test = new Data();
+                test.write();
+                test.read();
             }
         });
     }
