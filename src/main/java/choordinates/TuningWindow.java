@@ -1,4 +1,4 @@
-package dischord;
+package choordinates;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;

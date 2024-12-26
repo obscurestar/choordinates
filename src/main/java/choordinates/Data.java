@@ -1,4 +1,4 @@
-package dischord;
+package choordinates;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.File;
 import java.io.IOException;
 public class Data {
-	public static String filename = "dischord.json";
+	public static String filename = "choordinates.json";
 	
     public static void main(String[] args)
     {
@@ -20,7 +20,7 @@ public class Data {
             ObjectMapper objectMapper = new ObjectMapper();
             
             //Write a test file.
-            DischordData data = new DischordData();
+            ChoordinatesData data = new ChoordinatesData();
             data.setLastTuning("EADGBE 6 String");
 
             // Convert the object to JSON string
@@ -48,7 +48,7 @@ public class Data {
             File jsonFile = new File(filename);
             
             // Read the JSON file and map it to a Java object
-            DischordData myObject = objectMapper.readValue(jsonFile, DischordData.class);
+            ChoordinatesData myObject = objectMapper.readValue(jsonFile, ChoordinatesData.class);
 
             // Print the loaded object
             System.out.println(myObject.last_tuning);
@@ -62,7 +62,7 @@ public class Data {
 }
 
 //The data structure for reading and writing
-class DischordData
+class ChoordinatesData
 {
 	public String last_tuning;
 	
