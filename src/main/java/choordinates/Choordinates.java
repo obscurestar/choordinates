@@ -1,8 +1,9 @@
 package choordinates;
 
 import java.awt.EventQueue;
-import java.awt.Dimension; 
 
+import java.awt.Dimension; 
+import java.awt.Graphics;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
@@ -24,6 +25,8 @@ import java.awt.GridBagConstraints;
 import java.awt.Insets;
 import java.awt.FlowLayout;
 import java.awt.BorderLayout;
+
+import choordinates.FretPanel;
 
 public class Choordinates extends JFrame {
 
@@ -60,6 +63,10 @@ public class Choordinates extends JFrame {
 	public Choordinates() {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 584, 454);
+		
+		Data test = new Data();
+		test.write();
+		test.read();
 		
 		JMenuBar menuBar = new JMenuBar();
 		setJMenuBar(menuBar);
@@ -176,9 +183,34 @@ public class Choordinates extends JFrame {
 		
 		int cols = num_strings + 1; //Add a column for first fret label
 		int rows = num_frets + 1;   //Add a row for first fret selection
-				
-		JPanel panelSelectFret = new JPanel();
-		panelSelectFret.setMinimumSize(new Dimension(32 * cols,23 * rows));
+		
+		Dimension win_dimensions = new Dimension( 32*cols, 23*rows );
+		
+		JPanel panelSelectFret = new JPanel() {
+			 @Override
+	            protected void paintComponent(Graphics g) {
+	                super.paintComponent(g);
+	                
+	                int width = getWidth();
+	                int height = getHeight();
+	                
+	                //Dimension cell_dimensions = new Dimension ( width/(cols+1), height/(rows+1) );
+	                Dimension cell_dimensions = new Dimension(20, 20);
+	                // Draw horizontal lines
+	                for (int i = 1; i < rows; i++) {
+	                    int y = i * cell_dimensions.height;
+	                    g.drawLine(cell_dimensions.width, y, width - cell_dimensions.width/2, y);
+	                }
+
+	                // Draw vertical lines
+	                for (int i = 0; i < cols; i++) {
+	                    int x = i * cell_dimensions.width;
+	                    g.drawLine(x, cell_dimensions.height, x, height - cell_dimensions.height/2);
+	                }
+	            }
+	        };
+			
+		panelSelectFret.setMinimumSize(win_dimensions);
 		tabbedSelectBy.addTab("Frets", null, panelSelectFret, null);
 		GridBagLayout gbl_panelSelectFret = new GridBagLayout();
 		
@@ -248,15 +280,8 @@ public class Choordinates extends JFrame {
 		panelFavShapes.add(scrollFavShapes);
 		
 		//LOWER PANEL FOR GUITAR NECK
-		JPanel panelLower = new JPanel();
-		contentPane.add(panelLower);
-		panelLower.setLayout(new BoxLayout(panelLower, BoxLayout.Y_AXIS));
-		
-		JLabel lblNewLabel = new JLabel("<PLACEHOLDER>");
-		panelLower.add(lblNewLabel);
-		
-		JPanel panelNeck = new JPanel();
-		panelLower.add(panelNeck);
+		FretPanel panelNeck = new FretPanel();
+		contentPane.add(panelNeck);
 
 	}
 

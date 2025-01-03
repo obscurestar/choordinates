@@ -61,6 +61,14 @@ public class Data {
     }
 }
 
+class SubData
+{
+	public String sub;
+	public int value;
+	
+	
+}
+
 //The data structure for reading and writing
 class ChoordinatesData
 {
