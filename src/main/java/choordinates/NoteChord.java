@@ -2,7 +2,7 @@ package choordinates;
 
 //Note chords extend the abstract Chord class to represent notes on an A-Gb scale
 
-public class NoteChord extends Chord {
+public class NoteChord extends AbstractChord {
 
 	public static NoteChord parse(String tuning)
 	{
@@ -45,7 +45,7 @@ public class NoteChord extends Chord {
 		
 		for (end = begin; end < tuning.length(); ++end)
 		{
-			Note note = new Note();
+			ToneNote note = new ToneNote();
 			
 			//Look for a delimiter character
 			if ( delims.indexOf( tuning.charAt(end) ) > -1 )

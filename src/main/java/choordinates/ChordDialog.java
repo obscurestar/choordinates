@@ -24,8 +24,9 @@ public class ChordDialog extends JDialog {
 
 	private static final long serialVersionUID = 1L;
 	private final JPanel contentPanel = new JPanel();
-	private JTextField textChordName;
-	private JTextField textChordAliases;
+	private JTextField mTextName;
+	private JTextField mTextAliases;
+	private JTextField mTextIntervals;
 
 	/**
 	 * Create the dialog.
@@ -70,76 +71,96 @@ public class ChordDialog extends JDialog {
 			JPanel panelChordEntry = new JPanel();
 			contentPanel.add(panelChordEntry);
 			GridBagLayout gbl_panelChordEntry = new GridBagLayout();
-			gbl_panelChordEntry.columnWidths = new int[]{0, 0, 0, 0};
-			gbl_panelChordEntry.rowHeights = new int[]{0, 0, 0, 0};
-			gbl_panelChordEntry.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0};
+			gbl_panelChordEntry.columnWidths = new int[]{0, 0, 0};
+			gbl_panelChordEntry.rowHeights = new int[]{0, 0, 0};
+			gbl_panelChordEntry.columnWeights = new double[]{0.0, 1.0, 0.0};
 			gbl_panelChordEntry.rowWeights = new double[]{0.0, 0.0, 0.0};
 			panelChordEntry.setLayout(gbl_panelChordEntry);
 			{
-				JLabel lblChordName = new JLabel("Name");
-				GridBagConstraints gbc_lblChordName = new GridBagConstraints();
-				gbc_lblChordName.insets = new Insets(0, 0, 5, 5);
-				gbc_lblChordName.anchor = GridBagConstraints.EAST;
-				gbc_lblChordName.gridx = 0;
-				gbc_lblChordName.gridy = 0;
-				panelChordEntry.add(lblChordName, gbc_lblChordName);
+				JLabel lblName = new JLabel("Name");
+				GridBagConstraints gbc_lblName = new GridBagConstraints();
+				gbc_lblName.insets = new Insets(0, 0, 5, 5);
+				gbc_lblName.anchor = GridBagConstraints.EAST;
+				gbc_lblName.gridx = 0;
+				gbc_lblName.gridy = 0;
+				panelChordEntry.add(lblName, gbc_lblName);
 			}
 			{
-				textChordName = new JTextField();
-				textChordName.setToolTipText("Name of the chord eg: Major, minor, dominant, 7th");
-				GridBagConstraints gbc_textChordName = new GridBagConstraints();
-				gbc_textChordName.gridwidth = 2;
-				gbc_textChordName.insets = new Insets(0, 0, 5, 0);
-				gbc_textChordName.fill = GridBagConstraints.HORIZONTAL;
-				gbc_textChordName.gridx = 1;
-				gbc_textChordName.gridy = 0;
-				panelChordEntry.add(textChordName, gbc_textChordName);
-				textChordName.setColumns(10);
+				mTextName = new JTextField();
+				mTextName.setToolTipText("Name of the chord eg: Major, minor, dominant, 7th");
+				GridBagConstraints gbc_mTextName = new GridBagConstraints();
+				gbc_mTextName.gridwidth = 2;
+				gbc_mTextName.insets = new Insets(0, 0, 5, 5);
+				gbc_mTextName.fill = GridBagConstraints.HORIZONTAL;
+				gbc_mTextName.gridx = 1;
+				gbc_mTextName.gridy = 0;
+				panelChordEntry.add(mTextName, gbc_mTextName);
+				mTextName.setColumns(10);
 			}
 			{
-				JLabel lblChordAlias = new JLabel("Aliases");
-				lblChordAlias.setToolTipText("Comma delimited list.  EG");
-				GridBagConstraints gbc_lblChordAlias = new GridBagConstraints();
-				gbc_lblChordAlias.anchor = GridBagConstraints.EAST;
-				gbc_lblChordAlias.insets = new Insets(0, 0, 5, 5);
-				gbc_lblChordAlias.gridx = 0;
-				gbc_lblChordAlias.gridy = 1;
-				panelChordEntry.add(lblChordAlias, gbc_lblChordAlias);
+				JLabel lblAlias = new JLabel("Aliases");
+				lblAlias.setToolTipText("Comma delimited list.  EG");
+				GridBagConstraints gbc_lblAlias = new GridBagConstraints();
+				gbc_lblAlias.anchor = GridBagConstraints.EAST;
+				gbc_lblAlias.insets = new Insets(0, 0, 5, 5);
+				gbc_lblAlias.gridx = 0;
+				gbc_lblAlias.gridy = 1;
+				panelChordEntry.add(lblAlias, gbc_lblAlias);
 			}
 			{
-				textChordAliases = new JTextField();
-				GridBagConstraints gbc_textChordAliases = new GridBagConstraints();
-				gbc_textChordAliases.gridwidth = 2;
-				gbc_textChordAliases.insets = new Insets(0, 0, 5, 0);
-				gbc_textChordAliases.fill = GridBagConstraints.HORIZONTAL;
-				gbc_textChordAliases.gridx = 1;
-				gbc_textChordAliases.gridy = 1;
-				panelChordEntry.add(textChordAliases, gbc_textChordAliases);
-				textChordAliases.setColumns(10);
+				mTextAliases = new JTextField();
+				GridBagConstraints gbc_mTextAliases = new GridBagConstraints();
+				gbc_mTextAliases.gridwidth = 2;
+				gbc_mTextAliases.insets = new Insets(0, 0, 5, 5);
+				gbc_mTextAliases.fill = GridBagConstraints.HORIZONTAL;
+				gbc_mTextAliases.gridx = 1;
+				gbc_mTextAliases.gridy = 1;
+				panelChordEntry.add(mTextAliases, gbc_mTextAliases);
+				mTextAliases.setColumns(10);
 			}
 			{
-				JButton btnAddChord = new JButton("New");
-				GridBagConstraints gbc_btnAddChord = new GridBagConstraints();
-				gbc_btnAddChord.insets = new Insets(0, 0, 0, 5);
-				gbc_btnAddChord.gridx = 0;
-				gbc_btnAddChord.gridy = 3;
-				panelChordEntry.add(btnAddChord, gbc_btnAddChord);
+				JLabel lblInterval = new JLabel("Intervals");
+				GridBagConstraints gbc_lblInterval = new GridBagConstraints();
+				gbc_lblInterval.anchor = GridBagConstraints.EAST;
+				gbc_lblInterval.insets = new Insets(0, 0, 5, 5);
+				gbc_lblInterval.gridx = 0;
+				gbc_lblInterval.gridy = 2;
+				panelChordEntry.add(lblInterval, gbc_lblInterval);
 			}
 			{
-				JButton btnChordSave = new JButton("Save");
-				GridBagConstraints gbc_btnChordSave = new GridBagConstraints();
-				gbc_btnChordSave.insets = new Insets(0, 0, 0, 5);
-				gbc_btnChordSave.gridx = 1;
-				gbc_btnChordSave.gridy = 3;
-				panelChordEntry.add(btnChordSave, gbc_btnChordSave);
+				mTextIntervals = new JTextField();
+				GridBagConstraints gbc_mTextIntervals = new GridBagConstraints();
+				gbc_mTextIntervals.gridwidth = 2;
+				gbc_mTextIntervals.insets = new Insets(0, 0, 5, 5);
+				gbc_mTextIntervals.fill = GridBagConstraints.HORIZONTAL;
+				gbc_mTextIntervals.gridx = 1;
+				gbc_mTextIntervals.gridy = 2;
+				panelChordEntry.add(mTextIntervals, gbc_mTextIntervals);
+				mTextIntervals.setColumns(10);
 			}
 			{
-				JButton btnChordDelete = new JButton("Delete");
-				GridBagConstraints gbc_btnChordDelete = new GridBagConstraints();
-				gbc_btnChordDelete.insets = new Insets(0, 0, 0, 5);
-				gbc_btnChordDelete.gridx = 2;
-				gbc_btnChordDelete.gridy = 3;
-				panelChordEntry.add(btnChordDelete, gbc_btnChordDelete);
+				JButton btnNew = new JButton("New");
+				GridBagConstraints gbc_btnNew = new GridBagConstraints();
+				gbc_btnNew.insets = new Insets(0, 0, 0, 5);
+				gbc_btnNew.gridx = 0;
+				gbc_btnNew.gridy = 3;
+				panelChordEntry.add(btnNew, gbc_btnNew);
+			}
+			{
+				JButton btnSave = new JButton("Save");
+				GridBagConstraints gbc_btnSave = new GridBagConstraints();
+				gbc_btnSave.insets = new Insets(0, 0, 0, 5);
+				gbc_btnSave.gridx = 1;
+				gbc_btnSave.gridy = 3;
+				panelChordEntry.add(btnSave, gbc_btnSave);
+			}
+			{
+				JButton btnDelete = new JButton("Delete");
+				GridBagConstraints gbc_btnDelete = new GridBagConstraints();
+				gbc_btnDelete.insets = new Insets(0, 0, 0, 5);
+				gbc_btnDelete.gridx = 2;
+				gbc_btnDelete.gridy = 3;
+				panelChordEntry.add(btnDelete, gbc_btnDelete);
 			}
 		}
 		{
@@ -147,15 +168,15 @@ public class ChordDialog extends JDialog {
 			buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
 			getContentPane().add(buttonPane, BorderLayout.SOUTH);
 			{
-				JButton okButton = new JButton("OK");
-				okButton.setActionCommand("OK");
-				buttonPane.add(okButton);
-				getRootPane().setDefaultButton(okButton);
+				JButton btnOk = new JButton("OK");
+				btnOk.setActionCommand("OK");
+				buttonPane.add(btnOk);
+				getRootPane().setDefaultButton(btnOk);
 			}
 			{
-				JButton cancelButton = new JButton("Cancel");
-				cancelButton.setActionCommand("Cancel");
-				buttonPane.add(cancelButton);
+				JButton btnCancel = new JButton("Cancel");
+				btnCancel.setActionCommand("Cancel");
+				buttonPane.add(btnCancel);
 			}
 		}
 		setVisible(true);

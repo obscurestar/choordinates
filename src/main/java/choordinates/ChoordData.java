@@ -9,7 +9,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 public class ChoordData {
 	//TODO:  Probably a better filepath.
 	private static final String filename ="choordinates.json";
-	private ArrayList<Chord> mTunings = new ArrayList<>();
+	private ArrayList<AbstractChord> mTunings = new ArrayList<>();
 	private int mCurrentTuning;
 
 	public ChoordData()
@@ -52,7 +52,7 @@ public class ChoordData {
 		return mCurrentTuning;
 	}
 	
-	public Chord getTuning(int id)
+	public AbstractChord getTuning(int id)
 	{
 		if (!validID(id))
 		{
@@ -61,7 +61,7 @@ public class ChoordData {
 		return mTunings.get(id);
 	}
 	
-	public int addTuning(Chord tuning)
+	public int addTuning(AbstractChord tuning)
 	{
 		mTunings.add(tuning);
 		return mTunings.size() -1;
@@ -76,7 +76,7 @@ public class ChoordData {
 		}
 	}
 	
-	public void updateTuning(int id, Chord tuning)
+	public void updateTuning(int id, AbstractChord tuning)
 	{
 		if (validID(id))
 		{

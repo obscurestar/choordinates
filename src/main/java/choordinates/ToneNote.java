@@ -1,48 +1,13 @@
 package choordinates;
 
-public class Note {
-	private int mID = -1;   //A number from 0-6 representing A B C D E F G
-	private int mSharp = 0; //A positive or negative number representing how many semitones to move the named note.
-	private int mOctave = 0; //A positive or negative number representing distance from middle octave.
-	public final int[] mNoteMap = { 0, 2, 3, 5, 7, 8, 10 };  //ABCDEFG  0 is A-flat.
-	
-	public Note() {};
+/*
+ * ToneNote extends the abstract note class to support notes
+ * in the standard western scale. EG a note named A-G
+ * with one or more flat or sharp modifiers.
+ */
+public class ToneNote extends AbstractNote{
+	private final int[] mToneMap = { 0, 2, 3, 5, 7, 8, 10 };  //ABCDEFG  0 is A-flat.
 
-	public void setID(int id)
-	{
-		if (id < 0 || id > 6)
-		{
-			throw new IllegalArgumentException("Note ID valid range 0-11");
-		}
-		mID = id;
-	}
-	
-	//Setters and getters for Jackson JSON interface.
-	public void setSharp(int sharpness)
-	{
-		mSharp = sharpness;
-	}
-	
-	public void setOctave(int octave)
-	{
-		mOctave = octave;
-	}
-	
-	public int  getID()
-	{
-		return mID;
-	}
-	
-	public int getSharp()
-	{
-		return mSharp;
-	}
-	
-	public int getOctave()
-	{
-		return mOctave;
-	}
-	
 	public String getName()
 	{
 		/*
@@ -70,11 +35,10 @@ public class Note {
 
 		return name;
 	}
-	
 	public int getAbsoluteSemitone()
 	{
 		//Semitones from nearest A.
-		return mNoteMap[mID] + mSharp;
+		return mToneMap[mID] + mSharp;
 	}
 	
 	public int getSemitone()
@@ -137,7 +101,7 @@ public class Note {
 		return true;
 	}
 
-	public boolean isNote(Note note)
+	public boolean isNote(AbstractNote note)
 	{
 		//Returns true only when passed note is exact match.
 		if (mID == note.getID()
