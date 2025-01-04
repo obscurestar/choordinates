@@ -6,10 +6,9 @@ package choordinates;
 public abstract class AbstractNote {
 	protected int mID = -1;   //A number from 0-6 representing A B C D E F G
 	protected int mSharp = 0; //A positive or negative number representing how many semitones to move the named note.
-	protected int mOctave = 0; //A positive or negative number representing distance from middle octave.
 	
 	public abstract String getName();
-	public abstract int getAbsoluteSemitone();
+	public abstract int getOctaveSemitone();
 	public abstract int getSemitone();
 	public abstract boolean parse(String note);
 	public abstract boolean isNote(AbstractNote note);
@@ -31,11 +30,6 @@ public abstract class AbstractNote {
 		mSharp = sharpness;
 	}
 	
-	public void setOctave(int octave)
-	{
-		mOctave = octave;
-	}
-	
 	public int  getID()
 	{
 		return mID;
@@ -46,9 +40,5 @@ public abstract class AbstractNote {
 		return mSharp;
 	}
 	
-	public int getOctave()
-	{
-		return mOctave;
-	}
 	
 }

@@ -62,6 +62,12 @@ public class IntervalChord extends AbstractChord
 		return mAliases;
 	}
 
+	public String getAliasesString()
+	{
+		return String.join(" ", mAliases);
+	}
+	
+
 	public ArrayList<String> getAllChordNames() {
 		// Return all names for this chord (preferred first)
 		ArrayList<String> notes = getAliases();

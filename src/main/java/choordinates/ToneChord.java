@@ -2,9 +2,9 @@ package choordinates;
 
 //Note chords extend the abstract Chord class to represent notes on an A-Gb scale
 
-public class NoteChord extends AbstractChord {
+public class ToneChord extends AbstractChord {
 
-	public static NoteChord parse(String tuning)
+	public static ToneChord parse(String tuning)
 	{
 		/*Because I'm lazy and don't want to make a super complex UI,
 		 * the user suffers for having to use a string to describe the 
@@ -38,7 +38,7 @@ public class NoteChord extends AbstractChord {
 		int end;
 		boolean whitespace = true;
 		
-		NoteChord chord = new NoteChord();
+		ToneChord chord = new ToneChord();
 		
 		//TODO: Sloppy lazy parser.  Could probably be more efficient and less ugly.
 		tuning += " ";  //This is just shameful.

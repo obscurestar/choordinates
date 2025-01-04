@@ -140,7 +140,6 @@ public class TuningDialog extends JDialog {
             }
 		});
 		contentPane.add(btnCancel);
-		System.out.println("Here");
 		refresh();
 		setVisible(true);
 	}
@@ -248,11 +247,11 @@ public class TuningDialog extends JDialog {
     		return false;
     	}
     	
-       NoteChord chord;
+       ToneChord chord;
         
         try
         {
-        	chord = NoteChord.parse(string_names);
+        	chord = ToneChord.parse(string_names);
         }
         catch (IllegalArgumentException exception)
         {

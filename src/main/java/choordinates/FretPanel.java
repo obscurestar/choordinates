@@ -140,7 +140,6 @@ public class FretPanel extends JPanel implements MouseListener, MouseMotionListe
         	int y = mouse_y / cell_size;
         	g.setColor(Color.CYAN);
         	g.fillRect((x+1) * cell_size + cell_half,  (y+1) * cell_size, cell_size, cell_size);
-        	System.out.println("Cell " + x + ", " + y);
         }
         g.setColor(Color.BLACK);
       

@@ -7,6 +7,7 @@ package choordinates;
  */
 public class ToneNote extends AbstractNote{
 	private final int[] mToneMap = { 0, 2, 3, 5, 7, 8, 10 };  //ABCDEFG  0 is A-flat.
+	private int mOctave = 0; //A positive or negative number representing distance from middle octave.
 
 	public String getName()
 	{
@@ -35,7 +36,18 @@ public class ToneNote extends AbstractNote{
 
 		return name;
 	}
-	public int getAbsoluteSemitone()
+	
+	public void setOctave(int octave)
+	{
+		mOctave = octave;
+	}
+	
+	public int getOctave()
+	{
+		return mOctave;
+	}
+
+	public int getOctaveSemitone()
 	{
 		//Semitones from nearest A.
 		return mToneMap[mID] + mSharp;
@@ -44,7 +56,7 @@ public class ToneNote extends AbstractNote{
 	public int getSemitone()
 	{
 		//Semitones from middle A.
-		return mOctave * 12 + getAbsoluteSemitone();
+		return mOctave * 12 + getOctaveSemitone();
 	}
 	
 	public boolean parse(String note)
@@ -83,11 +95,11 @@ public class ToneNote extends AbstractNote{
 		
 		for (int i=1;i<note.length();++i)
 		{
-			if (flats.indexOf( note.charAt(1)) != -1)
+			if (flats.indexOf( note.charAt(i)) != -1)
 			{
 				mSharp--;
 			}
-			else if (sharps.indexOf( note.charAt(1)) != -1)
+			else if (sharps.indexOf( note.charAt(i)) != -1)
 			{
 	
 				mSharp++;
@@ -101,8 +113,19 @@ public class ToneNote extends AbstractNote{
 		return true;
 	}
 
-	public boolean isNote(AbstractNote note)
+	@Override
+	public boolean isNote(AbstractNote abs_note)
 	{
+		//Notes must be of same subclass to be identical.
+		ToneNote note;
+		if (abs_note instanceof ToneNote) {
+            note = (ToneNote) abs_note;
+		}
+		else
+		{
+			return false;
+		}
+            
 		//Returns true only when passed note is exact match.
 		if (mID == note.getID()
 				&& mSharp == note.getSharp()
