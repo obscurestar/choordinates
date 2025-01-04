@@ -46,7 +46,7 @@ public class ChordDialog extends JDialog {
 	
 	public ChordDialog() {
 		setTitle("Chord Dictionary");
-		setBounds(100, 100, 490, 258);
+		setBounds(150, 150, 490, 258);
 		getContentPane().setLayout(new BorderLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		getContentPane().add(contentPanel, BorderLayout.CENTER);
@@ -71,6 +71,7 @@ public class ChordDialog extends JDialog {
 			}
 			{
 				mListChords = new JList<>();
+				mListChords.setToolTipText("Select a chord to view its details and edit it. ");
 				GridBagConstraints gbc_mListChords = new GridBagConstraints();
 				gbc_mListChords.gridheight = 4;
 				gbc_mListChords.gridwidth = 2;
@@ -123,6 +124,7 @@ public class ChordDialog extends JDialog {
 			}
 			{
 				mTextAliases = new JTextField();
+				mTextAliases.setToolTipText("Alternate names for this chord.");
 				GridBagConstraints gbc_mTextAliases = new GridBagConstraints();
 				gbc_mTextAliases.insets = new Insets(0, 0, 5, 5);
 				gbc_mTextAliases.gridx = 3;
@@ -140,6 +142,7 @@ public class ChordDialog extends JDialog {
 			}
 			{
 				mTextIntervals = new JTextField();
+				mTextIntervals.setToolTipText("A string of intervals.  EG: 1 3 5 is a Major chord, 1 3b 5 is a minor chord.   Inversions may be specified as negative intervals.  .");
 				GridBagConstraints gbc_mTextIntervals = new GridBagConstraints();
 				gbc_mTextIntervals.insets = new Insets(0, 0, 5, 5);
 				gbc_mTextIntervals.gridx = 3;
@@ -150,6 +153,7 @@ public class ChordDialog extends JDialog {
 					
 					
 						JButton btnDelete = new JButton("Delete");
+						btnDelete.setToolTipText("Delete the currently selected chord.");
 						GridBagConstraints gbc_btnDelete = new GridBagConstraints();
 						gbc_btnDelete.insets = new Insets(0, 0, 0, 5);
 						gbc_btnDelete.gridx = 0;
@@ -180,6 +184,7 @@ public class ChordDialog extends JDialog {
 					
 					
 					JButton btnNew = new JButton("New");
+					btnNew.setToolTipText("Create a new chord from the d fields on the right.");
 					GridBagConstraints gbc_btnNew = new GridBagConstraints();
 					gbc_btnNew.insets = new Insets(0, 0, 0, 5);
 					gbc_btnNew.gridx = 1;
@@ -200,6 +205,7 @@ public class ChordDialog extends JDialog {
 				
 				
 					JButton btnSave = new JButton("Save");
+					btnSave.setToolTipText("Replace the current chord.  If no chdefined, acts like new.");
 					GridBagConstraints gbc_btnSave = new GridBagConstraints();
 					gbc_btnSave.insets = new Insets(0, 0, 0, 5);
 					gbc_btnSave.gridx = 2;
@@ -207,14 +213,15 @@ public class ChordDialog extends JDialog {
 					panelChordDict.add(btnSave, gbc_btnSave);
 							
 							
-								JButton btnCancel = new JButton("Cancel");
-								GridBagConstraints gbc_btnCancel = new GridBagConstraints();
-								gbc_btnCancel.insets = new Insets(0, 0, 0, 5);
-								gbc_btnCancel.gridx = 3;
-								gbc_btnCancel.gridy = 5;
-								panelChordDict.add(btnCancel, gbc_btnCancel);
-								btnCancel.setActionCommand("Cancel");
-						btnCancel.addActionListener(new ActionListener()
+								JButton btnClose = new JButton("Close");
+								btnClose.setToolTipText("Close the window.");
+								GridBagConstraints gbc_btnClose = new GridBagConstraints();
+								gbc_btnClose.insets = new Insets(0, 0, 0, 5);
+								gbc_btnClose.gridx = 3;
+								gbc_btnClose.gridy = 5;
+								panelChordDict.add(btnClose, gbc_btnClose);
+								btnClose.setActionCommand("Cancel");
+						btnClose.addActionListener(new ActionListener()
 						{
 							public void actionPerformed(ActionEvent e) {
 		                closeWindow();
@@ -251,7 +258,9 @@ public class ChordDialog extends JDialog {
     	
     	if (id == -1)
     	{
-    		if (name != "" || intervals != "" || aliases != "")
+    		if (name.compareTo("") != 0
+    				|| intervals.compareTo("") != 0
+    				|| aliases .compareTo("") != 0)
     		{
     			do_dialog = true;
     		}

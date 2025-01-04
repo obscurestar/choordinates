@@ -60,7 +60,7 @@ public class ToneChord extends AbstractChord {
 					}
 					else
 					{
-						throw new IllegalArgumentException("'" + string_name + "' is not a valid string name.");
+						throw new IllegalArgumentException("'" + string_name + "' is not a valid note name. Must be A-G followed by flats or sharps");
 
 					}
 				}

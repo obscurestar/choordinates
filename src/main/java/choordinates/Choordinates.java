@@ -27,6 +27,14 @@ import java.awt.FlowLayout;
 import java.awt.BorderLayout;
 
 import choordinates.FretPanel;
+import javax.swing.JList;
+import javax.swing.JButton;
+import com.jgoodies.forms.layout.FormLayout;
+import com.jgoodies.forms.layout.ColumnSpec;
+import com.jgoodies.forms.layout.FormSpecs;
+import com.jgoodies.forms.layout.RowSpec;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 
 public class Choordinates extends JFrame {
 
@@ -36,6 +44,7 @@ public class Choordinates extends JFrame {
 	private JTextField textSelectRoot;
 	private JTextField textSelectNotes;
 	private JTextField textField;
+	private JButton mBtnSearchNotes;
 
 	/**
 	 * Launch the application.
@@ -62,7 +71,7 @@ public class Choordinates extends JFrame {
 	 */
 	public Choordinates() {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 584, 454);
+		setBounds(100, 100, 473, 454);
 		
 		Data test = new Data();
 		test.write();
@@ -128,9 +137,9 @@ public class Choordinates extends JFrame {
 		tabbedSelectBy.addTab("Chord", null, panelSelectChordTab, null);
 		GridBagLayout gbl_panelSelectChordTab = new GridBagLayout();
 		gbl_panelSelectChordTab.columnWidths = new int[]{0,	0, 0};
-		gbl_panelSelectChordTab.rowHeights = new int[]{0, 0, 0};
-		gbl_panelSelectChordTab.columnWeights = new double[]{0.0, 0.0, Double.MIN_VALUE};
-		gbl_panelSelectChordTab.rowWeights = new double[]{0.0, 0.0, Double.MIN_VALUE};
+		gbl_panelSelectChordTab.rowHeights = new int[]{0, 0, 0, 0, 0};
+		gbl_panelSelectChordTab.columnWeights = new double[]{1.0, 0.0, Double.MIN_VALUE};
+		gbl_panelSelectChordTab.rowWeights = new double[]{0.0, 0.0, 0.0, 1.0, Double.MIN_VALUE};
 		panelSelectChordTab.setLayout(gbl_panelSelectChordTab);
 		
 		JLabel lblSelectRoot = new JLabel("Root Note");
@@ -153,29 +162,65 @@ public class Choordinates extends JFrame {
 		JLabel lblSelectChord = new JLabel("Chord");
 		GridBagConstraints gbc_lblSelectChord = new GridBagConstraints();
 		gbc_lblSelectChord.fill = GridBagConstraints.BOTH;
-		gbc_lblSelectChord.insets = new Insets(0, 0, 0, 5);
+		gbc_lblSelectChord.insets = new Insets(0, 0, 5, 5);
 		gbc_lblSelectChord.gridx = 0;
 		gbc_lblSelectChord.gridy = 1;
 		panelSelectChordTab.add(lblSelectChord, gbc_lblSelectChord);
 		
 		textSelectRoot = new JTextField();
 		GridBagConstraints gbc_textSelectRoot = new GridBagConstraints();
+		gbc_textSelectRoot.insets = new Insets(0, 0, 5, 0);
 		gbc_textSelectRoot.fill = GridBagConstraints.BOTH;
 		gbc_textSelectRoot.gridx = 1;
 		gbc_textSelectRoot.gridy = 1;
 		panelSelectChordTab.add(textSelectRoot, gbc_textSelectRoot);
 		textSelectRoot.setColumns(10);
 		
+		JButton btnSearchChord = new JButton("Search");
+		GridBagConstraints gbc_btnSearchChord = new GridBagConstraints();
+		gbc_btnSearchChord.gridwidth = 2;
+		gbc_btnSearchChord.insets = new Insets(0, 0, 5, 5);
+		gbc_btnSearchChord.gridx = 0;
+		gbc_btnSearchChord.gridy = 2;
+		panelSelectChordTab.add(btnSearchChord, gbc_btnSearchChord);
+		
+		JList listChordSelect = new JList();
+		GridBagConstraints gbc_listChordSelect = new GridBagConstraints();
+		gbc_listChordSelect.gridwidth = 2;
+		gbc_listChordSelect.fill = GridBagConstraints.BOTH;
+		gbc_listChordSelect.gridx = 0;
+		gbc_listChordSelect.gridy = 3;
+		panelSelectChordTab.add(listChordSelect, gbc_listChordSelect);
+		
 		//SELECT BY NOTES tab
 		JPanel panelSelectNotes = new JPanel();
 		tabbedSelectBy.addTab("Notes", null, panelSelectNotes, null);
+		panelSelectNotes.setLayout(new FormLayout(new ColumnSpec[] {
+				FormSpecs.RELATED_GAP_COLSPEC,
+				ColumnSpec.decode("37px"),
+				FormSpecs.RELATED_GAP_COLSPEC,
+				ColumnSpec.decode("202px"),},
+			new RowSpec[] {
+				FormSpecs.RELATED_GAP_ROWSPEC,
+				RowSpec.decode("29px"),
+				FormSpecs.RELATED_GAP_ROWSPEC,
+				FormSpecs.DEFAULT_ROWSPEC,
+				FormSpecs.RELATED_GAP_ROWSPEC,
+				FormSpecs.DEFAULT_ROWSPEC,}));
 		
 		JLabel lblSelectNotes = new JLabel("Notes");
-		panelSelectNotes.add(lblSelectNotes);
+		panelSelectNotes.add(lblSelectNotes, "2, 2, left, center");
 		
 		textSelectNotes = new JTextField();
-		panelSelectNotes.add(textSelectNotes);
+		panelSelectNotes.add(textSelectNotes, "4, 2, left, center");
 		textSelectNotes.setColumns(16);
+		
+		mBtnSearchNotes = new JButton("Search");
+		mBtnSearchNotes.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+			}
+		});
+		panelSelectNotes.add(mBtnSearchNotes, "4, 6, left, top");
 		
 		//SELECT BY FRETS tab
 		int num_strings = 6;
@@ -186,103 +231,74 @@ public class Choordinates extends JFrame {
 		
 		Dimension win_dimensions = new Dimension( 32*cols, 23*rows );
 		
-		JPanel panelSelectFret = new JPanel() {
-			 @Override
-	            protected void paintComponent(Graphics g) {
-	                super.paintComponent(g);
-	                
-	                int width = getWidth();
-	                int height = getHeight();
-	                
-	                //Dimension cell_dimensions = new Dimension ( width/(cols+1), height/(rows+1) );
-	                Dimension cell_dimensions = new Dimension(20, 20);
-	                // Draw horizontal lines
-	                for (int i = 1; i < rows; i++) {
-	                    int y = i * cell_dimensions.height;
-	                    g.drawLine(cell_dimensions.width, y, width - cell_dimensions.width/2, y);
-	                }
-
-	                // Draw vertical lines
-	                for (int i = 0; i < cols; i++) {
-	                    int x = i * cell_dimensions.width;
-	                    g.drawLine(x, cell_dimensions.height, x, height - cell_dimensions.height/2);
-	                }
-	            }
-	        };
+		JPanel panelSelectFret = new JPanel();
 			
 		panelSelectFret.setMinimumSize(win_dimensions);
 		tabbedSelectBy.addTab("Frets", null, panelSelectFret, null);
 		GridBagLayout gbl_panelSelectFret = new GridBagLayout();
-		
-		gbl_panelSelectFret.columnWidths = new int[cols + 1];
-		gbl_panelSelectFret.rowHeights = new int[rows];
-		gbl_panelSelectFret.columnWeights = new double[cols+1];
-		gbl_panelSelectFret.columnWeights[cols] = Double.MIN_VALUE;
-		gbl_panelSelectFret.rowWeights = new double[rows+1];
-		gbl_panelSelectFret.rowWeights[rows] = Double.MIN_VALUE;
+		gbl_panelSelectFret.columnWidths = new int[]{75, 75, 46, 0};
+		gbl_panelSelectFret.rowHeights = new int[]{26, 0, 0};
+		gbl_panelSelectFret.columnWeights = new double[]{0.0, 0.0, 1.0, Double.MIN_VALUE};
+		gbl_panelSelectFret.rowWeights = new double[]{0.0, 1.0, Double.MIN_VALUE};
 		panelSelectFret.setLayout(gbl_panelSelectFret);
 		
 		JLabel lblFirstFret = new JLabel("First Fret");
 		GridBagConstraints gbc_lblFirstFret = new GridBagConstraints();
-		gbc_lblFirstFret.gridwidth = 2;
+		gbc_lblFirstFret.anchor = GridBagConstraints.WEST;
 		gbc_lblFirstFret.insets = new Insets(0, 0, 5, 5);
-		gbc_lblFirstFret.anchor = GridBagConstraints.EAST;
-		gbc_lblFirstFret.gridx = 1;
+		gbc_lblFirstFret.gridx = 0;
 		gbc_lblFirstFret.gridy = 0;
 		panelSelectFret.add(lblFirstFret, gbc_lblFirstFret);
 		
 		textField = new JTextField();
 		GridBagConstraints gbc_textField = new GridBagConstraints();
-		gbc_textField.gridwidth = 3;
 		gbc_textField.insets = new Insets(0, 0, 5, 5);
-		gbc_textField.fill = GridBagConstraints.HORIZONTAL;
-		gbc_textField.gridx = 3;
+		gbc_textField.anchor = GridBagConstraints.NORTHWEST;
+		gbc_textField.gridx = 1;
 		gbc_textField.gridy = 0;
 		panelSelectFret.add(textField, gbc_textField);
 		textField.setColumns(3);
 		
-		JLabel lblFret = new JLabel("-");
-		lblFret.setHorizontalAlignment(SwingConstants.RIGHT);
-		GridBagConstraints gbc_lblFret = new GridBagConstraints();
-		gbc_lblFret.insets = new Insets(0, 0, 5, 5);
-		gbc_lblFret.gridx = 0;
-		gbc_lblFret.gridy = 1;
-		panelSelectFret.add(lblFret, gbc_lblFret);
+		JButton btnSearchFret = new JButton("Search");
+		GridBagConstraints gbc_btnSearchFret = new GridBagConstraints();
+		gbc_btnSearchFret.insets = new Insets(0, 0, 5, 0);
+		gbc_btnSearchFret.gridx = 2;
+		gbc_btnSearchFret.gridy = 0;
+		panelSelectFret.add(btnSearchFret, gbc_btnSearchFret);
 		
-		ButtonGroup[] groupByString = new ButtonGroup[num_strings];
-		int x,y=0;
-		for( x=1; x<=num_strings; x++)
-		{
-			groupByString[x-1] = new ButtonGroup();
-			for (y=1; y<=num_frets; y++)
-			{
-				JRadioButton rdbtn = new JRadioButton("");
-				GridBagConstraints gbc = new GridBagConstraints();
-				gbc.insets = new Insets(0, 0, 5, 5);
-				gbc.gridx = x;
-				gbc.gridy = y;
-				groupByString[x-1].add(rdbtn);
-				panelSelectFret.add(rdbtn, gbc);
-			}
-		}
+		FretPanel panelFrets = new FretPanel();
+		panelFrets.setOrientation(false);
+		panelFrets.configureFretboard(7, 6);
+		GridBagConstraints gbc_panelFrets = new GridBagConstraints();
+		gbc_panelFrets.gridwidth = 3;
+		gbc_panelFrets.fill = GridBagConstraints.BOTH;
+		gbc_panelFrets.gridx = 0;
+		gbc_panelFrets.gridy = 1;
+		panelSelectFret.add(panelFrets, gbc_panelFrets);
+		
 		
 		//FAVORITE SHAPES panel
-		JPanel panelFavShapes = new JPanel();
-		panelFavShapes.setLayout(null);
-		panelUpper.add(panelFavShapes);
+		JPanel panelRight = new JPanel();
+		panelUpper.add(panelRight);
+		panelRight.setLayout(null);
+		
+		JComboBox comboTuning = new JComboBox();
+		comboTuning.setBounds(0, 0, 195, 27);
+		comboTuning.setToolTipText("Select the Tuning");
+		panelRight.add(comboTuning);
 		
 		JLabel lblFavShapes = new JLabel("Favorite Shapes");
-		lblFavShapes.setBounds(10, 0, 90, 16);
-		panelFavShapes.add(lblFavShapes);
+		lblFavShapes.setHorizontalAlignment(SwingConstants.CENTER);
+		lblFavShapes.setBounds(10, 32, 185, 16);
+		panelRight.add(lblFavShapes);
 		
-		JScrollPane scrollFavShapes = new JScrollPane();
-		scrollFavShapes.setBounds(0, 16, 100, 4);
-		panelFavShapes.add(scrollFavShapes);
+		JPanel panel = new JPanel();
+		panel.setBounds(0, 53, 195, 204);
+		panelRight.add(panel);
 		
 		//LOWER PANEL FOR GUITAR NECK
 		FretPanel panelNeck = new FretPanel();
 		contentPane.add(panelNeck);
 
 	}
-
 }

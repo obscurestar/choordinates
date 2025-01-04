@@ -32,6 +32,18 @@ public class FretPanel extends JPanel implements MouseListener, MouseMotionListe
     	mOrientX = orientation;
     }
     
+    public void configureFretboard(int frets, int strings)
+    {
+    	if (frets > 0 && frets <= mMaxFrets)
+    	{
+    		mNumFrets = frets;
+    	}
+    	if (strings > 0 && strings <=mMaxStrings)
+    	{
+    		mNumStrings = strings;
+    	}
+    }
+    
     public FretPanel() {
         addMouseListener(this);
         addMouseMotionListener(this);
@@ -289,12 +301,4 @@ public class FretPanel extends JPanel implements MouseListener, MouseMotionListe
     public void mouseExited(MouseEvent e) {}
     @Override
     public void mouseMoved(MouseEvent e) {}
-
-    public static void main(String[] args) {
-        JFrame frame = new JFrame("Draw Line");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.add(new FretPanel());
-        frame.setSize(400, 400);
-        frame.setVisible(true);
-    }
 }

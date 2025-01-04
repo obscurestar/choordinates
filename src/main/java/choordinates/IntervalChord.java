@@ -110,7 +110,7 @@ public class IntervalChord extends AbstractChord
 					}
 					else
 					{
-						throw new IllegalArgumentException("'" + string_name + "' is not a valid string name.");
+						throw new IllegalArgumentException("'" + string_name + "' is not a valid interval.  Must be non-zero number followed by flats or sharps");
 
 					}
 				}

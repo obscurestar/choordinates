@@ -30,7 +30,7 @@ public class TuningDialog extends JDialog {
 
 	public TuningDialog() {
 		setTitle("Tunings");
-		setBounds(100, 100, 320, 211);
+		setBounds(180, 180, 320, 211);
 		//setUndecorated(true);
 		JPanel contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -43,6 +43,7 @@ public class TuningDialog extends JDialog {
 		contentPane.add(lblTunings);
 		
 		mComboTunings = new JComboBox<>();
+		mComboTunings.setToolTipText("Selected a tuning to see its settings and edit or delete it.");
 		mComboTunings.setBounds(6, 30, 308, 27);
 		// Add an ActionListener to handle item selection
         mComboTunings.addActionListener(e -> {
@@ -59,6 +60,7 @@ public class TuningDialog extends JDialog {
 		contentPane.add(lblTuningName);
 		
 		mTextTuning = new JTextField();
+		mTextTuning.setToolTipText("Name of this tuning.");
 		mTextTuning.setBounds(106, 89, 200, 26);
 		contentPane.add(mTextTuning);
 		mTextTuning.setColumns(10);
@@ -68,6 +70,7 @@ public class TuningDialog extends JDialog {
 		contentPane.add(lblStrings);
 		
 		mTextStrings = new JTextField();
+		mTextStrings.setToolTipText("A list of 1 or more notes in the form o of note  name,  followed by sharp or flat characters and delimited by space, comma or tab.  EX:  E A D G e  Note that the upper register is selected by using lowercase.  e is an octave about E.  This allows tunings like Uke gCEA to display chords effectively. ");
 		mTextStrings.setBounds(106, 117, 200, 26);
 		contentPane.add(mTextStrings);
 		mTextStrings.setColumns(10);
@@ -154,7 +157,8 @@ public class TuningDialog extends JDialog {
     	
     	if (id == -1)
     	{
-    		if (tuning_name != "" || string_names != "")
+    		System.out.println("ID is -1");
+    		if (tuning_name.compareTo("") != 0 || string_names.compareTo("") != 0)
     		{
     			do_dialog = true;
     		}
