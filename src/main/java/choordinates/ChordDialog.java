@@ -14,8 +14,11 @@ import javax.swing.JTextField;
 import javax.swing.JList;
 import javax.swing.ListSelectionModel;
 import javax.swing.DefaultListModel;
+import javax.swing.ImageIcon;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.ImageIcon;
+
 
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
@@ -289,11 +292,14 @@ public class ChordDialog extends JDialog {
 	
 	private boolean confirm(String title, String message)
 	{
+		ImageIcon icon = new ImageIcon("choordinates64.png");
         int result = JOptionPane.showConfirmDialog(null, 
                                                   message, 
                                                   title, 
-                                                  JOptionPane.OK_CANCEL_OPTION);
-
+                                                  JOptionPane.OK_CANCEL_OPTION,
+                                                  JOptionPane.QUESTION_MESSAGE,
+                                                  icon);
+        
         if (result == JOptionPane.OK_OPTION)
         {
            return true;

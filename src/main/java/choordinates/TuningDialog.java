@@ -9,6 +9,7 @@ import javax.swing.JTextField;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
+import javax.swing.ImageIcon;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
@@ -186,10 +187,13 @@ public class TuningDialog extends JDialog {
 	
 	private boolean confirm(String title, String message)
 	{
+		ImageIcon icon = new ImageIcon("choordinates64.png");
         int result = JOptionPane.showConfirmDialog(null, 
                                                   message, 
                                                   title, 
-                                                  JOptionPane.OK_CANCEL_OPTION);
+                                                  JOptionPane.OK_CANCEL_OPTION, 
+                                                  JOptionPane.QUESTION_MESSAGE,
+                                                  icon);
 
         if (result == JOptionPane.OK_OPTION)
         {
