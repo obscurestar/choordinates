@@ -1,5 +1,8 @@
 package choordinates;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 /*
  * ToneNote extends the abstract note class to support notes
  * in the standard western scale. EG a note named A-G
@@ -9,6 +12,7 @@ public class ToneNote extends AbstractNote{
 	private final int[] mToneMap = { 0, 2, 3, 5, 7, 8, 10 };  //ABCDEFG  0 is A-flat.
 	private int mOctave = 0; //A positive or negative number representing distance from middle octave.
 
+	@JsonIgnore
 	public String getName()
 	{
 		/*
@@ -37,22 +41,26 @@ public class ToneNote extends AbstractNote{
 		return name;
 	}
 	
+	@JsonIgnore
 	public void setOctave(int octave)
 	{
 		mOctave = octave;
 	}
 	
+	@JsonIgnore
 	public int getOctave()
 	{
 		return mOctave;
 	}
 
+	@JsonIgnore
 	public int getOctaveSemitone()
 	{
 		//Semitones from nearest A.
 		return mToneMap[mID] + mSharp;
 	}
 	
+	@JsonIgnore
 	public int getSemitone()
 	{
 		//Semitones from middle A.

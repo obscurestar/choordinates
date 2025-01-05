@@ -37,7 +37,7 @@ public class ChordDialog extends JDialog {
 	private JTextField mTextIntervals;
 
 	//Initialize and load from file.
-	private ChoordData mChoordData = ChoordData.read();
+	private ChoordData mChoordData;
 	
 	private boolean mRefreshing = false;
 
@@ -49,6 +49,7 @@ public class ChordDialog extends JDialog {
 	 */
 	
 	public ChordDialog() {
+		mChoordData = ChoordData.read();
 		setTitle("Chord Dictionary");
 		setBounds(150, 150, 490, 258);
 		getContentPane().setLayout(new BorderLayout());

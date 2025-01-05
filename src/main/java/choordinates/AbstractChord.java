@@ -8,12 +8,19 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import choordinates.AbstractNote;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
 
 /*
  * Chord contains the ChordNotes relative the root tone while remaining
  * agnostic to the root tone
  */
 
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
+@JsonSubTypes({
+        @JsonSubTypes.Type(value = ToneChord.class, name = "tone_chord"),
+        @JsonSubTypes.Type(value = IntervalChord.class, name = "interval_chord")
+})
 public abstract class AbstractChord
 {
 	@JsonProperty("notes")

@@ -23,13 +23,15 @@ public class TuningDialog extends JDialog {
 	private JComboBox<String> mComboTunings;
 	private boolean mRefreshing = false;
 	
-	private ChoordData mChoordData = new ChoordData();
+	private ChoordData mChoordData;
 	
 	/**
 	 * Create the frame.
 	 */
 
 	public TuningDialog() {
+		mChoordData = ChoordData.read();
+
 		setTitle("Tunings");
 		setBounds(180, 180, 320, 211);
 		//setUndecorated(true);
@@ -181,6 +183,7 @@ public class TuningDialog extends JDialog {
     	
     	if (!do_dialog)
     	{
+    		mChoordData.write();
     		this.dispose();
     	}
 	}

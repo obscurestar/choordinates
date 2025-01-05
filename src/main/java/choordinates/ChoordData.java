@@ -192,23 +192,17 @@ public class ChoordData {
 	public void write()
 	{
 		ObjectMapper objectMapper = new ObjectMapper();
-		
-		String jsonString="";
+				
 		try
 		{
-            jsonString = objectMapper.writeValueAsString(this);
-		}
+            
+            objectMapper.writeValue(new File(mJsonFile), this);
+        }
 		catch (JsonProcessingException e)
 		{
 			e.printStackTrace();
 			return;
 		}
-		
-		try
-		{
-            
-            objectMapper.writeValue(new File(mJsonFile), jsonString);
-        }
         catch (IOException e)
         {
             e.printStackTrace();
@@ -217,7 +211,12 @@ public class ChoordData {
 	
 	//Tasty static initializer
 	public static ChoordData read()
-	{        
+	{     
+		//Read data into a ChoordData object
+		//If the JSON fails to load for some reason,
+		//will return the default empty container.
+		ChoordData result = new ChoordData();
+		
 		try
 	    {
 	        // Create an ObjectMapper instance
@@ -229,7 +228,7 @@ public class ChoordData {
 	        if (jsonFile.exists()) 
             {	        
 	        	// Read the JSON file and map it to a Java object
-	        	return objectMapper.readValue(jsonFile, ChoordData.class);
+	        	result =  objectMapper.readValue(jsonFile, ChoordData.class);
             }
 	    }
 	    catch (IOException e)
@@ -237,8 +236,7 @@ public class ChoordData {
 	        e.printStackTrace();
 	    }   
 		
-		//If we couldn't load the data, return the default.
-		return new ChoordData();
+		return result;
 	}
 	
 }

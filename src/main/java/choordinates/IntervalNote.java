@@ -1,8 +1,12 @@
 package choordinates;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 public class IntervalNote extends AbstractNote{
 	private final int[] mIntervalMap = { 0, 2, 4, 5, 7, 9, 11 };
 	
+	@JsonIgnore
 	public String getName()
 	{
 		String name = String.valueOf(mID);
@@ -22,6 +26,7 @@ public class IntervalNote extends AbstractNote{
 		return name;
 	}
 	
+	@JsonIgnore
 	public int getOctaveSemitone()
 	{
 		//Lousy ancient Greeks and their lousy
@@ -36,6 +41,7 @@ public class IntervalNote extends AbstractNote{
 		return mIntervalMap[ (7 - (mID+1)) % 7];
 	}
 	
+	@JsonIgnore
 	public int getSemitone()
 	{
 		//TODO verify negative interval logic.
