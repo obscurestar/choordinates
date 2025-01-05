@@ -13,9 +13,14 @@ import javax.swing.ImageIcon;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
+
 import java.util.ArrayList;
 
-public class TuningDialog extends JDialog {
+public class TuningDialog extends JDialog
+{
 
 	private static final long serialVersionUID = 1L;
 	private JTextField mTextTuning;
@@ -32,9 +37,16 @@ public class TuningDialog extends JDialog {
 	public TuningDialog() {
 		mChoordData = ChoordData.read();
 
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+            	closeWindow( false );
+            }
+        });
+		//setUndecorated(true);
+
 		setTitle("Tunings");
 		setBounds(180, 180, 320, 211);
-		//setUndecorated(true);
 		JPanel contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 
@@ -142,7 +154,7 @@ public class TuningDialog extends JDialog {
 		btnClose.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e) {
-                closeWindow();
+                closeWindow( true );
             }
 		});
 		contentPane.add(btnClose);
@@ -150,20 +162,19 @@ public class TuningDialog extends JDialog {
 		setVisible(true);
 	}
 	
-	private void closeWindow()
+	private boolean changed(int id)
 	{
+		//check for unsaved changes.
+		boolean result = false;
     	String tuning_name = mTextTuning.getText();
     	String string_names = mTextStrings.getText();
-    	int id = mChoordData.getCurrentTuning();
-    	
-    	boolean do_dialog = false;
-    	
+    	    	
     	if (id == -1)
     	{
     		System.out.println("ID is -1");
     		if (tuning_name.compareTo("") != 0 || string_names.compareTo("") != 0)
     		{
-    			do_dialog = true;
+    			result = true;
     		}
     	}
     	else
@@ -171,17 +182,34 @@ public class TuningDialog extends JDialog {
     		if (tuning_name.compareTo( mChoordData.getTuning(id).getName() ) != 0 
     				|| string_names.compareTo(makeStringsText(id)) != 0)
     		{
-    			do_dialog = true;
+    			result = true;
     		}
     	}
-    	
-    	if ( do_dialog )
+    	return result;
+	}
+	
+	private void closeWindow(boolean from_button)
+	{
+		//Handle window closing from button or window.
+    	int id = mChoordData.getCurrentTuning();
+    	boolean confirm_write = false;
+    	if ( changed(id) )
     	{
-    		//Ugly variable overloading!
-    		do_dialog = !confirm("Unsaved Changes", "Confirm Close");
+    		if (from_button)
+    		{
+    			confirm_write = confirm("Unsaved Changes", "Confirm Close");
+    		}
+    		else
+    		{
+    			confirm_write = confirm("Window closing", "Save changes?");
+    		}
+    	}
+    	else if (from_button)
+    	{
+    		this.dispose();
     	}
     	
-    	if (!do_dialog)
+    	if (confirm_write)
     	{
     		mChoordData.write();
     		this.dispose();
@@ -283,7 +311,7 @@ public class TuningDialog extends JDialog {
     		if (tuning_name.compareTo( mChoordData.getTuning(tuning_id).getName() ) != 0 
     				|| string_names.compareTo(makeStringsText(tuning_id)) != 0)
     		{
-    			if(confirm("Confirm", "Update " + tuning_name + "?"))
+    			if(confirm("Confirm", "Update " +  mChoordData.getTuning(tuning_id).getName() + "?"))
     			{
     				mChoordData.updateTuning(tuning_id,  chord);
     			}

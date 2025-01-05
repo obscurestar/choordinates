@@ -18,17 +18,21 @@ import javax.swing.ImageIcon;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.ImageIcon;
-
+import javax.swing.SwingConstants;
 
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
-import javax.swing.SwingConstants;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 
-public class ChordDialog extends JDialog {
+import java.util.ArrayList;
+
+public class ChordDialog extends JDialog
+{
 
 	private static final long serialVersionUID = 1L;
 	private final JPanel contentPanel = new JPanel();
@@ -42,9 +46,6 @@ public class ChordDialog extends JDialog {
 	private ChoordData mChoordData;
 	
 	private boolean mRefreshing = false;
-
-	
-	
 	
 	/**
 	 * Create the dialog.
@@ -52,6 +53,15 @@ public class ChordDialog extends JDialog {
 	
 	public ChordDialog() {
 		mChoordData = ChoordData.read();
+		
+		addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                closeWindow( false );
+            }
+        });
+		//setUndecorated(true);
+
 		setTitle("Chord Dictionary");
 		setBounds(150, 150, 490, 258);
 		getContentPane().setLayout(new BorderLayout());
@@ -248,7 +258,7 @@ public class ChordDialog extends JDialog {
 						btnClose.addActionListener(new ActionListener()
 						{
 							public void actionPerformed(ActionEvent e) {
-		                closeWindow();
+		                closeWindow( true );
 		            }
 						});
 				btnSave.addActionListener(new ActionListener()
@@ -269,16 +279,14 @@ public class ChordDialog extends JDialog {
 		setVisible(true);
 	}
 
-	private void closeWindow()
+	private boolean changed(int id)
 	{
     	String name = mTextName.getText();
     	String aliases = mTextAliases.getText();
     	String symbol = mTextSymbol.getText();
     	String intervals = mTextIntervals.getText();
-
-    	int id = mChoordData.getCurrentChord();
     	
-    	boolean do_dialog = false;
+    	boolean result = false;
     	
     	if (id == -1)
     	{
@@ -287,7 +295,7 @@ public class ChordDialog extends JDialog {
     				|| symbol.compareTo("") != 0
     				|| aliases .compareTo("") != 0)
     		{
-    			do_dialog = true;
+    			result = true;
     		}
     	}
     	else
@@ -297,17 +305,34 @@ public class ChordDialog extends JDialog {
     				|| symbol.compareTo(mChoordData.getChord(id).getSymbol()) != 0
     				|| aliases.compareTo( mChoordData.getChord(id).getAliasesString()) != 0)
     		{
-    			do_dialog = true;
+    			result = true;
     		}
     	}
-    	
-    	if ( do_dialog )
+		return result;
+	}
+	
+	private void closeWindow(boolean from_button)
+	{
+		//Handle window closing from button or window.
+    	int id = mChoordData.getCurrentTuning();
+		boolean confirm_write = false;
+    	if ( changed(id) )
     	{
-    		//Ugly variable overloading!
-    		do_dialog = !confirm("Unsaved Changes", "Confirm Close");
+    		if (from_button)
+    		{
+    			confirm_write = confirm("Unsaved Changes", "Confirm Close");
+    		}
+    		else
+    		{
+    			confirm_write = confirm("Window closing", "Save changes?");
+    		}
+    	}
+    	else if (from_button)
+    	{
+    		this.dispose();
     	}
     	
-    	if (!do_dialog)
+    	if (confirm_write)
     	{
     		mChoordData.write();
     		this.dispose();
@@ -422,12 +447,9 @@ public class ChordDialog extends JDialog {
         }
         else
         {        	
-        	if (name.compareTo( mChoordData.getChord(chord_id).getName() ) != 0 
-    				|| intervals.compareTo(makeIntervalsText(chord_id)) != 0
-    				|| symbol.compareTo(mChoordData.getChord(chord_id).getSymbol()) != 0
-    				|| aliases.compareTo( mChoordData.getChord(chord_id).getAliasesString()) != 0)
+        	if (changed(chord_id))
     		{
-        		if (confirm("Confirm", "Update " + name + "?"))
+        		if (confirm("Confirm", "Update " + mChoordData.getChord(chord_id).getName() + "?"))
         		{
         			mChoordData.updateChord(chord_id,  chord);
         		}
