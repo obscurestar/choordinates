@@ -36,7 +36,8 @@ public class ChordDialog extends JDialog {
 	private JTextField mTextAliases;
 	private JTextField mTextIntervals;
 
-	private ChoordData mChoordData = new ChoordData();
+	//Initialize and load from file.
+	private ChoordData mChoordData = ChoordData.read();
 	
 	private boolean mRefreshing = false;
 
@@ -244,8 +245,7 @@ public class ChordDialog extends JDialog {
 		            }
 		        });
 		}
-		{
-		}
+		refresh();
 		setVisible(true);
 	}
 
@@ -286,6 +286,7 @@ public class ChordDialog extends JDialog {
     	
     	if (!do_dialog)
     	{
+    		mChoordData.write();
     		this.dispose();
     	}
 	}

@@ -73,10 +73,6 @@ public class Choordinates extends JFrame {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 473, 454);
 		
-		Data test = new Data();
-		test.write();
-		test.read();
-		
 		JMenuBar menuBar = new JMenuBar();
 		setJMenuBar(menuBar);
 		

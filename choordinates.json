@@ -1,1 +1,1 @@
-{"last_tuning":"EADGBE 6 String"}
+"{\"tunings\":[],\"current_tuning\":-1,\"chords\":[{\"notes\":[{\"id\":1,\"sharps\":0},{\"id\":3,\"sharps\":0},{\"id\":5,\"sharps\":0}],\"name\":\"asdf\",\"aliases\":[\"a\"]},{\"notes\":[{\"id\":1,\"sharps\":0},{\"id\":3,\"sharps\":-1},{\"id\":5,\"sharps\":0}],\"name\":\"bbb\",\"aliases\":[\"b\"]}],\"current_chord\":1}"

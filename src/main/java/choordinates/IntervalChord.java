@@ -2,6 +2,8 @@ package choordinates;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /*
  * IntervalChords are abstract chords defined by their relationship
@@ -18,6 +20,7 @@ import java.util.Iterator;
 
 public class IntervalChord extends AbstractChord
 {
+	@JsonProperty("aliases")
 	private ArrayList<String> mAliases = new ArrayList<String>(); // Aliases for the chord.
 
 	public void addAlias(String name) {
@@ -39,6 +42,7 @@ public class IntervalChord extends AbstractChord
 		}
 	}
 
+	@JsonIgnore
 	public void setAliasesFromString(String aliasString) {
 		// Flush whatever we had. Byeeee!
 		mAliases.clear();
@@ -57,17 +61,19 @@ public class IntervalChord extends AbstractChord
 		}
 	}
 
+	@JsonIgnore
 	public ArrayList<String> getAliases() {
 		// Return the list of aliases.
 		return mAliases;
 	}
 
+	@JsonIgnore
 	public String getAliasesString()
 	{
 		return String.join(" ", mAliases);
 	}
 	
-
+	@JsonIgnore
 	public ArrayList<String> getAllChordNames() {
 		// Return all names for this chord (preferred first)
 		ArrayList<String> notes = getAliases();

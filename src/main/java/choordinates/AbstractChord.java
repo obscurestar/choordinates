@@ -6,6 +6,8 @@ import java.util.Iterator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import choordinates.AbstractNote;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /*
  * Chord contains the ChordNotes relative the root tone while remaining
@@ -14,18 +16,22 @@ import choordinates.AbstractNote;
 
 public abstract class AbstractChord
 {
+	@JsonProperty("notes")
 	protected ArrayList<AbstractNote> mNotes = new ArrayList<AbstractNote>(); // List of notes comprising the chord.
+	@JsonProperty("name")
 	protected String mName; // Preferred name for chord
 
+	@JsonIgnore
 	public void setName(String name) {
 		mName = name;
 	}
 
+	@JsonIgnore
 	public String getName() {
 		return mName;
 	}
 
-
+	@JsonIgnore
 	public ArrayList<String> getAllNoteNames()
 	{
 		//Return names of all notes in the chord.
@@ -65,12 +71,12 @@ public abstract class AbstractChord
 		}
 	}
 
-	// @JsonProperty("notes");
+	@JsonIgnore
 	public ArrayList<AbstractNote> getNotes() {
 		return mNotes;
 	}
 
-	// @JsonProperty("notes");
+	@JsonIgnore
 	public void setNotes(AbstractNote[] notes) {
 		mNotes.clear();
 		for (AbstractNote note : notes) {
@@ -78,6 +84,7 @@ public abstract class AbstractChord
 		}
 	}
 
+	@JsonIgnore
 	public int getNumNotes() {
 		return mNotes.size();
 	}

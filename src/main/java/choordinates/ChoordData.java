@@ -5,13 +5,22 @@ import java.util.ArrayList;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import java.io.File;
+import java.io.IOException;
 
 public class ChoordData {
 	//TODO:  Probably a better filepath.
-	private static final String filename ="choordinates.json";
+	@JsonIgnore
+	private static final String mJsonFile ="choordinates.json";
+	@JsonProperty("tunings")
 	private ArrayList<ToneChord> mTunings = new ArrayList<>();
+	@JsonProperty("current_tuning")
 	private int mCurrentTuning;
+	@JsonProperty("chords")
 	private ArrayList<IntervalChord> mChords = new ArrayList<>();
+	@JsonProperty("current_chord")
 	private int mCurrentChord;
 
 	public ChoordData()
@@ -27,6 +36,7 @@ public class ChoordData {
 	 */
 	  
 	//Functions related to chords.
+	@JsonIgnore
 	public int getNumChords()
 	{
 		return mChords.size();
@@ -42,6 +52,7 @@ public class ChoordData {
 		return false;
 	}
 	
+	@JsonProperty("current_chord")
 	public void setCurrentChord(int id)
 	{
 		//Sets current chord to the passed ID.
@@ -63,6 +74,7 @@ public class ChoordData {
 		}
 	}
 	
+	@JsonIgnore
 	public int getCurrentChord()
 	{
 		return mCurrentChord;
@@ -101,6 +113,7 @@ public class ChoordData {
 	}
 
 	//Functions pertaining to tunings.
+	@JsonIgnore
 	public int getNumTunings()
 	{
 		return mTunings.size();
@@ -115,6 +128,7 @@ public class ChoordData {
 		return false;
 	}
 	
+	@JsonProperty("current_tuning")
 	public void setCurrentTuning(int id)
 	{
 		//Sets current tuning to the passed ID.
@@ -136,6 +150,7 @@ public class ChoordData {
 		}
 	}
 	
+	@JsonIgnore
 	public int getCurrentTuning()
 	{
 		return mCurrentTuning;
@@ -174,25 +189,56 @@ public class ChoordData {
 	}
 	
 	//Data serialization and deserialization routines.
-	public void serialize()
+	public void write()
 	{
-		if (mTunings.size() == 0 )
-		{
-			System.out.println("No tunings to write.");
-			return;
-		}
-
 		ObjectMapper objectMapper = new ObjectMapper();
 		
+		String jsonString="";
 		try
 		{
-            String jsonString = objectMapper.writeValueAsString(mTunings);
-            System.out.println(jsonString); 			
+            jsonString = objectMapper.writeValueAsString(this);
 		}
 		catch (JsonProcessingException e)
 		{
 			e.printStackTrace();
+			return;
 		}
+		
+		try
+		{
+            
+            objectMapper.writeValue(new File(mJsonFile), jsonString);
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+		}
+	}
+	
+	//Tasty static initializer
+	public static ChoordData read()
+	{        
+		try
+	    {
+	        // Create an ObjectMapper instance
+	        ObjectMapper objectMapper = new ObjectMapper();
+	                    
+	        File jsonFile = new File(mJsonFile);
+	        
+	        //Don't care if doesn't exist.
+	        if (jsonFile.exists()) 
+            {	        
+	        	// Read the JSON file and map it to a Java object
+	        	return objectMapper.readValue(jsonFile, ChoordData.class);
+            }
+	    }
+	    catch (IOException e)
+	    {
+	        e.printStackTrace();
+	    }   
+		
+		//If we couldn't load the data, return the default.
+		return new ChoordData();
 	}
 	
 }
