@@ -137,15 +137,15 @@ public class TuningDialog extends JDialog {
 		});
 		contentPane.add(btnDelete);
 		
-		JButton btnCancel = new JButton("Cancel");
-		btnCancel.setBounds(226, 150, 80, 29);
-		btnCancel.addActionListener(new ActionListener()
+		JButton btnClose = new JButton("Close");
+		btnClose.setBounds(226, 150, 80, 29);
+		btnClose.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e) {
                 closeWindow();
             }
 		});
-		contentPane.add(btnCancel);
+		contentPane.add(btnClose);
 		refresh();
 		setVisible(true);
 	}
@@ -280,7 +280,18 @@ public class TuningDialog extends JDialog {
         }
         else
         {
-        	mChoordData.updateTuning(tuning_id,  chord);
+    		if (tuning_name.compareTo( mChoordData.getTuning(tuning_id).getName() ) != 0 
+    				|| string_names.compareTo(makeStringsText(tuning_id)) != 0)
+    		{
+    			if(confirm("Confirm", "Update " + tuning_name + "?"))
+    			{
+    				mChoordData.updateTuning(tuning_id,  chord);
+    			}
+    			else
+    			{
+    				return false;
+    			}
+    		}
         }
         return true;
 	}

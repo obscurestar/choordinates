@@ -26,6 +26,7 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import javax.swing.SwingConstants;
 
 public class ChordDialog extends JDialog {
 
@@ -35,6 +36,7 @@ public class ChordDialog extends JDialog {
 	private JTextField mTextName;
 	private JTextField mTextAliases;
 	private JTextField mTextIntervals;
+	private JTextField mTextSymbol;
 
 	//Initialize and load from file.
 	private ChoordData mChoordData;
@@ -61,9 +63,9 @@ public class ChordDialog extends JDialog {
 			contentPanel.add(panelChordDict);
 			GridBagLayout gbl_panelChordDict = new GridBagLayout();
 			gbl_panelChordDict.columnWidths = new int[] {150, 45, 0, 10};
-			gbl_panelChordDict.rowHeights = new int[]{16, 0, 0,0,0,0};
-			gbl_panelChordDict.columnWeights = new double[]{1.0, 0.0, 0.0, 0.0};
-			gbl_panelChordDict.rowWeights = new double[]{0.0, 0.0, 1.0, 0.0, 0.0, 0.0};
+			gbl_panelChordDict.rowHeights = new int[]{16, 0, 0,0, 34,0,0};
+			gbl_panelChordDict.columnWeights = new double[]{1.0, 0.0, 0.0, 1.0};
+			gbl_panelChordDict.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0};
 			panelChordDict.setLayout(gbl_panelChordDict);
 			{
 				JLabel lblChordList = new JLabel("Chords");
@@ -78,7 +80,7 @@ public class ChordDialog extends JDialog {
 				mListChords = new JList<>();
 				mListChords.setToolTipText("Select a chord to view its details and edit it. ");
 				GridBagConstraints gbc_mListChords = new GridBagConstraints();
-				gbc_mListChords.gridheight = 4;
+				gbc_mListChords.gridheight = 5;
 				gbc_mListChords.gridwidth = 2;
 				gbc_mListChords.insets = new Insets(0, 0, 5, 5);
 				gbc_mListChords.fill = GridBagConstraints.BOTH;
@@ -108,7 +110,7 @@ public class ChordDialog extends JDialog {
 				 {
 				 	mTextName = new JTextField();
 				 	GridBagConstraints gbc_mTextName = new GridBagConstraints();
-				 	gbc_mTextName.insets = new Insets(0, 0, 5, 5);
+				 	gbc_mTextName.insets = new Insets(0, 0, 5, 0);
 				 	gbc_mTextName.gridx = 3;
 				 	gbc_mTextName.gridy = 1;
 				 	panelChordDict.add(mTextName, gbc_mTextName);
@@ -119,42 +121,60 @@ public class ChordDialog extends JDialog {
 				 panelChordDict.add(mListChords, gbc_mListChords);
 			}
 			{
+				JLabel lblSymbol = new JLabel("Symbol");
+				GridBagConstraints gbc_lblSymbol = new GridBagConstraints();
+				gbc_lblSymbol.insets = new Insets(0, 0, 5, 5);
+				gbc_lblSymbol.gridx = 2;
+				gbc_lblSymbol.gridy = 2;
+				panelChordDict.add(lblSymbol, gbc_lblSymbol);
+			}
+			{
+				mTextSymbol = new JTextField();
+				mTextSymbol.setToolTipText("Shorthand symbol for this chord. ex m for minor, 7 for 7th, m7 minor 7th,  + for augmented and so on.  Use \"\" for no name as in Major chords.");
+				GridBagConstraints gbc_mTextSymbol = new GridBagConstraints();
+				gbc_mTextSymbol.insets = new Insets(0, 0, 5, 0);
+				gbc_mTextSymbol.gridx = 3;
+				gbc_mTextSymbol.gridy = 2;
+				panelChordDict.add(mTextSymbol, gbc_mTextSymbol);
+				mTextSymbol.setColumns(10);
+			}
+			{
 				JLabel lblAlias = new JLabel("Aliases");
 				GridBagConstraints gbc_lblAlias = new GridBagConstraints();
 				gbc_lblAlias.insets = new Insets(0, 0, 5, 5);
 				gbc_lblAlias.gridx = 2;
-				gbc_lblAlias.gridy = 2;
+				gbc_lblAlias.gridy = 3;
 				panelChordDict.add(lblAlias, gbc_lblAlias);
 				lblAlias.setToolTipText("Comma delimited list.  EG");
 			}
-			{
-				mTextAliases = new JTextField();
-				mTextAliases.setToolTipText("Alternate names for this chord.");
-				GridBagConstraints gbc_mTextAliases = new GridBagConstraints();
-				gbc_mTextAliases.insets = new Insets(0, 0, 5, 5);
-				gbc_mTextAliases.gridx = 3;
-				gbc_mTextAliases.gridy = 2;
-				panelChordDict.add(mTextAliases, gbc_mTextAliases);
-				mTextAliases.setColumns(10);
-			}
-			{
-				JLabel lblInterval = new JLabel("Intervals");
-				GridBagConstraints gbc_lblInterval = new GridBagConstraints();
-				gbc_lblInterval.insets = new Insets(0, 0, 5, 5);
-				gbc_lblInterval.gridx = 2;
-				gbc_lblInterval.gridy = 3;
-				panelChordDict.add(lblInterval, gbc_lblInterval);
-			}
-			{
-				mTextIntervals = new JTextField();
-				mTextIntervals.setToolTipText("A string of intervals.  EG: 1 3 5 is a Major chord, 1 3b 5 is a minor chord.   Inversions may be specified as negative intervals.  .");
-				GridBagConstraints gbc_mTextIntervals = new GridBagConstraints();
-				gbc_mTextIntervals.insets = new Insets(0, 0, 5, 5);
-				gbc_mTextIntervals.gridx = 3;
-				gbc_mTextIntervals.gridy = 3;
-				panelChordDict.add(mTextIntervals, gbc_mTextIntervals);
-				mTextIntervals.setColumns(10);
-			}
+						{
+							mTextAliases = new JTextField();
+							mTextAliases.setToolTipText("Alternate names for this chord.");
+							GridBagConstraints gbc_mTextAliases = new GridBagConstraints();
+							gbc_mTextAliases.insets = new Insets(0, 0, 5, 0);
+							gbc_mTextAliases.gridx = 3;
+							gbc_mTextAliases.gridy = 3;
+							panelChordDict.add(mTextAliases, gbc_mTextAliases);
+							mTextAliases.setColumns(10);
+						}
+						{
+							JLabel lblInterval = new JLabel("Intervals");
+							GridBagConstraints gbc_lblInterval = new GridBagConstraints();
+							gbc_lblInterval.insets = new Insets(0, 0, 5, 5);
+							gbc_lblInterval.gridx = 2;
+							gbc_lblInterval.gridy = 4;
+							panelChordDict.add(lblInterval, gbc_lblInterval);
+						}
+						{
+							mTextIntervals = new JTextField();
+							mTextIntervals.setToolTipText("A string of intervals.  EG: 1 3 5 is a Major chord, 1 3b 5 is a minor chord.   Inversions may be specified as negative intervals.  .");
+							GridBagConstraints gbc_mTextIntervals = new GridBagConstraints();
+							gbc_mTextIntervals.insets = new Insets(0, 0, 5, 0);
+							gbc_mTextIntervals.gridx = 3;
+							gbc_mTextIntervals.gridy = 4;
+							panelChordDict.add(mTextIntervals, gbc_mTextIntervals);
+							mTextIntervals.setColumns(10);
+						}
 					
 					
 						JButton btnDelete = new JButton("Delete");
@@ -162,7 +182,7 @@ public class ChordDialog extends JDialog {
 						GridBagConstraints gbc_btnDelete = new GridBagConstraints();
 						gbc_btnDelete.insets = new Insets(0, 0, 0, 5);
 						gbc_btnDelete.gridx = 0;
-						gbc_btnDelete.gridy = 5;
+						gbc_btnDelete.gridy = 6;
 						panelChordDict.add(btnDelete, gbc_btnDelete);
 						btnDelete.addActionListener(new ActionListener()
 						{
@@ -193,7 +213,7 @@ public class ChordDialog extends JDialog {
 					GridBagConstraints gbc_btnNew = new GridBagConstraints();
 					gbc_btnNew.insets = new Insets(0, 0, 0, 5);
 					gbc_btnNew.gridx = 1;
-					gbc_btnNew.gridy = 5;
+					gbc_btnNew.gridy = 6;
 					panelChordDict.add(btnNew, gbc_btnNew);
 					btnNew.addActionListener(new ActionListener()
 					{
@@ -214,16 +234,15 @@ public class ChordDialog extends JDialog {
 					GridBagConstraints gbc_btnSave = new GridBagConstraints();
 					gbc_btnSave.insets = new Insets(0, 0, 0, 5);
 					gbc_btnSave.gridx = 2;
-					gbc_btnSave.gridy = 5;
+					gbc_btnSave.gridy = 6;
 					panelChordDict.add(btnSave, gbc_btnSave);
 							
 							
 								JButton btnClose = new JButton("Close");
 								btnClose.setToolTipText("Close the window.");
 								GridBagConstraints gbc_btnClose = new GridBagConstraints();
-								gbc_btnClose.insets = new Insets(0, 0, 0, 5);
 								gbc_btnClose.gridx = 3;
-								gbc_btnClose.gridy = 5;
+								gbc_btnClose.gridy = 6;
 								panelChordDict.add(btnClose, gbc_btnClose);
 								btnClose.setActionCommand("Cancel");
 						btnClose.addActionListener(new ActionListener()
@@ -254,6 +273,7 @@ public class ChordDialog extends JDialog {
 	{
     	String name = mTextName.getText();
     	String aliases = mTextAliases.getText();
+    	String symbol = mTextSymbol.getText();
     	String intervals = mTextIntervals.getText();
 
     	int id = mChoordData.getCurrentChord();
@@ -264,6 +284,7 @@ public class ChordDialog extends JDialog {
     	{
     		if (name.compareTo("") != 0
     				|| intervals.compareTo("") != 0
+    				|| symbol.compareTo("") != 0
     				|| aliases .compareTo("") != 0)
     		{
     			do_dialog = true;
@@ -272,8 +293,9 @@ public class ChordDialog extends JDialog {
     	else
     	{
     		if (name.compareTo( mChoordData.getChord(id).getName() ) != 0 
-    				|| name.compareTo(makeIntervalsText(id)) != 0
-    				|| aliases.compareTo( mChoordData.getChord(id).getAliasesString())!= 0)
+    				|| intervals.compareTo(makeIntervalsText(id)) != 0
+    				|| symbol.compareTo(mChoordData.getChord(id).getSymbol()) != 0
+    				|| aliases.compareTo( mChoordData.getChord(id).getAliasesString()) != 0)
     		{
     			do_dialog = true;
     		}
@@ -348,12 +370,14 @@ public class ChordDialog extends JDialog {
 		{
 			mListChords.setSelectedIndex(id);
 			mTextName.setText(mChoordData.getChord(id).getName());
+			mTextSymbol.setText(mChoordData.getChord(id).getSymbol());
 			mTextAliases.setText(mChoordData.getChord(id).getAliasesString());
 			mTextIntervals.setText(makeIntervalsText(id));
 		}
 		else
 		{
 			mTextName.setText("");
+			mTextSymbol.setText("");
 			mTextAliases.setText("");
 			mTextIntervals.setText("");
 		}
@@ -364,6 +388,7 @@ public class ChordDialog extends JDialog {
 	private boolean saveChord(int chord_id)
 	{
     	String name = mTextName.getText();
+    	String symbol = mTextSymbol.getText();
     	String aliases = mTextAliases.getText();
     	String intervals = mTextIntervals.getText();
 
@@ -386,6 +411,7 @@ public class ChordDialog extends JDialog {
         }
         
         chord.setName(name);
+        chord.setSymbol(symbol);
         chord.setAliasesFromString(aliases);
         
         if (chord_id == -1)
@@ -395,8 +421,21 @@ public class ChordDialog extends JDialog {
         	mChoordData.setCurrentChord(0);
         }
         else
-        {
-        	mChoordData.updateChord(chord_id,  chord);
+        {        	
+        	if (name.compareTo( mChoordData.getChord(chord_id).getName() ) != 0 
+    				|| intervals.compareTo(makeIntervalsText(chord_id)) != 0
+    				|| symbol.compareTo(mChoordData.getChord(chord_id).getSymbol()) != 0
+    				|| aliases.compareTo( mChoordData.getChord(chord_id).getAliasesString()) != 0)
+    		{
+        		if (confirm("Confirm", "Update " + name + "?"))
+        		{
+        			mChoordData.updateChord(chord_id,  chord);
+        		}
+        		else
+        		{
+        			return false;
+        		}
+    		}
         }
         return true;
 	}

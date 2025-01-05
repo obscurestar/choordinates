@@ -20,6 +20,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public class IntervalChord extends AbstractChord
 {
+	@JsonProperty("symbol")
+	private String mSymbol;	//The display symbol. EG: m for minor, m7 for minor 7th
 	@JsonProperty("aliases")
 	private ArrayList<String> mAliases = new ArrayList<String>(); // Aliases for the chord.
 
@@ -61,6 +63,18 @@ public class IntervalChord extends AbstractChord
 		}
 	}
 
+	@JsonIgnore
+	public void setSymbol(String symbol)
+	{
+		mSymbol = symbol;
+	}
+	
+	@JsonIgnore
+	public String getSymbol()
+	{
+		return mSymbol;
+	}
+	
 	@JsonIgnore
 	public ArrayList<String> getAliases() {
 		// Return the list of aliases.
