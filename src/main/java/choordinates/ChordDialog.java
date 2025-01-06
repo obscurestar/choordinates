@@ -314,7 +314,7 @@ public class ChordDialog extends JDialog
 	private void closeWindow(boolean from_button)
 	{
 		//Handle window closing from button or window.
-    	int id = mChoordData.getCurrentTuning();
+    	int id = mChoordData.getCurrentChord();
 		boolean confirm_write = false;
     	if ( changed(id) )
     	{

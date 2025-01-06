@@ -80,6 +80,7 @@ public class ChoordData {
 		return mCurrentChord;
 	}
 		
+	@JsonIgnore
 	public IntervalChord getChord(int id)
 	{
 		if (!validChord(id))
@@ -235,6 +236,10 @@ public class ChoordData {
 	    {
 	        e.printStackTrace();
 	    }   
+		
+		//Make sure currents are within bounds when file loaded.
+		result.setCurrentTuning( result.getCurrentTuning() );
+		result.setCurrentChord( result.getCurrentChord() );
 		
 		return result;
 	}
