@@ -81,6 +81,7 @@ public class Choordinates extends JFrame {
 			return;
 		}
 		
+		mPanelNeck.setChordNote(root_note);	
 	}
 	
 	public void search()
@@ -295,7 +296,7 @@ public class Choordinates extends JFrame {
 		gbc_lblRootNote.gridy = 0;
 		panelChordSelect.add(lblRootNote, gbc_lblRootNote);
 		
-		JTextField mTextRootNote = new JTextField();
+		mTextRootNote = new JTextField();
 		GridBagConstraints gbc_mTextRootNote = new GridBagConstraints();
 		gbc_mTextRootNote.insets = new Insets(0, 0, 5, 0);
 		gbc_mTextRootNote.fill = GridBagConstraints.HORIZONTAL;

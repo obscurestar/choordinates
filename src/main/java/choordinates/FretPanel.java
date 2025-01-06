@@ -27,6 +27,8 @@ public class FretPanel extends JPanel implements MouseListener, MouseMotionListe
     private char[][] mFrets=new char[mMaxStrings][mMaxFrets];  //Let's not be clever.  Just buffer max space.
     private boolean mOrientX = true;  //Set true for horizontal strings, false for vertical
 
+    private ToneNote mChordNote;
+    
     public void setOrientation(boolean orientation) {
     	//Sets the orientation of the fretboard view in the window.
     	mOrientX = orientation;
@@ -47,6 +49,72 @@ public class FretPanel extends JPanel implements MouseListener, MouseMotionListe
     	 SwingUtilities.invokeLater(() -> {
 	            this.repaint();
 	        });
+    }
+    
+    public void flushFrets()
+    {
+    	//Array.fill is stupid.  Give me memset() 
+    	for (int i=0;i<mMaxStrings; ++i)
+    	{
+    		for (int j=0;j<mMaxFrets; ++j)
+    		{
+    			mFrets[i][j] = 0;
+    		}
+    	}
+    }
+    
+    public void setChordNote(ToneNote note)
+    {
+    	
+    	mChordNote = note;
+    	
+    	ChoordData choord_data = ChoordData.getInstance();
+    	ToneChord tuning = choord_data.getTuning( choord_data.getCurrentTuning() );
+    	IntervalChord chord = choord_data.getChord( choord_data.getCurrentChord() );
+    	
+    	int root_tone = mChordNote.getSemitone();
+    	
+    	flushFrets();   //Floosh
+    	
+    	System.out.println("Root Note: " + mChordNote.getName() + " value " + root_tone);
+    	//Loop through the strings on the instrument
+    	for (int i=0; i<tuning.getNumNotes(); ++i)
+    	{
+    		ToneNote string_note = tuning.getNote(i);
+    		
+    		int string_tone = string_note.getSemitone();
+    		
+    		System.out.println("String: " + string_note.getName() + " " + string_tone + ": ");
+    		//Loop through the notes in the selected chord
+    		for (int j=0; j<chord.getNumNotes(); ++j)
+    		{
+    			int interval_tone = chord.getNote(j).getSemitone();
+    			
+    			if (interval_tone < 0 )
+    			{
+    				interval_tone = interval_tone % 12;
+    				if (interval_tone < 0)
+    				{
+    					interval_tone += 12;
+    				}
+    			}
+    			
+    			int chord_tone = ( root_tone + interval_tone ) % 12;
+    			
+    			System.out.print("\tInterval " + j + " Semitone " + interval_tone + ":  Chord Tone " + chord_tone);
+    			for (int fret=0;fret<mNumFrets; ++fret)
+    			{
+    				if ( ( ( string_tone + fret ) % 12 ) == chord_tone)
+    				{
+    					System.out.print(" " + fret);
+    					//mFrets[i][k] = chord.getNote(j).getSemitone();
+    					mFrets[i][fret] = '0';
+    				}
+    			}
+        		System.out.println("");
+    		}
+    	}
+    	refresh();
     }
     
     public void updateTuning()
@@ -125,16 +193,6 @@ public class FretPanel extends JPanel implements MouseListener, MouseMotionListe
         int max_cell_x, max_cell_y;
         
         updateTuning();
-        //TEMPORARY FOR TESTING BEGIN
-        //Mocked E-Major chord
-        mFrets[0][0] = 'O';
-        mFrets[1][2] = 'O';
-        mFrets[2][2] = 'O';
-        mFrets[3][1] = 'O';
-        mFrets[4][0] = 'O';
-        mFrets[5][0] = 'O';
-        
-        //TEMPORARY FOR TESTING END
         
         //Number of cells in x and y.
         int cells_x = mNumFrets;

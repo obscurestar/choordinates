@@ -25,6 +25,11 @@ public class IntervalChord extends AbstractChord
 	@JsonProperty("aliases")
 	private ArrayList<String> mAliases = new ArrayList<String>(); // Aliases for the chord.
 
+	public IntervalNote getNote(int id)
+	{
+		return (IntervalNote) mNotes.get(id);
+	}
+	
 	public void addAlias(String name) {
 		// I don't care about duplicates. It's your computation time, user.
 		mAliases.add(name);

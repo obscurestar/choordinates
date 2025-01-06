@@ -95,4 +95,9 @@ public abstract class AbstractChord
 	public int getNumNotes() {
 		return mNotes.size();
 	}
+	
+	public AbstractNote getNote(int id)
+	{
+		return (AbstractNote) mNotes.get(id);
+	}
 }
