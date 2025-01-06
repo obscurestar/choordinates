@@ -19,6 +19,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.ImageIcon;
 import javax.swing.SwingConstants;
+import javax.swing.WindowConstants;
 
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
@@ -41,9 +42,7 @@ public class ChordDialog extends JDialog
 	private JTextField mTextAliases;
 	private JTextField mTextIntervals;
 	private JTextField mTextSymbol;
-
-	//Initialize and load from file.
-	private ChoordData mChoordData;
+	private Choordinates mOwner;
 	
 	private boolean mRefreshing = false;
 	
@@ -51,13 +50,27 @@ public class ChordDialog extends JDialog
 	 * Create the dialog.
 	 */
 	
+	public void setOwner( Choordinates owner)
+	{
+		//why use a callback when we can use the whole window?
+		//Surely that's secure and good design...
+		mOwner = owner;
+	}
+	
 	public ChordDialog() {
-		mChoordData = ChoordData.read();
+		ChoordData choord_data = ChoordData.read();
 		
+		setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
+
 		addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
                 closeWindow( false );
+            }
+            
+            @Override
+            public void windowActivated(WindowEvent e) {
+                refresh();
             }
         });
 		//setUndecorated(true);
@@ -103,8 +116,9 @@ public class ChordDialog extends JDialog
 	                	if (!mRefreshing)
 	                	{
 		                    if (!e.getValueIsAdjusting()) { // Check if selection is finalized
-		                    	mChoordData.setCurrentChord( mListChords.getSelectedIndex());
+		                    	choord_data.setCurrentChord( mListChords.getSelectedIndex());
 		                    	refresh();
+		                    	refreshMain();
 		                    }
 	                	}
 	                }
@@ -199,19 +213,19 @@ public class ChordDialog extends JDialog
 		            @Override
 		            public void actionPerformed(ActionEvent e)
 		            {
-		            	int id  = mChoordData.getCurrentChord();
+		            	int id  = choord_data.getCurrentChord();
 		            	
 		            	if (id == -1)
 		            	{
 		            		return;
 		            	}
 		            	
-		            	String name = mChoordData.getChord(id).getName();
+		            	String name = choord_data.getChord(id).getName();
 		            	
 		            	if (confirm("Delete Chord", name))
 		            	{
-		            		mChoordData.deleteChord(id);
-		            		mChoordData.setCurrentChord(-1); 
+		            		choord_data.deleteChord(id);
+		            		choord_data.setCurrentChord(-1); 
 		            		refresh();
 		            	}
 		            }
@@ -232,8 +246,9 @@ public class ChordDialog extends JDialog
 		            {
 		            	if (saveChord(-1) )
 		            	{
-		            		mChoordData.setCurrentChord(mChoordData.getNumChords() - 1);
+		            		choord_data.setCurrentChord(choord_data.getNumChords() - 1);
 		            		refresh();
+		            		refreshMain();
 		            	}
 		            }
 		        });
@@ -266,11 +281,12 @@ public class ChordDialog extends JDialog
 		            @Override
 		            public void actionPerformed(ActionEvent e)
 		            {
-		            	int id = mChoordData.getCurrentChord();
+		            	int id = choord_data.getCurrentChord();
 		            	
 		            	if (saveChord(id))
 		            	{
 		            		refresh();
+		            		refreshMain();
 		            	}
 		            }
 		        });
@@ -281,6 +297,8 @@ public class ChordDialog extends JDialog
 
 	private boolean changed(int id)
 	{
+		ChoordData choord_data = ChoordData.getInstance();
+
     	String name = mTextName.getText();
     	String aliases = mTextAliases.getText();
     	String symbol = mTextSymbol.getText();
@@ -300,10 +318,10 @@ public class ChordDialog extends JDialog
     	}
     	else
     	{
-    		if (name.compareTo( mChoordData.getChord(id).getName() ) != 0 
+    		if (name.compareTo( choord_data.getChord(id).getName() ) != 0 
     				|| intervals.compareTo(makeIntervalsText(id)) != 0
-    				|| symbol.compareTo(mChoordData.getChord(id).getSymbol()) != 0
-    				|| aliases.compareTo( mChoordData.getChord(id).getAliasesString()) != 0)
+    				|| symbol.compareTo(choord_data.getChord(id).getSymbol()) != 0
+    				|| aliases.compareTo( choord_data.getChord(id).getAliasesString()) != 0)
     		{
     			result = true;
     		}
@@ -311,10 +329,22 @@ public class ChordDialog extends JDialog
 		return result;
 	}
 	
+	private void refreshMain()
+	{
+		/*
+		//Tells the main window to update its data
+		if (mOwner != null)
+		{
+			mOwner.refresh();
+		}*/
+	}
+	
 	private void closeWindow(boolean from_button)
 	{
+		ChoordData choord_data = ChoordData.getInstance();
+
 		//Handle window closing from button or window.
-    	int id = mChoordData.getCurrentChord();
+    	int id = choord_data.getCurrentChord();
 		boolean confirm_write = false;
     	if ( changed(id) )
     	{
@@ -329,13 +359,14 @@ public class ChordDialog extends JDialog
     	}
     	else if (from_button)
     	{
-    		this.dispose();
+    		this.setVisible(false);
     	}
     	
     	if (confirm_write)
     	{
-    		mChoordData.write();
-    		this.dispose();
+    		choord_data.write();
+    		refreshMain();
+    		this.setVisible(false);
     	}
 	}
 	
@@ -362,14 +393,19 @@ public class ChordDialog extends JDialog
 	
 	private String makeIntervalsText(int id)
 	{
+		ChoordData choord_data = ChoordData.getInstance();
+
 		//Generates a space-delimited set of string names from chord id
-		ArrayList<String> string_names= mChoordData.getChord(id).getAllNoteNames();
+		ArrayList<String> string_names= choord_data.getChord(id).getAllNoteNames();
 		
 		return String.join(" ", string_names);
 	}
+	
 
-	private void refresh()
+	public void refresh()
 	{
+		ChoordData choord_data = ChoordData.getInstance();
+
 		//This list probably won't be that long.
 		//Be lazy, just wipe it out and rebuild it.
 		
@@ -377,26 +413,26 @@ public class ChordDialog extends JDialog
 		
 		mListChords.removeAll();
 		
-		//We could just return the arraylist from mChoordData
+		//We could just return the arraylist from choord_data
 		//and convert it to a list, but why do anything the
 		//easy way?
         DefaultListModel<String> listModel = new DefaultListModel<>();
 
-        for (int i=0;i < mChoordData.getNumChords(); ++i) {
-            listModel.addElement(mChoordData.getChord(i).getName());
+        for (int i=0;i < choord_data.getNumChords(); ++i) {
+            listModel.addElement(choord_data.getChord(i).getName());
         }
 
         // Set the list model to the JList
         mListChords.setModel(listModel);
 		
 		//Set Chord to current in data.
-		int id = mChoordData.getCurrentChord();
+		int id = choord_data.getCurrentChord();
 		if (id > -1)
 		{
 			mListChords.setSelectedIndex(id);
-			mTextName.setText(mChoordData.getChord(id).getName());
-			mTextSymbol.setText(mChoordData.getChord(id).getSymbol());
-			mTextAliases.setText(mChoordData.getChord(id).getAliasesString());
+			mTextName.setText(choord_data.getChord(id).getName());
+			mTextSymbol.setText(choord_data.getChord(id).getSymbol());
+			mTextAliases.setText(choord_data.getChord(id).getAliasesString());
 			mTextIntervals.setText(makeIntervalsText(id));
 		}
 		else
@@ -412,6 +448,8 @@ public class ChordDialog extends JDialog
 	
 	private boolean saveChord(int chord_id)
 	{
+		ChoordData choord_data = ChoordData.getInstance();
+
     	String name = mTextName.getText();
     	String symbol = mTextSymbol.getText();
     	String aliases = mTextAliases.getText();
@@ -442,16 +480,16 @@ public class ChordDialog extends JDialog
         if (chord_id == -1)
         {
         	//Add a new chord if using Add or save no chords present.
-        	mChoordData.addChord(chord);
-        	mChoordData.setCurrentChord(0);
+        	choord_data.addChord(chord);
+        	choord_data.setCurrentChord(0);
         }
         else
         {        	
         	if (changed(chord_id))
     		{
-        		if (confirm("Confirm", "Update " + mChoordData.getChord(chord_id).getName() + "?"))
+        		if (confirm("Confirm", "Update " + choord_data.getChord(chord_id).getName() + "?"))
         		{
-        			mChoordData.updateChord(chord_id,  chord);
+        			choord_data.updateChord(chord_id,  chord);
         		}
         		else
         		{
@@ -459,6 +497,7 @@ public class ChordDialog extends JDialog
         		}
     		}
         }
+        choord_data.write();
         return true;
 	}
 }

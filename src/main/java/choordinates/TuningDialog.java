@@ -10,6 +10,7 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
 import javax.swing.ImageIcon;
+import javax.swing.WindowConstants;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
@@ -27,23 +28,36 @@ public class TuningDialog extends JDialog
 	private JTextField mTextStrings;
 	private JComboBox<String> mComboTunings;
 	private boolean mRefreshing = false;
-	
-	private ChoordData mChoordData;
-	
+	private Choordinates mOwner;
+		
 	/**
 	 * Create the frame.
 	 */
 
+	public void setOwner(Choordinates owner)
+	{
+		mOwner = owner;
+	}
+	
 	public TuningDialog() {
-		mChoordData = ChoordData.read();
+		//BEWARE of lambdas and instance variables.
+		ChoordData.read();
 
+		//setUndecorated(true);
+		
+		setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
+		
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
             	closeWindow( false );
             }
+            
+            @Override
+            public void windowActivated(WindowEvent e) {
+                refresh();
+            }
         });
-		//setUndecorated(true);
 
 		setTitle("Tunings");
 		setBounds(180, 180, 320, 211);
@@ -64,8 +78,9 @@ public class TuningDialog extends JDialog
         mComboTunings.addActionListener(e -> {
         	if (!mRefreshing)
         	{
-        		mChoordData.setCurrentTuning( mComboTunings.getSelectedIndex());
+        		ChoordData.getInstance().setCurrentTuning( mComboTunings.getSelectedIndex());
         		refresh();
+        		refreshMain();
         	}
         });
 		contentPane.add(mComboTunings);
@@ -99,7 +114,8 @@ public class TuningDialog extends JDialog
             {
             	if (saveTuning(-1) )
             	{
-            		mChoordData.setCurrentTuning(mChoordData.getNumTunings() - 1);
+            		ChoordData choord_data = ChoordData.getInstance();
+            		choord_data.setCurrentTuning(choord_data.getNumTunings() - 1);
             		refresh();
             	}
             }
@@ -113,11 +129,12 @@ public class TuningDialog extends JDialog
             @Override
             public void actionPerformed(ActionEvent e)
             {
-            	int id = mChoordData.getCurrentTuning();
+            	int id = ChoordData.getInstance().getCurrentTuning();
             	
             	if (saveTuning(id))
             	{
             		refresh();
+            		refreshMain();
             	}
             }
         });
@@ -130,20 +147,23 @@ public class TuningDialog extends JDialog
             @Override
             public void actionPerformed(ActionEvent e)
             {
-            	int id  = mChoordData.getCurrentTuning();
+        		ChoordData choord_data = ChoordData.getInstance();
+
+            	int id  = choord_data.getCurrentTuning();
             	
             	if (id == -1)
             	{
             		return;
             	}
             	
-            	String name = mChoordData.getTuning(id).getName();
+            	String name = choord_data.getTuning(id).getName();
             	
             	if (confirm("Delete Tuning", name))
             	{
-            		mChoordData.deleteTuning(id);
-            		mChoordData.setCurrentTuning(-1); 
+            		choord_data.deleteTuning(id);
+            		choord_data.setCurrentTuning(-1); 
             		refresh();
+            		refreshMain();
             	}
             }
 		});
@@ -165,13 +185,14 @@ public class TuningDialog extends JDialog
 	private boolean changed(int id)
 	{
 		//check for unsaved changes.
+		ChoordData choord_data = ChoordData.getInstance();
+
 		boolean result = false;
     	String tuning_name = mTextTuning.getText();
     	String string_names = mTextStrings.getText();
     	    	
     	if (id == -1)
     	{
-    		System.out.println("ID is -1");
     		if (tuning_name.compareTo("") != 0 || string_names.compareTo("") != 0)
     		{
     			result = true;
@@ -179,7 +200,7 @@ public class TuningDialog extends JDialog
     	}
     	else
     	{
-    		if (tuning_name.compareTo( mChoordData.getTuning(id).getName() ) != 0 
+    		if (tuning_name.compareTo( choord_data.getTuning(id).getName() ) != 0 
     				|| string_names.compareTo(makeStringsText(id)) != 0)
     		{
     			result = true;
@@ -188,10 +209,22 @@ public class TuningDialog extends JDialog
     	return result;
 	}
 	
+	private void refreshMain()
+	{
+		/*
+		//Tells the main window to update its data
+		if (mOwner != null)
+		{
+			mOwner.refresh();
+		}*/
+	}
+	
 	private void closeWindow(boolean from_button)
 	{
 		//Handle window closing from button or window.
-    	int id = mChoordData.getCurrentTuning();
+		ChoordData choord_data = ChoordData.getInstance();
+
+    	int id = choord_data.getCurrentTuning();
     	boolean confirm_write = false;
     	if ( changed(id) )
     	{
@@ -206,13 +239,14 @@ public class TuningDialog extends JDialog
     	}
     	else if (from_button)
     	{
-    		this.dispose();
+    		this.setVisible(false);
     	}
     	
     	if (confirm_write)
     	{
-    		mChoordData.write();
-    		this.dispose();
+    		choord_data.write();
+    		refreshMain();
+    		this.setVisible(false);
     	}
 	}
 	
@@ -239,31 +273,34 @@ public class TuningDialog extends JDialog
 		
 	private String makeStringsText(int id)
 	{
+		ChoordData choord_data = ChoordData.getInstance();
+
 		//Generates a space-delimited set of string names from chord id
-		ArrayList<String> string_names= mChoordData.getTuning(id).getAllNoteNames();
+		ArrayList<String> string_names= choord_data.getTuning(id).getAllNoteNames();
 		
 		return String.join(" ", string_names);
 	}
 	
-	private void refresh()
-	{
-		//This list probably won't be that long.
-		//Be lazy, just wipe it out and rebuild it.
-		
+	public void refresh()
+	{	
+		ChoordData choord_data = ChoordData.getInstance();
+
 		mRefreshing = true; //Combobox y u suk?
 		
+		//This list probably won't be that long.
+		//Be lazy, just wipe it out and rebuild it.
 		mComboTunings.removeAllItems();
-		for (int i=0;i < mChoordData.getNumTunings(); ++i)
+		for (int i=0;i < choord_data.getNumTunings(); ++i)
 		{
-			mComboTunings.addItem(mChoordData.getTuning(i).getName());
+			mComboTunings.addItem(choord_data.getTuning(i).getName());
 		}
 		
 		//Set tuning to current in data.
-		int id = mChoordData.getCurrentTuning();
+		int id = choord_data.getCurrentTuning();
 		if (id > -1)
 		{
 			mComboTunings.setSelectedIndex(id);
-			mTextTuning.setText(mChoordData.getTuning(id).getName());
+			mTextTuning.setText(choord_data.getTuning(id).getName());
 			mTextStrings.setText(makeStringsText(id));
 		}
 		else
@@ -277,6 +314,8 @@ public class TuningDialog extends JDialog
 	
 	private boolean saveTuning(int tuning_id)
 	{
+		ChoordData choord_data = ChoordData.getInstance();
+
     	String tuning_name = mTextTuning.getText();
     	String string_names = mTextStrings.getText();
 
@@ -303,17 +342,17 @@ public class TuningDialog extends JDialog
         if (tuning_id == -1)
         {
         	//Add a new tuning if using Add or save no tunings present.
-        	mChoordData.addTuning(chord);
-        	mChoordData.setCurrentTuning(0);
+        	choord_data.addTuning(chord);
+        	choord_data.setCurrentTuning(0);
         }
         else
         {
-    		if (tuning_name.compareTo( mChoordData.getTuning(tuning_id).getName() ) != 0 
+    		if (tuning_name.compareTo( choord_data.getTuning(tuning_id).getName() ) != 0 
     				|| string_names.compareTo(makeStringsText(tuning_id)) != 0)
     		{
-    			if(confirm("Confirm", "Update " +  mChoordData.getTuning(tuning_id).getName() + "?"))
+    			if(confirm("Confirm", "Update " +  choord_data.getTuning(tuning_id).getName() + "?"))
     			{
-    				mChoordData.updateTuning(tuning_id,  chord);
+    				choord_data.updateTuning(tuning_id,  chord);
     			}
     			else
     			{
@@ -321,6 +360,7 @@ public class TuningDialog extends JDialog
     			}
     		}
         }
+        choord_data.write();
         return true;
 	}
 }

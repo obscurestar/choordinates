@@ -20,6 +20,7 @@ import java.awt.GridBagConstraints;
 import java.awt.Insets;
 
 import javax.swing.JList;
+import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 
 import java.awt.event.ActionListener;
@@ -28,10 +29,16 @@ import java.awt.event.ActionEvent;
 public class Choordinates extends JFrame {
 
 	private static final long serialVersionUID = 1L;
+	private boolean mRefreshing;
+	
+	private TuningDialog mTuningDialog;
+	private ChordDialog mChordDialog;
+	
 	private JPanel contentPane;
 	private JComboBox<String> comboRootNote;
+	private JComboBox<String> mComboTuning;
 	private JTextField textNotesNotes;
-
+	
 	/**
 	 * Launch the application.
 	 */
@@ -52,10 +59,55 @@ public class Choordinates extends JFrame {
 		});
 	}
 
+	private void refreshAll()
+	{
+		//WARNING this does a read from the file.
+		ChoordData.read();
+		
+		refresh();
+		
+		if (mTuningDialog != null)
+		{
+			mTuningDialog.refresh();
+		}
+		if (mChordDialog != null)
+		{
+			mChordDialog.refresh();
+		}
+	}
+	
+	public void refresh()
+	{
+		ChoordData choord_data = ChoordData.getInstance();
+		int id=choord_data.getCurrentTuning();
+
+		mRefreshing = true; //Combobox y u suk?
+		
+		//This list probably won't be that long.
+		//Be lazy, just wipe it out and rebuild it.
+		mComboTuning.removeAllItems();
+		for (int i=0;i < choord_data.getNumTunings(); ++i)
+		{
+			mComboTuning.addItem(choord_data.getTuning(i).getName());
+		}
+
+		if (id > -1)
+		{
+			mComboTuning.setSelectedIndex(id);
+		}
+	
+		mRefreshing = false;
+	}
+
 	/**
 	 * Create the frame.
 	 */
 	public Choordinates() {
+		/*DANGER!  Do not get an instance of chorddata here.
+		 * The lambdas will make you cry.
+		 */
+		ChoordData.read();   //Initialize data structures from JSON file.
+		
 		setTitle("Choordinates");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
@@ -70,14 +122,32 @@ public class Choordinates extends JFrame {
 		mnWindow.add(mntmTuning);
 		
 		mntmTuning.addActionListener(e -> {
-            TuningDialog tuningDialog = new TuningDialog();
+			if (mTuningDialog == null)
+			{
+				mTuningDialog = new TuningDialog();
+			}
+			else
+			{
+				refreshAll();
+				mTuningDialog.toFront();
+				mTuningDialog.setVisible(true);
+			}
         });		
 		
 		JMenuItem mntmChord = new JMenuItem("Chords");
 		mnWindow.add(mntmChord);
 		
 		mntmChord.addActionListener(e -> {
-            ChordDialog chordDialog = new ChordDialog();
+			if (mChordDialog == null)
+			{
+            	mChordDialog = new ChordDialog();
+			}
+			else
+			{
+				refreshAll();
+				mChordDialog.toFront();
+				mChordDialog.setVisible(true);
+			}
         });	
 		
 		JMenu mnHelp = new JMenu("Help");
@@ -107,14 +177,23 @@ public class Choordinates extends JFrame {
 		gbc_lblNewLabel.gridy = 0;
 		contentPane.add(lblNewLabel, gbc_lblNewLabel);
 		
-		JComboBox<String> comboTuning = new JComboBox<String>();
-		GridBagConstraints gbc_comboTuning = new GridBagConstraints();
-		gbc_comboTuning.insets = new Insets(0, 0, 5, 5);
-		gbc_comboTuning.fill = GridBagConstraints.HORIZONTAL;
-		gbc_comboTuning.gridx = 1;
-		gbc_comboTuning.gridy = 0;
-		comboTuning.setPreferredSize(new Dimension(10,20));
-		contentPane.add(comboTuning, gbc_comboTuning);
+		mComboTuning = new JComboBox<String>();
+		GridBagConstraints gbc_mComboTuning = new GridBagConstraints();
+		gbc_mComboTuning.insets = new Insets(0, 0, 5, 5);
+		gbc_mComboTuning.fill = GridBagConstraints.HORIZONTAL;
+		gbc_mComboTuning.gridx = 1;
+		gbc_mComboTuning.gridy = 0;
+		mComboTuning.setPreferredSize(new Dimension(10,20));
+        mComboTuning.addActionListener(e -> {
+        	if (!mRefreshing)
+        	{
+        		int id = mComboTuning.getSelectedIndex();
+        		ChoordData.getInstance().setCurrentTuning(id);
+
+        		refresh();
+        	}
+        });
+		contentPane.add(mComboTuning, gbc_mComboTuning);
 		
 		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
 		GridBagConstraints gbc_tabbedPane = new GridBagConstraints();
@@ -240,5 +319,6 @@ public class Choordinates extends JFrame {
 		gbc_panelNeck.gridx = 0;
 		gbc_panelNeck.gridy = 6;
 		contentPane.add(panelNeck, gbc_panelNeck);
+		refresh();
 	}
 }

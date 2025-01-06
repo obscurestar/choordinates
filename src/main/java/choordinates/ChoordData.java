@@ -14,6 +14,9 @@ public class ChoordData {
 	//TODO:  Probably a better filepath.
 	@JsonIgnore
 	private static final String mJsonFile ="choordinates.json";
+	@JsonIgnore
+	private static ChoordData mInstance;
+	
 	@JsonProperty("tunings")
 	private ArrayList<ToneChord> mTunings = new ArrayList<>();
 	@JsonProperty("current_tuning")
@@ -23,11 +26,19 @@ public class ChoordData {
 	@JsonProperty("current_chord")
 	private int mCurrentChord;
 
-	public ChoordData()
+	private ChoordData()
 	{
 		mCurrentTuning = -1;
 		mCurrentChord = -1;
 	}
+		
+	@JsonIgnore
+	public static ChoordData getInstance() {
+        if (mInstance == null) {
+            mInstance = new ChoordData();
+        }
+        return mInstance;
+    }
 	
 	/*
 	 * TODO There's a LOT of commonality between Chord and Tone
@@ -193,7 +204,7 @@ public class ChoordData {
 	public void write()
 	{
 		ObjectMapper objectMapper = new ObjectMapper();
-				
+		
 		try
 		{
             
@@ -211,12 +222,13 @@ public class ChoordData {
 	}
 	
 	//Tasty static initializer
+	//now with yummy singleton flavor.
 	public static ChoordData read()
 	{     
 		//Read data into a ChoordData object
 		//If the JSON fails to load for some reason,
 		//will return the default empty container.
-		ChoordData result = new ChoordData();
+		ChoordData.getInstance();
 		
 		try
 	    {
@@ -229,7 +241,7 @@ public class ChoordData {
 	        if (jsonFile.exists()) 
             {	        
 	        	// Read the JSON file and map it to a Java object
-	        	result =  objectMapper.readValue(jsonFile, ChoordData.class);
+	        	mInstance =  objectMapper.readValue(jsonFile, ChoordData.class);
             }
 	    }
 	    catch (IOException e)
@@ -237,11 +249,8 @@ public class ChoordData {
 	        e.printStackTrace();
 	    }   
 		
-		//Make sure currents are within bounds when file loaded.
-		result.setCurrentTuning( result.getCurrentTuning() );
-		result.setCurrentChord( result.getCurrentChord() );
 		
-		return result;
+		return mInstance;
 	}
 	
 }
