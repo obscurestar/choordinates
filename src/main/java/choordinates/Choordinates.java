@@ -38,6 +38,8 @@ public class Choordinates extends JFrame {
 	private JComboBox<String> comboRootNote;
 	private JComboBox<String> mComboTuning;
 	private JTextField textNotesNotes;
+	FretPanel mPanelFretSelect;
+	FretPanel mPanelNeck;
 	
 	/**
 	 * Launch the application.
@@ -169,13 +171,13 @@ public class Choordinates extends JFrame {
 		gbl_contentPane.rowWeights = new double[]{0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 2.0, 2.0, Double.MIN_VALUE};
 		contentPane.setLayout(gbl_contentPane);
 		
-		JLabel lblNewLabel = new JLabel("Tuning");
-		GridBagConstraints gbc_lblNewLabel = new GridBagConstraints();
-		gbc_lblNewLabel.anchor = GridBagConstraints.EAST;
-		gbc_lblNewLabel.insets = new Insets(0, 0, 5, 5);
-		gbc_lblNewLabel.gridx = 0;
-		gbc_lblNewLabel.gridy = 0;
-		contentPane.add(lblNewLabel, gbc_lblNewLabel);
+		JLabel lblTuning = new JLabel("Tuning");
+		GridBagConstraints gbc_lblTuning = new GridBagConstraints();
+		gbc_lblTuning.anchor = GridBagConstraints.EAST;
+		gbc_lblTuning.insets = new Insets(0, 0, 5, 5);
+		gbc_lblTuning.gridx = 0;
+		gbc_lblTuning.gridy = 0;
+		contentPane.add(lblTuning, gbc_lblTuning);
 		
 		mComboTuning = new JComboBox<String>();
 		GridBagConstraints gbc_mComboTuning = new GridBagConstraints();
@@ -215,13 +217,13 @@ public class Choordinates extends JFrame {
 		//panelChordSelect.setPreferredSize(new Dimension(100, 100));
 		panelChordSelect.setLayout(gbl_panelChordSelect);
 		
-		JLabel lblNewLabel_4 = new JLabel("Root Note");
-		GridBagConstraints gbc_lblNewLabel_4 = new GridBagConstraints();
-		gbc_lblNewLabel_4.insets = new Insets(0, 0, 5, 5);
-		gbc_lblNewLabel_4.anchor = GridBagConstraints.EAST;
-		gbc_lblNewLabel_4.gridx = 0;
-		gbc_lblNewLabel_4.gridy = 0;
-		panelChordSelect.add(lblNewLabel_4, gbc_lblNewLabel_4);
+		JLabel lblRootNote = new JLabel("Root Note");
+		GridBagConstraints gbc_lblRootNote = new GridBagConstraints();
+		gbc_lblRootNote.insets = new Insets(0, 0, 5, 5);
+		gbc_lblRootNote.anchor = GridBagConstraints.EAST;
+		gbc_lblRootNote.gridx = 0;
+		gbc_lblRootNote.gridy = 0;
+		panelChordSelect.add(lblRootNote, gbc_lblRootNote);
 		
 		JComboBox<String> comboRootNote = new JComboBox<String>();
 		GridBagConstraints gbc_comboRootNote = new GridBagConstraints();
@@ -232,13 +234,13 @@ public class Choordinates extends JFrame {
 		//comboRootNote.setPreferredSize(new Dimension(10,20));
 		panelChordSelect.add(comboRootNote, gbc_comboRootNote);
 		
-		JLabel lblNewLabel_5 = new JLabel("Chord");
-		GridBagConstraints gbc_lblNewLabel_5 = new GridBagConstraints();
-		gbc_lblNewLabel_5.gridwidth = 2;
-		gbc_lblNewLabel_5.insets = new Insets(0, 0, 5, 5);
-		gbc_lblNewLabel_5.gridx = 0;
-		gbc_lblNewLabel_5.gridy = 1;
-		panelChordSelect.add(lblNewLabel_5, gbc_lblNewLabel_5);
+		JLabel lblChordChord = new JLabel("Chord");
+		GridBagConstraints gbc_lblChordChord = new GridBagConstraints();
+		gbc_lblChordChord.gridwidth = 2;
+		gbc_lblChordChord.insets = new Insets(0, 0, 5, 5);
+		gbc_lblChordChord.gridx = 0;
+		gbc_lblChordChord.gridy = 1;
+		panelChordSelect.add(lblChordChord, gbc_lblChordChord);
 		
 		JList listChordChord = new JList();
 		GridBagConstraints gbc_listChordChord = new GridBagConstraints();
@@ -251,25 +253,22 @@ public class Choordinates extends JFrame {
 		JPanel panelNotesSelect = new JPanel();
 		tabbedPane.addTab("Notes", null, panelNotesSelect, null);
 		
-		JLabel lblNotesNotes = new JLabel("Notes");
-		panelNotesSelect.add(lblNotesNotes);
-		
 		textNotesNotes = new JTextField();
 		panelNotesSelect.add(textNotesNotes);
 		textNotesNotes.setColumns(10);
 		
-		FretPanel panelFretSelect = new FretPanel();
-		panelFretSelect.setOrientation(false);
-		panelFretSelect.configureFretboard(7, 6);
-		tabbedPane.addTab("Frets", null, panelFretSelect, null);
+		mPanelFretSelect = new FretPanel();
+		mPanelFretSelect.setOrientation(false);
+		mPanelFretSelect.configureFretboard(7, 6);
+		tabbedPane.addTab("Frets", null, mPanelFretSelect, null);
 
-		JLabel lblNewLabel_2 = new JLabel("Matches");
-		GridBagConstraints gbc_lblNewLabel_2 = new GridBagConstraints();
-		gbc_lblNewLabel_2.gridwidth = 2;
-		gbc_lblNewLabel_2.insets = new Insets(0, 0, 5, 0);
-		gbc_lblNewLabel_2.gridx = 2;
-		gbc_lblNewLabel_2.gridy = 0;
-		contentPane.add(lblNewLabel_2, gbc_lblNewLabel_2);
+		JLabel lblMatches = new JLabel("Matches");
+		GridBagConstraints gbc_lblMatches = new GridBagConstraints();
+		gbc_lblMatches.gridwidth = 2;
+		gbc_lblMatches.insets = new Insets(0, 0, 5, 0);
+		gbc_lblMatches.gridx = 2;
+		gbc_lblMatches.gridy = 0;
+		contentPane.add(lblMatches, gbc_lblMatches);
 		
 		JList listMatches = new JList();
 		GridBagConstraints gbc_listMatches = new GridBagConstraints();
@@ -281,13 +280,13 @@ public class Choordinates extends JFrame {
 		gbc_listMatches.gridy = 1;
 		contentPane.add(listMatches, gbc_listMatches);
 		
-		JLabel lblNewLabel_3 = new JLabel("Favorite Shapes");
-		GridBagConstraints gbc_lblNewLabel_3 = new GridBagConstraints();
-		gbc_lblNewLabel_3.gridwidth = 2;
-		gbc_lblNewLabel_3.insets = new Insets(0, 0, 5, 0);
-		gbc_lblNewLabel_3.gridx = 2;
-		gbc_lblNewLabel_3.gridy = 3;
-		contentPane.add(lblNewLabel_3, gbc_lblNewLabel_3);
+		JLabel lblFavorites = new JLabel("Favorite Shapes");
+		GridBagConstraints gbc_lblFavorites = new GridBagConstraints();
+		gbc_lblFavorites.gridwidth = 2;
+		gbc_lblFavorites.insets = new Insets(0, 0, 5, 0);
+		gbc_lblFavorites.gridx = 2;
+		gbc_lblFavorites.gridy = 3;
+		contentPane.add(lblFavorites, gbc_lblFavorites);
 				
 		JScrollPane scrollFavorites = new JScrollPane();
 		GridBagConstraints gbc_scrollFavorites = new GridBagConstraints();
@@ -311,14 +310,14 @@ public class Choordinates extends JFrame {
 		gbc_btnSearch.gridy = 5;
 		contentPane.add(btnSearch, gbc_btnSearch);
 		
-		FretPanel panelNeck = new FretPanel();
-		GridBagConstraints gbc_panelNeck = new GridBagConstraints();
-		gbc_panelNeck.gridheight = 5;
-		gbc_panelNeck.gridwidth = 4;
-		gbc_panelNeck.fill = GridBagConstraints.BOTH;
-		gbc_panelNeck.gridx = 0;
-		gbc_panelNeck.gridy = 6;
-		contentPane.add(panelNeck, gbc_panelNeck);
+		mPanelNeck = new FretPanel();
+		GridBagConstraints gbc_mPanelNeck = new GridBagConstraints();
+		gbc_mPanelNeck.gridheight = 5;
+		gbc_mPanelNeck.gridwidth = 4;
+		gbc_mPanelNeck.fill = GridBagConstraints.BOTH;
+		gbc_mPanelNeck.gridx = 0;
+		gbc_mPanelNeck.gridy = 6;
+		contentPane.add(mPanelNeck, gbc_mPanelNeck);
 		refresh();
 	}
 }

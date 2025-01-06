@@ -10,6 +10,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  */
 public class ToneNote extends AbstractNote{
 	private final int[] mToneMap = { 0, 2, 3, 5, 7, 8, 10 };  //ABCDEFG  0 is A-flat.
+	@JsonProperty("octave")
 	private int mOctave = 0; //A positive or negative number representing distance from middle octave.
 
 	@JsonIgnore
