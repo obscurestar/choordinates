@@ -32,19 +32,59 @@ public class FretPanel extends JPanel implements MouseListener, MouseMotionListe
     	mOrientX = orientation;
     }
     
-    public void configureFretboard(int frets, int strings)
+    public void setNumFrets(int frets)
     {
     	if (frets > 0 && frets <= mMaxFrets)
     	{
     		mNumFrets = frets;
     	}
-    	if (strings > 0 && strings <=mMaxStrings)
+    	updateTuning();
+    	refresh();
+    }
+    
+    public void refresh()
+    {
+    	 SwingUtilities.invokeLater(() -> {
+	            this.repaint();
+	        });
+    }
+    
+    public void updateTuning()
+    {
+    	ChoordData choord_data = ChoordData.getInstance();
+    	
+    	int tuning_id = choord_data.getCurrentTuning();
+    	
+    	if (tuning_id == -1)
     	{
-    		mNumStrings = strings;
+    		//No tuning set, default.
+    		 mStringNames[0] = "E";
+    	     mStringNames[1] = "A";
+    	     mStringNames[2] = "D";
+    	     mStringNames[3] = "G";
+    	     mStringNames[4] = "B";
+    	     mStringNames[5] = "e";
+    	     mNumStrings = 6;
     	}
+    	else
+    	{
+    		ToneChord tuning = choord_data.getTuning(tuning_id);
+    		mNumStrings = tuning.getNumNotes();
+    		
+    		System.out.print("There are " + tuning.getNumNotes() + " named ");
+
+    		for (int i=0;i<mNumStrings; ++i)
+    		{
+    			System.out.print(" " + tuning.getNote(i).getName());
+    			mStringNames[i] = tuning.getNote(i).getName();
+    		}
+    		System.out.println("");
+    	}	
     }
     
     public FretPanel() {
+    	ChoordData.getInstance();
+    	
         addMouseListener(this);
         addMouseMotionListener(this);
     }
@@ -84,15 +124,8 @@ public class FretPanel extends JPanel implements MouseListener, MouseMotionListe
         //Max size of cells in the space of the pane.
         int max_cell_x, max_cell_y;
         
+        updateTuning();
         //TEMPORARY FOR TESTING BEGIN
-        //Mock up some string names
-        mStringNames[0] = "E";
-        mStringNames[1] = "A";
-        mStringNames[2] = "D";
-        mStringNames[3] = "G";
-        mStringNames[4] = "B";
-        mStringNames[5] = "e";
-        
         //Mocked E-Major chord
         mFrets[0][0] = 'O';
         mFrets[1][2] = 'O';

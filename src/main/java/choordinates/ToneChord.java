@@ -4,6 +4,11 @@ package choordinates;
 
 public class ToneChord extends AbstractChord {
 
+	public ToneNote getNote(int id)
+	{
+		return (ToneNote) mNotes.get(id);
+	}
+	
 	public static ToneChord parse(String tuning)
 	{
 		/*Because I'm lazy and don't want to make a super complex UI,

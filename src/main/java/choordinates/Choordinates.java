@@ -1,11 +1,11 @@
 package choordinates;
 
-import java.awt.EventQueue;
 
-import java.awt.Dimension; 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.JMenuBar;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -13,16 +13,20 @@ import javax.swing.JLabel;
 import javax.swing.JTabbedPane;
 import javax.swing.JComboBox;
 import javax.swing.JTextField;
+import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 import javax.swing.JScrollPane;
-import java.awt.GridBagLayout;
-import java.awt.GridBagConstraints;
-import java.awt.Insets;
-
 import javax.swing.JList;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
+import javax.swing.SwingUtilities;
+import javax.swing.JOptionPane;
 
+import java.awt.GridBagLayout;
+import java.awt.GridBagConstraints;
+import java.awt.Insets;
+import java.awt.EventQueue;
+import java.awt.Dimension; 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
@@ -35,11 +39,12 @@ public class Choordinates extends JFrame {
 	private ChordDialog mChordDialog;
 	
 	private JPanel contentPane;
-	private JComboBox<String> comboRootNote;
 	private JComboBox<String> mComboTuning;
 	private JTextField textNotesNotes;
-	FretPanel mPanelFretSelect;
-	FretPanel mPanelNeck;
+	private JList<String> mListChordChord;
+	private FretPanel mPanelFretSelect;
+	private FretPanel mPanelNeck;
+	private JTextField mTextRootNote;
 	
 	/**
 	 * Launch the application.
@@ -61,6 +66,29 @@ public class Choordinates extends JFrame {
 		});
 	}
 
+	public void search_by_chord()
+	{
+		ChoordData choord_data = ChoordData.getInstance();
+		String root_name = mTextRootNote.getText().toUpperCase();
+		int chord_id = choord_data.getCurrentChord();
+		int tuning_id = choord_data.getCurrentTuning();
+		
+		ToneNote root_note = new ToneNote();
+		
+		if (!root_note.parse(root_name))
+		{
+			alert( "Search", "'" + root_name + "' is not a valid note name.");
+			return;
+		}
+		
+	}
+	
+	public void search()
+	{
+		//TODO do search by current pane
+		search_by_chord();
+	}
+	
 	private void refreshAll()
 	{
 		//WARNING this does a read from the file.
@@ -81,26 +109,68 @@ public class Choordinates extends JFrame {
 	public void refresh()
 	{
 		ChoordData choord_data = ChoordData.getInstance();
-		int id=choord_data.getCurrentTuning();
+		int tuning_id=choord_data.getCurrentTuning();
 
 		mRefreshing = true; //Combobox y u suk?
 		
-		//This list probably won't be that long.
-		//Be lazy, just wipe it out and rebuild it.
+		/*
+		 * TODO removing everything from the combo and list boxes
+		 * is probably the wrong way to do things.
+		 * It'll work for now but let's improve this.
+		 */
 		mComboTuning.removeAllItems();
 		for (int i=0;i < choord_data.getNumTunings(); ++i)
 		{
 			mComboTuning.addItem(choord_data.getTuning(i).getName());
 		}
 
-		if (id > -1)
+		if (tuning_id > -1)
 		{
-			mComboTuning.setSelectedIndex(id);
+			mComboTuning.setSelectedIndex(tuning_id);
 		}
 	
+		mListChordChord.removeAll();
+		
+		//We could just return the arraylist from choord_data
+		//and convert it to a list, but why do anything the
+		//easy way?
+        DefaultListModel<String> listModel = new DefaultListModel<>();
+        int chord_id = choord_data.getCurrentChord();
+
+        for (int i=0;i < choord_data.getNumChords(); ++i) {
+            listModel.addElement(choord_data.getChord(i).getName());
+        }
+
+        // Set the list model to the JList
+        mListChordChord.setModel(listModel);
+        if (tuning_id > -1)
+        {
+        	mListChordChord.setSelectedIndex(chord_id);
+        }
+        
+		updateFretDisplays();
 		mRefreshing = false;
 	}
 
+	public void updateFretDisplays()
+	{
+		ChoordData choords_data = ChoordData.getInstance();
+		
+		int num_frets = 24;
+		int tuning_id = choords_data.getCurrentTuning();
+		
+		mPanelNeck.setNumFrets(num_frets);
+	}
+	
+	private void alert(String title, String message)
+	{
+		JOptionPane.showMessageDialog(null,
+				message, 
+				title, 
+				JOptionPane.INFORMATION_MESSAGE,
+				ChoordData.getInstance().getPreferences().getIcon());
+	}
+	
 	/**
 	 * Create the frame.
 	 */
@@ -159,7 +229,7 @@ public class Choordinates extends JFrame {
 		JMenuItem mntmAbout = new JMenuItem("About");
 		mnHelp.add(mntmAbout);
 
-		setBounds(100, 100, 499, 421);
+		setBounds(100, 100, 499, 449);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 
@@ -225,14 +295,14 @@ public class Choordinates extends JFrame {
 		gbc_lblRootNote.gridy = 0;
 		panelChordSelect.add(lblRootNote, gbc_lblRootNote);
 		
-		JComboBox<String> comboRootNote = new JComboBox<String>();
-		GridBagConstraints gbc_comboRootNote = new GridBagConstraints();
-		gbc_comboRootNote.insets = new Insets(0, 0, 5, 0);
-		gbc_comboRootNote.fill = GridBagConstraints.HORIZONTAL;
-		gbc_comboRootNote.gridx = 1;
-		gbc_comboRootNote.gridy = 0;
+		JTextField mTextRootNote = new JTextField();
+		GridBagConstraints gbc_mTextRootNote = new GridBagConstraints();
+		gbc_mTextRootNote.insets = new Insets(0, 0, 5, 0);
+		gbc_mTextRootNote.fill = GridBagConstraints.HORIZONTAL;
+		gbc_mTextRootNote.gridx = 1;
+		gbc_mTextRootNote.gridy = 0;
 		//comboRootNote.setPreferredSize(new Dimension(10,20));
-		panelChordSelect.add(comboRootNote, gbc_comboRootNote);
+		panelChordSelect.add(mTextRootNote, gbc_mTextRootNote);
 		
 		JLabel lblChordChord = new JLabel("Chord");
 		GridBagConstraints gbc_lblChordChord = new GridBagConstraints();
@@ -242,13 +312,27 @@ public class Choordinates extends JFrame {
 		gbc_lblChordChord.gridy = 1;
 		panelChordSelect.add(lblChordChord, gbc_lblChordChord);
 		
-		JList listChordChord = new JList();
-		GridBagConstraints gbc_listChordChord = new GridBagConstraints();
-		gbc_listChordChord.gridwidth = 2;
-		gbc_listChordChord.fill = GridBagConstraints.BOTH;
-		gbc_listChordChord.gridx = 0;
-		gbc_listChordChord.gridy = 2;
-		panelChordSelect.add(listChordChord, gbc_listChordChord);
+		mListChordChord = new JList<String>();
+		GridBagConstraints gbc_mListChordChord = new GridBagConstraints();
+		gbc_mListChordChord.gridwidth = 2;
+		gbc_mListChordChord.fill = GridBagConstraints.BOTH;
+		gbc_mListChordChord.gridx = 0;
+		gbc_mListChordChord.gridy = 2;
+		mListChordChord.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        mListChordChord.addListSelectionListener(new ListSelectionListener() {
+            @Override
+            public void valueChanged(ListSelectionEvent e) {
+            	if (!mRefreshing)
+            	{
+            		ChoordData choord_data = ChoordData.getInstance();
+                    if (!e.getValueIsAdjusting()) { // Check if selection is finalized
+                    	choord_data.setCurrentChord( mListChordChord.getSelectedIndex());
+                    	refresh();
+                    }
+            	}
+            }
+        });
+		panelChordSelect.add(mListChordChord, gbc_mListChordChord);
 		
 		JPanel panelNotesSelect = new JPanel();
 		tabbedPane.addTab("Notes", null, panelNotesSelect, null);
@@ -259,7 +343,7 @@ public class Choordinates extends JFrame {
 		
 		mPanelFretSelect = new FretPanel();
 		mPanelFretSelect.setOrientation(false);
-		mPanelFretSelect.configureFretboard(7, 6);
+		mPanelFretSelect.setNumFrets(7);
 		tabbedPane.addTab("Frets", null, mPanelFretSelect, null);
 
 		JLabel lblMatches = new JLabel("Matches");
@@ -301,6 +385,7 @@ public class Choordinates extends JFrame {
 		JButton btnSearch = new JButton("Search");
 		btnSearch.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				search();
 			}
 		});
 		GridBagConstraints gbc_btnSearch = new GridBagConstraints();

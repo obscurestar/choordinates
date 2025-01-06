@@ -1,7 +1,6 @@
 package choordinates;
 
 import java.awt.BorderLayout;
-import java.awt.FlowLayout;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -14,10 +13,8 @@ import javax.swing.JTextField;
 import javax.swing.JList;
 import javax.swing.ListSelectionModel;
 import javax.swing.DefaultListModel;
-import javax.swing.ImageIcon;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import javax.swing.ImageIcon;
 import javax.swing.SwingConstants;
 import javax.swing.WindowConstants;
 
@@ -58,7 +55,7 @@ public class ChordDialog extends JDialog
 	}
 	
 	public ChordDialog() {
-		ChoordData choord_data = ChoordData.read();
+		ChoordData.read();
 		
 		setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
 
@@ -116,6 +113,7 @@ public class ChordDialog extends JDialog
 	                	if (!mRefreshing)
 	                	{
 		                    if (!e.getValueIsAdjusting()) { // Check if selection is finalized
+		                    	ChoordData choord_data = ChoordData.getInstance();
 		                    	choord_data.setCurrentChord( mListChords.getSelectedIndex());
 		                    	refresh();
 		                    	refreshMain();
@@ -213,6 +211,7 @@ public class ChordDialog extends JDialog
 		            @Override
 		            public void actionPerformed(ActionEvent e)
 		            {
+		            	ChoordData choord_data = ChoordData.getInstance();
 		            	int id  = choord_data.getCurrentChord();
 		            	
 		            	if (id == -1)
@@ -246,6 +245,7 @@ public class ChordDialog extends JDialog
 		            {
 		            	if (saveChord(-1) )
 		            	{
+		            		ChoordData choord_data = ChoordData.getInstance();
 		            		choord_data.setCurrentChord(choord_data.getNumChords() - 1);
 		            		refresh();
 		            		refreshMain();
@@ -281,6 +281,7 @@ public class ChordDialog extends JDialog
 		            @Override
 		            public void actionPerformed(ActionEvent e)
 		            {
+		            	ChoordData choord_data = ChoordData.getInstance();
 		            	int id = choord_data.getCurrentChord();
 		            	
 		            	if (saveChord(id))
@@ -372,13 +373,12 @@ public class ChordDialog extends JDialog
 	
 	private boolean confirm(String title, String message)
 	{
-		ImageIcon icon = new ImageIcon("choordinates64.png");
         int result = JOptionPane.showConfirmDialog(null, 
                                                   message, 
                                                   title, 
                                                   JOptionPane.OK_CANCEL_OPTION,
                                                   JOptionPane.QUESTION_MESSAGE,
-                                                  icon);
+                                                  ChoordData.getInstance().getPreferences().getIcon());
         
         if (result == JOptionPane.OK_OPTION)
         {

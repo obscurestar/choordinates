@@ -2,9 +2,9 @@ package choordinates;
 
 import java.util.ArrayList;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.io.File;
@@ -25,6 +25,9 @@ public class ChoordData {
 	private ArrayList<IntervalChord> mChords = new ArrayList<>();
 	@JsonProperty("current_chord")
 	private int mCurrentChord;
+	//@JsonProperty("preferences")
+	@JsonIgnore
+	private Preferences mPreferences = new Preferences();
 
 	private ChoordData()
 	{
@@ -198,6 +201,12 @@ public class ChoordData {
 		{
 			mTunings.set(id,  tuning);
 		}
+	}
+	
+	@JsonIgnore
+	public Preferences getPreferences()
+	{
+		return mPreferences;
 	}
 	
 	//Data serialization and deserialization routines.
