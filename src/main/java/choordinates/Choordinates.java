@@ -14,12 +14,12 @@ import javax.swing.JTabbedPane;
 import javax.swing.JComboBox;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
-import javax.swing.SwingConstants;
+//import javax.swing.SwingConstants;
 import javax.swing.JScrollPane;
 import javax.swing.JList;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
-import javax.swing.SwingUtilities;
+//import javax.swing.SwingUtilities;
 import javax.swing.JOptionPane;
 
 import java.awt.GridBagLayout;
@@ -45,6 +45,7 @@ public class Choordinates extends JFrame {
 	private FretPanel mPanelFretSelect;
 	private FretPanel mPanelNeck;
 	private JTextField mTextRootNote;
+	private JList<String> mListMatches;
 	
 	/**
 	 * Launch the application.
@@ -145,11 +146,11 @@ public class Choordinates extends JFrame {
         	mListChordChord.setSelectedIndex(chord_id);
         }
         
-		updateFretDisplays();
+		//updateFretDisplays();
 		mRefreshing = false;
 	}
 
-	public void updateFretDisplays()
+/*	public void updateFretDisplays()
 	{
 		ChoordData choords_data = ChoordData.getInstance();
 		
@@ -157,7 +158,7 @@ public class Choordinates extends JFrame {
 		int tuning_id = choords_data.getCurrentTuning();
 		
 		mPanelNeck.setNumFrets(num_frets);
-	}
+	}*/
 	
 	private void alert(String title, String message)
 	{
@@ -351,7 +352,7 @@ public class Choordinates extends JFrame {
 		gbc_lblMatches.gridy = 0;
 		contentPane.add(lblMatches, gbc_lblMatches);
 		
-		JList listMatches = new JList();
+		mListMatches = new JList<String>();
 		GridBagConstraints gbc_listMatches = new GridBagConstraints();
 		gbc_listMatches.gridwidth = 2;
 		gbc_listMatches.gridheight = 2;
@@ -359,7 +360,7 @@ public class Choordinates extends JFrame {
 		gbc_listMatches.fill = GridBagConstraints.BOTH;
 		gbc_listMatches.gridx = 2;
 		gbc_listMatches.gridy = 1;
-		contentPane.add(listMatches, gbc_listMatches);
+		contentPane.add(mListMatches, gbc_listMatches);
 		
 		JLabel lblFavorites = new JLabel("Favorite Shapes");
 		GridBagConstraints gbc_lblFavorites = new GridBagConstraints();

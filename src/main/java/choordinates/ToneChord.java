@@ -29,8 +29,6 @@ public class ToneChord extends AbstractChord {
 			
 			mNotes.add(note);
 		}
-		
-		System.out.println("Created ToneChord: " + mName);
 	}
 	
 	

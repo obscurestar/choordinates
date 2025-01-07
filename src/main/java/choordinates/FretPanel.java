@@ -3,7 +3,6 @@ package choordinates;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.Arrays;
-import static java.lang.Math.min;
 
 //TODO reduce amount of stuff imported.
 //import java.awt.Color;
@@ -11,6 +10,7 @@ import static java.lang.Math.min;
 import javax.swing.*;
 
 public class FretPanel extends JPanel implements MouseListener, MouseMotionListener {
+	private static final long serialVersionUID = 1L;
     //Member constants
     private final int mMaxStrings = 8;
     private final int mMaxFrets = 26;  //The nut is fret 0.
@@ -80,9 +80,7 @@ public class FretPanel extends JPanel implements MouseListener, MouseMotionListe
     	IntervalChord chord = mSearchChord;
     	
     	int root_tone = mRootNote.getSemitone();
-    	
-    	ToneChord foo = new ToneChord(mRootNote, chord);
-    	
+    	    	
     	flushFrets();   //Floosh
     	
     	//Loop through the strings on the instrument
@@ -320,8 +318,6 @@ public class FretPanel extends JPanel implements MouseListener, MouseMotionListe
         }
         else
         {				//Horizontal fret, vertical strings.
-        	int strnum = 0;
-
         	for (int x=0; x < mNumStrings; ++x)
         	{
         		g.drawLine( (x+1) * cell_size + cell_half, cell_size + cell_half, (x+1) * cell_size + cell_half, cell_size * fret_lines + cell_half );

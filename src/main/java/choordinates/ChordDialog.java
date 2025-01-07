@@ -15,7 +15,7 @@ import javax.swing.ListSelectionModel;
 import javax.swing.DefaultListModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import javax.swing.SwingConstants;
+//import javax.swing.SwingConstants;
 import javax.swing.WindowConstants;
 
 import java.awt.GridBagLayout;
@@ -25,7 +25,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
+//import java.awt.event.WindowListener;
 
 import java.util.ArrayList;
 
@@ -39,21 +39,13 @@ public class ChordDialog extends JDialog
 	private JTextField mTextAliases;
 	private JTextField mTextIntervals;
 	private JTextField mTextSymbol;
-	private Choordinates mOwner;
 	
 	private boolean mRefreshing = false;
 	
 	/**
 	 * Create the dialog.
 	 */
-	
-	public void setOwner( Choordinates owner)
-	{
-		//why use a callback when we can use the whole window?
-		//Surely that's secure and good design...
-		mOwner = owner;
-	}
-	
+		
 	public ChordDialog() {
 		setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
 

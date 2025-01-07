@@ -15,7 +15,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
+//import java.awt.event.WindowListener;
 
 import java.util.ArrayList;
 
@@ -27,16 +27,10 @@ public class TuningDialog extends JDialog
 	private JTextField mTextStrings;
 	private JComboBox<String> mComboTunings;
 	private boolean mRefreshing = false;
-	private Choordinates mOwner;
 		
 	/**
 	 * Create the frame.
 	 */
-
-	public void setOwner(Choordinates owner)
-	{
-		mOwner = owner;
-	}
 	
 	public TuningDialog() {
 		//BEWARE of lambdas and instance variables.
