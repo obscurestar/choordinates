@@ -40,8 +40,7 @@ public class TuningDialog extends JDialog
 	
 	public TuningDialog() {
 		//BEWARE of lambdas and instance variables.
-		ChoordData.read();
-
+		
 		//setUndecorated(true);
 		
 		setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
@@ -161,6 +160,7 @@ public class TuningDialog extends JDialog
             	{
             		choord_data.deleteTuning(id);
             		choord_data.setCurrentTuning(-1); 
+            		choord_data.write();
             		refresh();
             		refreshMain();
             	}

@@ -55,8 +55,6 @@ public class ChordDialog extends JDialog
 	}
 	
 	public ChordDialog() {
-		ChoordData.read();
-		
 		setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
 
 		addWindowListener(new WindowAdapter() {
@@ -208,26 +206,27 @@ public class ChordDialog extends JDialog
 						panelChordDict.add(btnDelete, gbc_btnDelete);
 						btnDelete.addActionListener(new ActionListener()
 						{
-		            @Override
-		            public void actionPerformed(ActionEvent e)
-		            {
-		            	ChoordData choord_data = ChoordData.getInstance();
-		            	int id  = choord_data.getCurrentChord();
+							@Override
+							public void actionPerformed(ActionEvent e)
+							{
+								ChoordData choord_data = ChoordData.getInstance();
+								int id  = choord_data.getCurrentChord();
 		            	
-		            	if (id == -1)
-		            	{
-		            		return;
-		            	}
+								if (id == -1)
+								{
+									return;
+								}
 		            	
-		            	String name = choord_data.getChord(id).getName();
+								String name = choord_data.getChord(id).getName();
 		            	
-		            	if (confirm("Delete Chord", name))
-		            	{
-		            		choord_data.deleteChord(id);
-		            		choord_data.setCurrentChord(-1); 
-		            		refresh();
-		            	}
-		            }
+								if (confirm("Delete Chord", name))
+								{
+									choord_data.deleteChord(id);
+									choord_data.setCurrentChord(-1); 
+									choord_data.write();
+									refresh();
+								}
+							}
 						});
 					
 					

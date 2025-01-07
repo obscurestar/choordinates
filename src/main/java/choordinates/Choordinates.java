@@ -69,9 +69,8 @@ public class Choordinates extends JFrame {
 	public void search_by_chord()
 	{
 		ChoordData choord_data = ChoordData.getInstance();
-		String root_name = mTextRootNote.getText().toUpperCase();
+		String root_name = mTextRootNote.getText();
 		int chord_id = choord_data.getCurrentChord();
-		int tuning_id = choord_data.getCurrentTuning();
 		
 		ToneNote root_note = new ToneNote();
 		
@@ -81,7 +80,7 @@ public class Choordinates extends JFrame {
 			return;
 		}
 		
-		mPanelNeck.setChordNote(root_note);	
+		mPanelNeck.setRootAndChord(root_note, choord_data.getChord(chord_id));	
 	}
 	
 	public void search()
@@ -92,9 +91,6 @@ public class Choordinates extends JFrame {
 	
 	private void refreshAll()
 	{
-		//WARNING this does a read from the file.
-		ChoordData.read();
-		
 		refresh();
 		
 		if (mTuningDialog != null)

@@ -13,7 +13,7 @@ import javax.swing.*;
 public class FretPanel extends JPanel implements MouseListener, MouseMotionListener {
     //Member constants
     private final int mMaxStrings = 8;
-    private final int mMaxFrets = 24;
+    private final int mMaxFrets = 26;  //The nut is fret 0.
     
     //Member variables
     private int startX, startY;
@@ -24,11 +24,13 @@ public class FretPanel extends JPanel implements MouseListener, MouseMotionListe
     private boolean mLefty = false;		//Set to true for left-handed chord shapes.
     private String[] mStringNames = new String[mMaxStrings];
 
-    private char[][] mFrets=new char[mMaxStrings][mMaxFrets];  //Let's not be clever.  Just buffer max space.
+    private int[][] mFrets=new int[mMaxStrings][mMaxFrets];  //Let's not be clever.  Just buffer max space.
     private boolean mOrientX = true;  //Set true for horizontal strings, false for vertical
 
-    private ToneNote mChordNote;
-    
+    //Root Note and Search Chord inform the fret display.
+    private ToneNote mRootNote;
+    private IntervalChord mSearchChord;
+        
     public void setOrientation(boolean orientation) {
     	//Sets the orientation of the fretboard view in the window.
     	mOrientX = orientation;
@@ -36,9 +38,17 @@ public class FretPanel extends JPanel implements MouseListener, MouseMotionListe
     
     public void setNumFrets(int frets)
     {
-    	if (frets > 0 && frets <= mMaxFrets)
+    	if (frets < 0)
     	{
-    		mNumFrets = frets;
+    		frets = 0;
+    	}
+    	else if (frets < (mMaxFrets+1))
+    	{
+    		mNumFrets = mMaxFrets;
+    	}
+    	else
+    	{
+    		mNumFrets = frets+1;
     	}
     	updateTuning();
     	refresh();
@@ -58,25 +68,21 @@ public class FretPanel extends JPanel implements MouseListener, MouseMotionListe
     	{
     		for (int j=0;j<mMaxFrets; ++j)
     		{
-    			mFrets[i][j] = 0;
+    			mFrets[i][j] = -1;
     		}
     	}
     }
     
-    public void setChordNote(ToneNote note)
+    public void markFrets()
     {
-    	
-    	mChordNote = note;
-    	
     	ChoordData choord_data = ChoordData.getInstance();
     	ToneChord tuning = choord_data.getTuning( choord_data.getCurrentTuning() );
-    	IntervalChord chord = choord_data.getChord( choord_data.getCurrentChord() );
+    	IntervalChord chord = mSearchChord;
     	
-    	int root_tone = mChordNote.getSemitone();
+    	int root_tone = mRootNote.getSemitone();
     	
     	flushFrets();   //Floosh
     	
-    	System.out.println("Root Note: " + mChordNote.getName() + " value " + root_tone);
     	//Loop through the strings on the instrument
     	for (int i=0; i<tuning.getNumNotes(); ++i)
     	{
@@ -84,7 +90,6 @@ public class FretPanel extends JPanel implements MouseListener, MouseMotionListe
     		
     		int string_tone = string_note.getSemitone();
     		
-    		System.out.println("String: " + string_note.getName() + " " + string_tone + ": ");
     		//Loop through the notes in the selected chord
     		for (int j=0; j<chord.getNumNotes(); ++j)
     		{
@@ -100,21 +105,23 @@ public class FretPanel extends JPanel implements MouseListener, MouseMotionListe
     			}
     			
     			int chord_tone = ( root_tone + interval_tone ) % 12;
-    			
-    			System.out.print("\tInterval " + j + " Semitone " + interval_tone + ":  Chord Tone " + chord_tone);
     			for (int fret=0;fret<mNumFrets; ++fret)
     			{
     				if ( ( ( string_tone + fret ) % 12 ) == chord_tone)
     				{
-    					System.out.print(" " + fret);
-    					//mFrets[i][k] = chord.getNote(j).getSemitone();
-    					mFrets[i][fret] = '0';
+    					mFrets[i][fret] = j;
     				}
     			}
-        		System.out.println("");
     		}
     	}
     	refresh();
+    }
+    
+    public void setRootAndChord(ToneNote note, IntervalChord chord)
+    {
+    	mRootNote = note;
+    	mSearchChord = chord;
+    	markFrets();
     }
     
     public void updateTuning()
@@ -139,19 +146,16 @@ public class FretPanel extends JPanel implements MouseListener, MouseMotionListe
     		ToneChord tuning = choord_data.getTuning(tuning_id);
     		mNumStrings = tuning.getNumNotes();
     		
-    		System.out.print("There are " + tuning.getNumNotes() + " named ");
-
     		for (int i=0;i<mNumStrings; ++i)
     		{
-    			System.out.print(" " + tuning.getNote(i).getName());
     			mStringNames[i] = tuning.getNote(i).getName();
     		}
-    		System.out.println("");
     	}	
     }
     
     public FretPanel() {
     	ChoordData.getInstance();
+    	flushFrets();
     	
         addMouseListener(this);
         addMouseMotionListener(this);
@@ -246,21 +250,28 @@ public class FretPanel extends JPanel implements MouseListener, MouseMotionListe
         }
         g.setColor(Color.BLACK);
       
+        int fret_lines = mNumFrets;
+        if (mFirstFret==0)
+        {
+        	fret_lines ++;
+        }
+        
         //TODO refactor this orientx orienty into a less duplicate-code function some day.
         if (mOrientX)  //Horizontal strings, vertical frets
         {
-        	for (int x=0; x<mNumFrets; ++x)
+        	for (int x=0; x<fret_lines; ++x)
         	{
         		g.drawLine( (x+1) * cell_size + cell_half,  cell_size + cell_half,  (x+1) * cell_size + cell_half, cell_size * mNumStrings + cell_half);
-        		if (mFirstFret + x == 0)
+        		if (((mFirstFret + x) % 12) == 0)
         		{
+        			//Draw double-lines at 0 12 24
             		g.drawLine( (x+1) * cell_size + cell_half - 2,  cell_size + cell_half,  (x+1) * cell_size + cell_half -2, cell_size * mNumStrings + cell_half);
 
         		}
         	}
         	for (int y=0; y<mNumStrings; ++y)
         	{
-        		g.drawLine(cell_size + cell_half, (y+1) * cell_size + cell_half, cell_size * mNumFrets + cell_half, (y+1) * cell_size + cell_half);
+        		g.drawLine(cell_size + cell_half, (y+1) * cell_size + cell_half, cell_size * fret_lines + cell_half, (y+1) * cell_size + cell_half);
         		if (mLefty)
         		{
         			g.drawString(mStringNames[y], cell_half, (y+1) * cell_size + cell_half);
@@ -287,19 +298,28 @@ public class FretPanel extends JPanel implements MouseListener, MouseMotionListe
         			g.drawString(numeral, cell_size * i + offset + cell_half - 5, cell_size);
         		}
         		//Draw the selected frets;
-        		for (int j=0; j<mNumStrings; ++j)
+        		if (i < (mNumFrets-1))
         		{
-        			if (mFrets[j][i] != 0)
-        			{
-        				if (mLefty)
-        				{
-        					g.fillOval( (i+1) * cell_size + cell23, (j+1) * cell_size + cell16, cell34, cell34);
-        				}
-        				else
-        				{
-        					g.fillOval( (i+1) * cell_size + cell23, (mNumStrings - j) * cell_size + cell16, cell34, cell34);
-        				}
-        			}
+	        		for (int j=0; j<mNumStrings; ++j)
+	        		{
+	        			if (mFrets[j][i] != -1)
+	        			{
+	        				if (mLefty)
+	        				{
+	        					g.setColor(IntervalNote.getColor(mFrets[j][i]));
+	        					g.fillOval( (i+1) * cell_size + cell23, (j+1) * cell_size + cell16, cell34, cell34);
+	        					g.setColor(Color.BLACK);
+	        					g.drawOval( (i+1) * cell_size + cell23, (j+1) * cell_size + cell16, cell34, cell34);
+	        				}
+	        				else
+	        				{
+	        					g.setColor(IntervalNote.getColor(mFrets[j][i]));
+	        					g.fillOval( (i+1) * cell_size + cell23, (mNumStrings - j) * cell_size + cell16, cell34, cell34);
+	        					g.setColor(Color.BLACK);
+	        					g.drawOval( (i+1) * cell_size + cell23, (mNumStrings - j) * cell_size + cell16, cell34, cell34);
+	        				}
+	        			}
+	        		}
         		}
         	}
         }
@@ -309,7 +329,7 @@ public class FretPanel extends JPanel implements MouseListener, MouseMotionListe
 
         	for (int x=0; x < mNumStrings; ++x)
         	{
-        		g.drawLine( (x+1) * cell_size + cell_half, cell_size + cell_half, (x+1) * cell_size + cell_half, cell_size * mNumFrets + cell_half );
+        		g.drawLine( (x+1) * cell_size + cell_half, cell_size + cell_half, (x+1) * cell_size + cell_half, cell_size * fret_lines + cell_half );
         		if (mLefty)
         		{
         			g.drawString(mStringNames[x], (mNumStrings - x) * cell_size + cell14, cell_size);
@@ -319,20 +339,22 @@ public class FretPanel extends JPanel implements MouseListener, MouseMotionListe
         			g.drawString(mStringNames[x], (x+1) * cell_size + cell14, cell_size);
         		}
         	}
-        	for (int y=cell_half; y < cell_size * mNumFrets; y += cell_size)
+        	for (int y=cell_half; y < cell_size * fret_lines; y += cell_size)
         	{
         		g.drawLine(cell_size + cell_half, cell_size + y, cell_size * mNumStrings + cell_half, cell_size + y);
         	}
-        	for (int y=0; y < mNumFrets; ++y)
+        	for (int y=0; y < fret_lines; ++y)
         	{
         		g.drawLine(cell_size + cell_half, (y+1) * cell_size + cell_half, cell_size * mNumStrings + cell_half, (y+1) * cell_size + cell_half);
-        		if (mFirstFret + y == 0)
+        		if (((mFirstFret + y) % 12) == 0)
         		{
+        			//Draw double-lines at 0 12 24
             		g.drawLine(cell_size + cell_half, (y+1) * cell_size + cell_half - 2, cell_size * mNumStrings + cell_half, (y+1) * cell_size + cell_half -2);
         		}
         	}
         	for (int i=0; i<mNumFrets; ++i)
         	{
+        		//Draw fret numbers.
         		int fret_no = mFirstFret+i;
         		if (Arrays.binarySearch(labeled_frets, fret_no) >= 0)
         		{
@@ -347,16 +369,25 @@ public class FretPanel extends JPanel implements MouseListener, MouseMotionListe
         		//Draw the selected frets;
         		for (int j=0; j<mNumStrings; ++j)
         		{
-        			if (mFrets[j][i] != 0)
+        			if (i < (mNumFrets-1))
         			{
-        				if (mLefty)
-        				{
-        					g.fillOval( (mNumStrings - j) * cell_size + cell16, (i+1) * cell_size + cell_half+ cell16, cell34, cell34);
-        				}
-        				else
-        				{
-        					g.fillOval( (j+1) * cell_size + cell16, (i+1) * cell_size + cell_half + cell16, cell34, cell34);
-        				}
+	        			if (mFrets[j][i] != -1)
+	        			{
+	        				if (mLefty)
+	        				{
+	        					g.setColor(IntervalNote.getColor(mFrets[j][i]));
+	        					g.fillOval( (mNumStrings - j) * cell_size + cell16, (i+1) * cell_size + cell_half+ cell16, cell34, cell34);
+	        					g.setColor(Color.BLACK);
+	        					g.fillOval( (mNumStrings - j) * cell_size + cell16, (i+1) * cell_size + cell_half+ cell16, cell34, cell34);
+	        				}
+	        				else
+	        				{
+	        					g.setColor(IntervalNote.getColor(mFrets[j][i]));
+	        					g.fillOval( (j+1) * cell_size + cell16, (i+1) * cell_size + cell_half + cell16, cell34, cell34);
+	        					g.setColor(Color.BLACK);
+	        					g.fillOval( (j+1) * cell_size + cell16, (i+1) * cell_size + cell_half + cell16, cell34, cell34);
+	        				}
+	        			}
         			}
         		}
         	}

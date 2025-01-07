@@ -94,7 +94,7 @@ public class ToneNote extends AbstractNote{
 			//Not a valid note name.
 			return false;
 		}
-		
+				
 		mID = note_index;
 		
 		if (note_up.charAt(0) != note.charAt(0))
@@ -110,7 +110,6 @@ public class ToneNote extends AbstractNote{
 			}
 			else if (sharps.indexOf( note.charAt(i)) != -1)
 			{
-	
 				mSharp++;
 			}
 			else

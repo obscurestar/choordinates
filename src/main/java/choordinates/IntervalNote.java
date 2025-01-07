@@ -1,11 +1,21 @@
 package choordinates;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+
+import java.awt.Color;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public class IntervalNote extends AbstractNote{
 	private final int[] mIntervalMap = { 0, 2, 4, 5, 7, 9, 11 };
 	
+    //TODO something better than colors but the order they appear in the chord.
+    //Black white yellow orange red pink
+    //If you have more than 6 fingers, colors loop.  Sorry!
+	@JsonIgnore 
+	private static final Color[] mNoteColors = { Color.BLACK, Color.WHITE, Color.YELLOW, Color.ORANGE, Color.RED, Color.PINK };
+    
+
 	@JsonIgnore
 	public String getName()
 	{
@@ -34,11 +44,11 @@ public class IntervalNote extends AbstractNote{
 		//They don't know nothing.
 		if (mID > 0)
 		{
-			return mIntervalMap[ (mID-1) % 7 ];
+			return mIntervalMap[ (mID-1) % 7 ] + mSharp;
 		}
 		
 		//Handle negative intervals.
-		return mIntervalMap[ (7 - (mID+1)) % 7];
+		return mIntervalMap[ (7 - (mID+1)) % 7] + mSharp;
 	}
 	
 	@JsonIgnore
@@ -128,5 +138,11 @@ public class IntervalNote extends AbstractNote{
 	public boolean isNote(AbstractNote note)
 	{
 		return false;
+	}
+	
+	@JsonIgnore
+	public static Color getColor( int cid )
+	{
+		return mNoteColors[ cid % mNoteColors.length ];
 	}
 }
