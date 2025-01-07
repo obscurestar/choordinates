@@ -178,13 +178,15 @@ public class Choordinates extends JFrame {
 		 */
 		ChoordData.read();   //Initialize data structures from JSON file.
 		
+		//Set up the window.
 		setTitle("Choordinates");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
+//Add a Menubar.
 		JMenuBar menuBar = new JMenuBar();
 		setJMenuBar(menuBar);
 		
-		//   Window Menu
+	//   Window Menu
 		JMenu mnWindow = new JMenu("Window");
 		menuBar.add(mnWindow);
 		
@@ -223,10 +225,11 @@ public class Choordinates extends JFrame {
 		JMenu mnHelp = new JMenu("Help");
 		menuBar.add(mnHelp);
 		
-		//HELP menu
+	//HELP menu
 		JMenuItem mntmAbout = new JMenuItem("About");
 		mnHelp.add(mntmAbout);
 
+//Create the content pane
 		setBounds(100, 100, 499, 449);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -238,7 +241,7 @@ public class Choordinates extends JFrame {
 		gbl_contentPane.columnWeights = new double[]{0.0, 0.5, 0.0, 1.0, Double.MIN_VALUE};
 		gbl_contentPane.rowWeights = new double[]{0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 2.0, 2.0, Double.MIN_VALUE};
 		contentPane.setLayout(gbl_contentPane);
-		
+//Tuning select		
 		JLabel lblTuning = new JLabel("Tuning");
 		GridBagConstraints gbc_lblTuning = new GridBagConstraints();
 		gbc_lblTuning.anchor = GridBagConstraints.EAST;
@@ -264,7 +267,7 @@ public class Choordinates extends JFrame {
         	}
         });
 		contentPane.add(mComboTuning, gbc_mComboTuning);
-		
+//TABBED Pane		
 		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
 		GridBagConstraints gbc_tabbedPane = new GridBagConstraints();
 		gbc_tabbedPane.gridheight = 4;
@@ -274,7 +277,8 @@ public class Choordinates extends JFrame {
 		gbc_tabbedPane.gridx = 0;
 		gbc_tabbedPane.gridy = 1;
 		contentPane.add(tabbedPane, gbc_tabbedPane);
-		
+
+//Chord select Pane
 		JPanel panelChordSelect = new JPanel();
 		tabbedPane.addTab("Chord", null, panelChordSelect, null);
 		GridBagLayout gbl_panelChordSelect = new GridBagLayout();
@@ -299,7 +303,6 @@ public class Choordinates extends JFrame {
 		gbc_mTextRootNote.fill = GridBagConstraints.HORIZONTAL;
 		gbc_mTextRootNote.gridx = 1;
 		gbc_mTextRootNote.gridy = 0;
-		//comboRootNote.setPreferredSize(new Dimension(10,20));
 		panelChordSelect.add(mTextRootNote, gbc_mTextRootNote);
 		
 		JLabel lblChordChord = new JLabel("Chord");
@@ -331,7 +334,7 @@ public class Choordinates extends JFrame {
             }
         });
 		panelChordSelect.add(mListChordChord, gbc_mListChordChord);
-		
+//Select by NOTES pane		
 		JPanel panelNotesSelect = new JPanel();
 		tabbedPane.addTab("Notes", null, panelNotesSelect, null);
 		
@@ -339,11 +342,14 @@ public class Choordinates extends JFrame {
 		panelNotesSelect.add(textNotesNotes);
 		textNotesNotes.setColumns(10);
 		
+//Select by FRETS pane
 		mPanelFretSelect = new FretPanel();
 		mPanelFretSelect.setOrientation(false);
 		mPanelFretSelect.setNumFrets(7);
 		tabbedPane.addTab("Frets", null, mPanelFretSelect, null);
+		
 
+//Matches components.
 		JLabel lblMatches = new JLabel("Matches");
 		GridBagConstraints gbc_lblMatches = new GridBagConstraints();
 		gbc_lblMatches.gridwidth = 2;
@@ -361,7 +367,8 @@ public class Choordinates extends JFrame {
 		gbc_listMatches.gridx = 2;
 		gbc_listMatches.gridy = 1;
 		contentPane.add(mListMatches, gbc_listMatches);
-		
+
+//Favorite shape components.
 		JLabel lblFavorites = new JLabel("Favorite Shapes");
 		GridBagConstraints gbc_lblFavorites = new GridBagConstraints();
 		gbc_lblFavorites.gridwidth = 2;
@@ -379,7 +386,8 @@ public class Choordinates extends JFrame {
 		gbc_scrollFavorites.gridx = 2;
 		gbc_scrollFavorites.gridy = 4;
 		contentPane.add(scrollFavorites, gbc_scrollFavorites);
-		
+
+//Search button		
 		JButton btnSearch = new JButton("Search");
 		btnSearch.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {

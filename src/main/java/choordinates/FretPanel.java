@@ -28,8 +28,8 @@ public class FretPanel extends JPanel implements MouseListener, MouseMotionListe
     private boolean mOrientX = true;  //Set true for horizontal strings, false for vertical
 
     //Root Note and Search Chord inform the fret display.
-    private ToneNote mRootNote;
-    private IntervalChord mSearchChord;
+    private ToneNote mRootNote = new ToneNote();
+    private IntervalChord mSearchChord = new IntervalChord();
         
     public void setOrientation(boolean orientation) {
     	//Sets the orientation of the fretboard view in the window.
@@ -42,14 +42,12 @@ public class FretPanel extends JPanel implements MouseListener, MouseMotionListe
     	{
     		frets = 0;
     	}
-    	else if (frets < (mMaxFrets+1))
+    	else if (frets > (mMaxFrets+1))
     	{
     		mNumFrets = mMaxFrets;
     	}
-    	else
-    	{
-    		mNumFrets = frets+1;
-    	}
+    	mNumFrets = frets+1;
+    	
     	updateTuning();
     	refresh();
     }
