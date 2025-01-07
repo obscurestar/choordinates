@@ -81,6 +81,8 @@ public class FretPanel extends JPanel implements MouseListener, MouseMotionListe
     	
     	int root_tone = mRootNote.getSemitone();
     	
+    	ToneChord foo = new ToneChord(mRootNote, chord);
+    	
     	flushFrets();   //Floosh
     	
     	//Loop through the strings on the instrument
@@ -132,13 +134,6 @@ public class FretPanel extends JPanel implements MouseListener, MouseMotionListe
     	
     	if (tuning_id == -1)
     	{
-    		//No tuning set, default.
-    		 mStringNames[0] = "E";
-    	     mStringNames[1] = "A";
-    	     mStringNames[2] = "D";
-    	     mStringNames[3] = "G";
-    	     mStringNames[4] = "B";
-    	     mStringNames[5] = "e";
     	     mNumStrings = 6;
     	}
     	else
