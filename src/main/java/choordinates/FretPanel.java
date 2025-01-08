@@ -16,13 +16,13 @@ public class FretPanel extends JPanel implements MouseListener, MouseMotionListe
     private final int mMaxFrets = 26;  //The nut is fret 0.
     
     //Member variables
-    private int startX, startY;
-    private int endX, endY;
+    private int mClickX, mClickY;
     private int mNumStrings = 6;
     private int mNumFrets = 24;
     private int mFirstFret = -1;
     private boolean mLefty = false;		//Set to true for left-handed chord shapes.
     private String[] mStringNames = new String[mMaxStrings];
+    private int[] mSelections = new int[mMaxStrings];
 
     private int[][] mFrets=new int[mMaxStrings][mMaxFrets];  //Let's not be clever.  Just buffer max space.
     private boolean mOrientX = true;  //Set true for horizontal strings, false for vertical
@@ -31,6 +31,15 @@ public class FretPanel extends JPanel implements MouseListener, MouseMotionListe
     private ToneNote mRootNote = new ToneNote();
     private IntervalChord mSearchChord = new IntervalChord();
         
+    private boolean mSelectAny = true;
+    
+    public void selectAny(boolean any)
+    {
+    	//Determines whether we can select any string/fret 
+    	//or only populated ones.
+    	mSelectAny = any;
+    }
+    
     public void setOrientation(boolean orientation) {
     	//Sets the orientation of the fretboard view in the window.
     	mOrientX = orientation;
@@ -50,6 +59,33 @@ public class FretPanel extends JPanel implements MouseListener, MouseMotionListe
     	
     	updateTuning();
     	refresh();
+    }
+    
+    public void flushSelections()
+    {
+    	//Deselect all the strings.
+    	for (int i=0;i<mMaxStrings;++i)
+    	{
+    		mSelections[i] = -1;
+    	}
+    }
+    
+    public void selectFret(int string_num, int fret_num)
+    {
+    	if (!mSelectAny && (mFrets[string_num][fret_num] == -1))
+    	{
+    		return;
+    	}
+    	
+    	if ( mSelections[string_num] == fret_num )
+    	{
+    		//This fret was already selected.  Deselect.
+    		mSelections[string_num] = -1;
+    	}
+    	else
+    	{
+    		mSelections[string_num] = fret_num;
+    	}
     }
     
     public void refresh()
@@ -147,6 +183,7 @@ public class FretPanel extends JPanel implements MouseListener, MouseMotionListe
     public FretPanel() {
     	ChoordData.getInstance();
     	flushFrets();
+    	flushSelections();
     	
         addMouseListener(this);
         addMouseMotionListener(this);
@@ -178,6 +215,8 @@ public class FretPanel extends JPanel implements MouseListener, MouseMotionListe
 
     @Override
     public void paintComponent(Graphics g) {
+    	//Hideous boutique graphic panel with trial and error layout.
+    	//TODO Refactor into function blocks some day.
         super.paintComponent(g);
         
         //Get the height and width of the panel. 
@@ -221,48 +260,149 @@ public class FretPanel extends JPanel implements MouseListener, MouseMotionListe
  
         // Set the color to red
 //      g.setColor(Color.RED); 
-
-
-        if (startX != 0 && startY != 0) {
-        	// Set the color to red
-        	g.setColor(Color.BLACK); 
-        	g.drawLine(startX, startY, endX, endY);
-        }
         
-        int mouse_x = endX - (cell_size + cell_half);
-        int mouse_y = endY - (cell_size);
-        if ((mouse_x > 0 && mouse_x < (cells_x - 1) * cell_size)
-        	&& (mouse_y > 0 && mouse_y < (cells_y) * cell_size))
-        {
-        	int x = mouse_x / cell_size;
-        	int y = mouse_y / cell_size;
-        	g.setColor(Color.CYAN);
-        	g.fillRect((x+1) * cell_size + cell_half,  (y+1) * cell_size, cell_size, cell_size);
-        }
-        g.setColor(Color.BLACK);
-      
         int fret_lines = mNumFrets;
         if (mFirstFret==0)
         {
         	fret_lines ++;
         }
         
+    	int fret_area[][] = new int[2][2]; //X and Y mins and maxes of fret box.
+    	
+    	if (mOrientX)
+    	{
+    		fret_area[0][0] = cell_size + cell_half;		//X min
+    		fret_area[1][0] = cell_size * fret_lines + cell_half;	//X max
+    		
+    		fret_area[0][1] =  cell_size + cell_half;
+    		fret_area[1][1] =  cell_size * mNumStrings + cell_half;
+    	}
+    	else
+    	{
+    		fret_area[0][0] = cell_size + cell_half;
+    		fret_area[1][0] =  cell_size * mNumStrings + cell_half;
+    		
+    		fret_area[0][1] = cell_size + cell_half;
+    		fret_area[1][1] =  cell_size * fret_lines + cell_half;
+    	}
+
+    	//Handle mouse clicks.
+    	if ( mClickX > fret_area[0][0] - cell_half 
+    			&& mClickX < fret_area[1][0] + cell_half
+    			&& mClickY > fret_area[0][1] - cell_half
+    			&& mClickY < fret_area[1][1] + cell_half )
+    	{
+    		int mouse_x = 0;
+    		int mouse_y = 0;
+    		
+    		mouse_x = Math.min( Math.max ( mClickX, fret_area[0][0]), fret_area[1][0] );
+    		mouse_y = Math.min( Math.max ( mClickY, fret_area[0][1]), fret_area[1][1] );
+    		
+    		int cell_x = (mouse_x - fret_area[0][0]) / cell_size;
+			int cell_y = (mouse_y - fret_area[0][1]) / cell_size;
+			
+    		int string_num, fret_num;
+    		if (mOrientX)
+    		{
+    			cell_y = (mouse_y - fret_area[0][1] + cell_half) / cell_size;
+
+    			fret_num = cell_x;
+    			if (mLefty)
+    			{
+    				string_num = cell_y;
+    			}
+    			else
+    			{
+    				string_num = mNumStrings - (cell_y +1);
+    			}
+    		}
+    		else
+    		{
+    			cell_x = (mouse_x - fret_area[0][0] + cell_half) / cell_size;
+    			fret_num = cell_y;
+    			if (mLefty)
+    			{
+    				string_num = mNumStrings - (cell_x + 1);
+    			}
+    			else
+    			{
+    				string_num = cell_x;	
+    			}
+    		}
+    		    		
+    		selectFret(string_num, fret_num);
+    	}
+    	
+    	//Draw the selections:
+    	if (mSelectAny)
+    	{
+    		g.setColor(Color.BLACK); 
+    	}
+    	else
+    	{
+    		g.setColor(Color.CYAN); 
+    	}
+    	for (int i=0;i<mNumStrings;++i)
+    	{
+    		if (mSelections[i] != -1)
+    		{
+    			int x,y;
+    			if (mOrientX)
+    			{
+    				y = i;
+    				if (!mLefty)
+    				{
+    					y = mNumStrings - ( i + 1 );
+    				}
+    				x = mSelections[i];
+    				if (mSelectAny)
+    				{
+    					g.fillOval( fret_area[0][0] + x*cell_size + cell_size/4, fret_area[0][1] + y*cell_size - cell_size/3, cell34, cell34);
+    				}
+    				else
+    				{
+    					g.fillRect(fret_area[0][0] + x*cell_size, fret_area[0][1] + y*cell_size - cell_half, cell_size, cell_size);
+    				}
+    			}
+    			else
+    			{
+    				x = i;
+    				if (mLefty)
+    				{
+    					x = mNumStrings - ( i + 1);
+    				}
+    				y = mSelections[i];
+    				if (mSelectAny)
+    				{
+    					g.fillOval( fret_area[0][0] + x*cell_size - cell_size/3, fret_area[0][1] + y*cell_size + cell_size/4, cell34, cell34);
+    				}
+    				else
+    				{
+    					g.fillRect(fret_area[0][0] + x*cell_size - cell_half, fret_area[0][1] + y*cell_size, cell_size, cell_size);
+    				}
+
+    			}
+    		}
+    	}
+    	
+        g.setColor(Color.BLACK);
+        
         //TODO refactor this orientx orienty into a less duplicate-code function some day.
         if (mOrientX)  //Horizontal strings, vertical frets
         {
         	for (int x=0; x<fret_lines; ++x)
         	{
-        		g.drawLine( (x+1) * cell_size + cell_half,  cell_size + cell_half,  (x+1) * cell_size + cell_half, cell_size * mNumStrings + cell_half);
+        		g.drawLine( (x+1) * cell_size + cell_half,  fret_area[0][1],  (x+1) * cell_size + cell_half, fret_area[1][1]);
         		if (((mFirstFret + x) % 12) == 0)
         		{
         			//Draw double-lines at 0 12 24
-            		g.drawLine( (x+1) * cell_size + cell_half - 2,  cell_size + cell_half,  (x+1) * cell_size + cell_half -2, cell_size * mNumStrings + cell_half);
+            		g.drawLine( (x+1) * cell_size + cell_half - 2,  fret_area[0][1],  (x+1) * cell_size + cell_half -2, fret_area[1][1]);
 
         		}
         	}
         	for (int y=0; y<mNumStrings; ++y)
         	{
-        		g.drawLine(cell_size + cell_half, (y+1) * cell_size + cell_half, cell_size * fret_lines + cell_half, (y+1) * cell_size + cell_half);
+        		g.drawLine(fret_area[0][0], (y+1) * cell_size + cell_half, fret_area[1][0], (y+1) * cell_size + cell_half);
         		if (mLefty)
         		{
         			g.drawString(mStringNames[y], cell_half, (y+1) * cell_size + cell_half);
@@ -318,7 +458,7 @@ public class FretPanel extends JPanel implements MouseListener, MouseMotionListe
         {				//Horizontal fret, vertical strings.
         	for (int x=0; x < mNumStrings; ++x)
         	{
-        		g.drawLine( (x+1) * cell_size + cell_half, cell_size + cell_half, (x+1) * cell_size + cell_half, cell_size * fret_lines + cell_half );
+        		g.drawLine( (x+1) * cell_size + cell_half, fret_area[0][1], (x+1) * cell_size + cell_half, fret_area[1][1]);
         		if (mLefty)
         		{
         			g.drawString(mStringNames[x], (mNumStrings - x) * cell_size + cell14, cell_size);
@@ -328,13 +468,10 @@ public class FretPanel extends JPanel implements MouseListener, MouseMotionListe
         			g.drawString(mStringNames[x], (x+1) * cell_size + cell14, cell_size);
         		}
         	}
-        	for (int y=cell_half; y < cell_size * fret_lines; y += cell_size)
-        	{
-        		g.drawLine(cell_size + cell_half, cell_size + y, cell_size * mNumStrings + cell_half, cell_size + y);
-        	}
+
         	for (int y=0; y < fret_lines; ++y)
         	{
-        		g.drawLine(cell_size + cell_half, (y+1) * cell_size + cell_half, cell_size * mNumStrings + cell_half, (y+1) * cell_size + cell_half);
+        		g.drawLine(fret_area[0][1], (y+1) * cell_size + cell_half, fret_area[1][0], (y+1) * cell_size + cell_half);
         		if (((mFirstFret + y) % 12) == 0)
         		{
         			//Draw double-lines at 0 12 24
@@ -382,27 +519,18 @@ public class FretPanel extends JPanel implements MouseListener, MouseMotionListe
         	}
         }
     }
-
+    
     @Override
     public void mousePressed(MouseEvent e) {
-        startX = e.getX();
-        startY = e.getY();
+        mClickX = e.getX();
+        mClickY = e.getY();
+        repaint();   
     }
 
     @Override
-    public void mouseReleased(MouseEvent e) {
-        endX = e.getX();
-        endY = e.getY();
-        repaint(); // Redraw the panel to show the line
-    }
-
+    public void mouseReleased(MouseEvent e) {}
     @Override
-    public void mouseDragged(MouseEvent e) {
-        endX = e.getX();
-        endY = e.getY();
-        repaint(); // Redraw the panel as the mouse is dragged
-    }
-
+    public void mouseDragged(MouseEvent e) {}
     // Unused MouseListener/MouseMotionListener methods
     @Override
     public void mouseClicked(MouseEvent e) {}

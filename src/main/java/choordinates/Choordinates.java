@@ -509,6 +509,7 @@ public class Choordinates extends JFrame {
 		gbc_btnSearch.gridy = 5;
 		contentPane.add(btnSearch, gbc_btnSearch);
 		
+//Fretboard display
 		mPanelNeck = new FretPanel();
 		GridBagConstraints gbc_mPanelNeck = new GridBagConstraints();
 		gbc_mPanelNeck.gridheight = 5;
@@ -516,6 +517,7 @@ public class Choordinates extends JFrame {
 		gbc_mPanelNeck.fill = GridBagConstraints.BOTH;
 		gbc_mPanelNeck.gridx = 0;
 		gbc_mPanelNeck.gridy = 6;
+		mPanelNeck.selectAny(false);
 		contentPane.add(mPanelNeck, gbc_mPanelNeck);
 		refresh();
 	}
