@@ -21,14 +21,14 @@ public class FretPanel extends JPanel implements MouseListener, MouseMotionListe
     private int mNumFrets = 24;
     private int mFirstFret = -1;
     private boolean mLefty = false;		//Set to true for left-handed chord shapes.
-    private String[] mStringNames = new String[mMaxStrings];
+    private ToneChord mTuning = new ToneChord();
     private int[] mSelections = new int[mMaxStrings];
 
     private int[][] mFrets=new int[mMaxStrings][mMaxFrets];  //Let's not be clever.  Just buffer max space.
     private boolean mOrientX = true;  //Set true for horizontal strings, false for vertical
 
     //Root Note and Search Chord inform the fret display.
-    private ToneNote mRootNote = new ToneNote();
+    private ToneNote mRootNote;
     private IntervalChord mSearchChord = new IntervalChord();
         
     private boolean mSelectAny = true;
@@ -79,8 +79,29 @@ public class FretPanel extends JPanel implements MouseListener, MouseMotionListe
     	}
     }
     
+    public ToneChord getSelections()
+    {    	
+    	/*SO Lazy!  Rather than implement another function, I'm going to
+    	 * just build a string of the note names on the strings, then 
+    	 * let ToneChord sort it out.
+    	 */
+    	String chord_string = "";
+    	
+    	for (int i=0;i<mTuning.getNumNotes();++i )
+    	{
+    		if (mSelections[i] != -1)
+    		{
+    			ToneNote string_note = new ToneNote(  mTuning.getNote(i), mSelections[i] );
+    			chord_string = chord_string + " " + string_note.getName();
+    		}
+    	}
+    	
+    	return new ToneChord( chord_string );
+    }
+    
     public void selectFret(int string_num, int fret_num)
     {
+    	System.out.println("String: " + string_num + " " + fret_num );
     	if (!mSelectAny && (mFrets[string_num][fret_num] == -1))
     	{
     		return;
@@ -122,7 +143,12 @@ public class FretPanel extends JPanel implements MouseListener, MouseMotionListe
     	ToneChord tuning = choord_data.getTuning( choord_data.getCurrentTuning() );
     	IntervalChord chord = mSearchChord;
     	
-    	int root_tone = mRootNote.getSemitone();
+    	int root_tone=0;
+    	
+    	if (mRootNote != null)
+    	{
+    		root_tone = mRootNote.getSemitone();
+    	}
     	    	
     	flushFrets();   //Floosh
     	
@@ -147,13 +173,16 @@ public class FretPanel extends JPanel implements MouseListener, MouseMotionListe
     				}
     			}
     			
-    			int chord_tone = ( root_tone + interval_tone ) % 12;
-    			for (int fret=0;fret<mNumFrets; ++fret)
+    			if (mRootNote != null)
     			{
-    				if ( ( ( string_tone + fret ) % 12 ) == chord_tone)
-    				{
-    					mFrets[i][fret] = j;
-    				}
+	    			int chord_tone = ( root_tone + interval_tone ) % 12;
+	    			for (int fret=0;fret<mNumFrets; ++fret)
+	    			{
+	    				if ( ( ( string_tone + fret ) % 12 ) == chord_tone)
+	    				{
+	    					mFrets[i][fret] = j;
+	    				}
+	    			}
     			}
     		}
     	}
@@ -180,14 +209,11 @@ public class FretPanel extends JPanel implements MouseListener, MouseMotionListe
     	}
     	else
     	{
-    		ToneChord tuning = choord_data.getTuning(tuning_id);
-    		mNumStrings = tuning.getNumNotes();
-    		
-    		for (int i=0;i<mNumStrings; ++i)
-    		{
-    			mStringNames[i] = tuning.getNote(i).getName();
-    		}
-    	}	
+    		mTuning = choord_data.getTuning(tuning_id);
+    		mNumStrings = mTuning.getNumNotes();
+    	}
+    	//flushSelections();
+    	markFrets();
     }
     
     public FretPanel() {
@@ -293,6 +319,7 @@ public class FretPanel extends JPanel implements MouseListener, MouseMotionListe
     			&& mClickY > fret_area[0][1] - cell_half
     			&& mClickY < fret_area[1][1] + cell_half )
     	{
+    		System.out.println("Clicky " + mClickX + " " + mClickY);
     		int mouse_x = 0;
     		int mouse_y = 0;
     		
@@ -410,11 +437,11 @@ public class FretPanel extends JPanel implements MouseListener, MouseMotionListe
         		g.drawLine(fret_area[0][0], (y+1) * cell_size + cell_half, fret_area[1][0], (y+1) * cell_size + cell_half);
         		if (mLefty)
         		{
-        			g.drawString(mStringNames[y], cell_half, (y+1) * cell_size + cell_half);
+        			g.drawString(mTuning.getNote(y).getName(), cell_half, (y+1) * cell_size + cell_half);
         		}
         		else
         		{
-        			g.drawString(mStringNames[y], cell_half, (mNumStrings - y) * cell_size + cell_half);
+        			g.drawString(mTuning.getNote(y).getName(), cell_half, (mNumStrings - y) * cell_size + cell_half);
         		}
         	}
         	
@@ -466,11 +493,11 @@ public class FretPanel extends JPanel implements MouseListener, MouseMotionListe
         		g.drawLine( (x+1) * cell_size + cell_half, fret_area[0][1], (x+1) * cell_size + cell_half, fret_area[1][1]);
         		if (mLefty)
         		{
-        			g.drawString(mStringNames[x], (mNumStrings - x) * cell_size + cell14, cell_size);
+        			g.drawString(mTuning.getNote(x).getName(), (mNumStrings - x) * cell_size + cell14, cell_size);
         		}
         		else
         		{
-        			g.drawString(mStringNames[x], (x+1) * cell_size + cell14, cell_size);
+        			g.drawString(mTuning.getNote(x).getName(), (x+1) * cell_size + cell14, cell_size);
         		}
         	}
 

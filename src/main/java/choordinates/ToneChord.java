@@ -3,11 +3,13 @@ package choordinates;
 import java.util.ArrayList;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonCreator;
 
 //Note chords extend the abstract Chord class to represent notes on an A-Gb scale
 
 public class ToneChord extends AbstractChord {
 
+	@JsonCreator
 	public ToneChord() {};
 	
 	@JsonIgnore
@@ -53,7 +55,7 @@ public class ToneChord extends AbstractChord {
 		return (ToneNote) mNotes.get(id);
 	}
 	
-	public static ToneChord parse(String tuning)
+	public ToneChord(String tuning)
 	{
 		/*Because I'm lazy and don't want to make a super complex UI,
 		 * the user suffers for having to use a string to describe the 
@@ -129,7 +131,5 @@ public class ToneChord extends AbstractChord {
 		{
 			throw new IllegalArgumentException("Must contain at least one note.");
 		}
-		
-		return chord;
 	}
 }

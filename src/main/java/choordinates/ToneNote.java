@@ -2,6 +2,7 @@ package choordinates;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonCreator;
 
 /*
  * ToneNote extends the abstract note class to support notes
@@ -13,6 +14,42 @@ public class ToneNote extends AbstractNote{
 	@JsonProperty("octave")
 	private int mOctave = 0; //A positive or negative number representing distance from middle octave.
 
+	@JsonCreator
+	ToneNote(){ super(); }
+	
+	@JsonIgnore
+	public ToneNote(ToneNote root, int semitones)
+	{
+		/*Given a tone note and semitones create a relative note.*/
+		
+		semitones = (root.getOctaveSemitone() + semitones) % 12;
+		
+		mID = -1;
+		
+		for (int i=0;i<mToneMap.length;++i)
+		{
+			if (semitones == mToneMap[i])
+			{
+				mID = i;
+				break;
+			}
+		}
+		
+		if (mID == -1)
+		{
+			for (int i=0;i<mToneMap.length;++i)
+			{
+				if (semitones == mToneMap[i]+1)
+				{
+					mID = i;
+					mSharp = -1;
+					break;
+				}
+			}
+		}
+		System.out.println("Note now named " + getName());
+	}
+	
 	@JsonIgnore
 	public String getName()
 	{
@@ -76,6 +113,7 @@ public class ToneNote extends AbstractNote{
 		 * else false.
 		 */
 		 
+		note = note.trim();
 		
 		if (note.length() < 1)
 		{

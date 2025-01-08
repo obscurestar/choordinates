@@ -133,7 +133,7 @@ public class Choordinates extends JFrame {
 		
 		try
 		{
-			tone_chord = ToneChord.parse( mTextNotesNotes.getText() );
+			tone_chord = new ToneChord( mTextNotesNotes.getText() );
         }
         catch (IllegalArgumentException exception)
         {
@@ -181,7 +181,8 @@ public class Choordinates extends JFrame {
 		mPanelFretSelect.setFirstFret(fret_num);
 		refreshFretPanel(mPanelFretSelect);
 		
-		//TODO sleep now, code later.
+		ToneChord chord = mPanelFretSelect.getSelections();
+		System.out.println(chord.getAllNoteNames());
 	}
 	
 	private void search()
@@ -217,12 +218,6 @@ public class Choordinates extends JFrame {
 		 */
 		refreshFretPanel( mPanelNeck );
 		refreshFretPanel( mPanelFretSelect );
-		/*mPanelNeck.updateTuning();
-		mPanelNeck.flushSelections();
-		mPanelNeck.refresh();
-		mPanelFretSelect.updateTuning();
-		mPanelFretSelect.flushSelections();
-		mPanelFretSelect.refresh();*/
 	}
 	
 	private void refreshAll()

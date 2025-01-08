@@ -321,7 +321,7 @@ public class TuningDialog extends JDialog
         
         try
         {
-        	chord = ToneChord.parse(string_names);
+        	chord = new ToneChord(string_names);
         }
         catch (IllegalArgumentException exception)
         {
