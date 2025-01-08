@@ -317,7 +317,7 @@ public class TuningDialog extends JDialog
     		return false;
     	}
     	
-       ToneChord chord;
+       ToneChord chord = new ToneChord();
         
         try
         {

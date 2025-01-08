@@ -22,6 +22,58 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 })
 public abstract class AbstractChord
 {
+	@JsonIgnore
+	public int getInterval( int note_id )
+	{
+		return mNotes.get(note_id).getID();
+	}
+	
+	public static int makeAbsoluteInterval( int num )
+	{
+		int interval = num % 7;
+		
+		if (interval < 0) //Negative modulo is weird ya'll
+		{
+			interval += 7;
+		}
+		
+		return interval;
+	}
+	
+	@JsonIgnore
+	public int getAbsoluteInterval( int note_id )
+	{
+		return makeAbsoluteInterval( getInterval( note_id ) );
+	}
+	
+	@JsonIgnore
+	public ArrayList<Integer> getIntervals( )
+	{
+		ArrayList<Integer> result = new ArrayList<Integer>();
+				
+		for (int i=0;i< mNotes.size(); ++i)
+		{
+			result.add( getInterval(i) );
+		}
+		
+		return result;
+	}
+	
+	@JsonIgnore
+	public ArrayList<Integer> getAbsoluteIntervals( )
+	{
+		//Return intervals in positive single-octave space.
+		ArrayList<Integer> result = new ArrayList<Integer>();
+		
+		for (int i=0;i< mNotes.size(); ++i)
+		{
+			//Look carefully at ToneChord.getInterval() and behold the glory of polymorphism!
+			result.add( getAbsoluteInterval(i) );
+		}
+		
+		return result;
+	}
+	
 	@JsonProperty("notes")
 	protected ArrayList<AbstractNote> mNotes = new ArrayList<AbstractNote>(); // List of notes comprising the chord.
 	@JsonProperty("name")
@@ -98,5 +150,31 @@ public abstract class AbstractChord
 	public AbstractNote getNote(int id)
 	{
 		return (AbstractNote) mNotes.get(id);
+	}
+	
+	public boolean similar(AbstractChord chord)
+	{
+		if ( chord.getNumNotes() != getNumNotes()  || getNumNotes() < 0 )
+		{
+			return false;
+		}
+		
+		ArrayList<Integer> semitones = new ArrayList<Integer>();
+		
+		for (int i=0; i<getNumNotes(); ++i )
+		{
+			semitones.add( getNote(i).getOctaveSemitone() );
+		}
+		
+		//Accept notes in any order with any number of repeats.
+		for (int i=0; i<getNumNotes(); ++i )
+		{
+			if ( semitones.indexOf( chord.getNote(i).getOctaveSemitone() ) == -1 )
+			{
+				return false;
+			}
+		}
+		
+		return true;
 	}
 }

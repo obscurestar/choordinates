@@ -30,6 +30,22 @@ public class IntervalChord extends AbstractChord
 		return (IntervalNote) mNotes.get(id);
 	}
 	
+	public IntervalChord()
+	{
+	}
+	
+	public IntervalChord( ToneChord tone_chord )
+	{
+		//Create an intervalchord from a tone chord
+		mName = tone_chord.getNote(0).getName();
+		for (int i=0;i<tone_chord.getNumNotes();++i)
+		{
+			IntervalNote note = new IntervalNote();
+			note.setID( (tone_chord.getAbsoluteInterval(i) +1) % 7 );
+			note.setSharp( tone_chord.getNote(i).getSharp());
+			mNotes.add(note);
+		}
+	}
 	public void addAlias(String name) {
 		// I don't care about duplicates. It's your computation time, user.
 		mAliases.add(name);

@@ -203,6 +203,35 @@ public class ChoordData {
 		}
 	}
 	
+	public ArrayList<Integer> findIntervalChords( IntervalChord chord )
+	{
+		/*Search the list of interval chords, return list of chords
+		 * with the same notes in them.
+		 */
+		
+		/*TODO THIS IS TERRIBLE AND DOES NOT SCALE.
+		 * Just doing a linear search to compare the chords. 
+		 * Could actually do something smart like map the 
+		 * chord IDs into a longlong, sort it and use a binary
+		 * search.  However, that's a bit of work and the list of 
+		 * practical chord intervals is at most a few dozen.
+		 * For now, just eat some computation time.
+		 */
+		ArrayList<Integer> matches = new ArrayList<>();
+		
+		return matches;
+	}
+	
+	public ArrayList<Integer> findIntervalChord( ToneChord chord )
+	{
+		/*Returns list of chords matching this chord*/
+		
+		/*TODO THIS IS TERRIBLE AND DOES NOT SCALE.  See above.*/
+		ArrayList<Integer> matches = new ArrayList<>();
+		
+		return matches;
+	}
+	
 	@JsonIgnore
 	public Preferences getPreferences()
 	{
@@ -257,7 +286,6 @@ public class ChoordData {
 	    {
 	        e.printStackTrace();
 	    }   
-		
 		
 		return mInstance;
 	}

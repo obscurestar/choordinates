@@ -1,5 +1,7 @@
 package choordinates;
 
+import java.util.ArrayList;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 //Note chords extend the abstract Chord class to represent notes on an A-Gb scale
@@ -13,8 +15,8 @@ public class ToneChord extends AbstractChord {
 	{
 		int root_id = root.getID();
 		
-		mName = root.getName().toUpperCase() + intervals.getName() //C minor Seventh
-		+ " (" + root.getName() + intervals.getSymbol() + ")";  //(Cm7)
+		mName = root.getName().toUpperCase() + " " + intervals.getName() //C minor Seventh
+		+ " (" + root.getName().toUpperCase() + intervals.getSymbol() + ") -";  //(Cm7)
 		
 		for (int i=0; i < intervals.getNumNotes(); ++i)
 		{
@@ -31,6 +33,20 @@ public class ToneChord extends AbstractChord {
 		}
 	}
 	
+	@Override
+	@JsonIgnore
+	public int getInterval( int note_id )
+	{
+		//For tone chords, we want to get the interval relative to the root note.
+		return super.getInterval(note_id) - mNotes.get(0).getID();
+	}
+	
+	@Override
+	@JsonIgnore
+	public int getAbsoluteInterval( int note_id )
+	{
+		return AbstractChord.makeAbsoluteInterval( getInterval(note_id) );
+	}
 	
 	public ToneNote getNote(int id)
 	{

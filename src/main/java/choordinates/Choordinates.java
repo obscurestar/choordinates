@@ -30,6 +30,8 @@ import java.awt.Dimension;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
+import java.util.ArrayList;
+
 public class Choordinates extends JFrame {
 
 	private static final long serialVersionUID = 1L;
@@ -40,12 +42,15 @@ public class Choordinates extends JFrame {
 	
 	private JPanel contentPane;
 	private JComboBox<String> mComboTuning;
-	private JTextField textNotesNotes;
+	private JTextField mTextNotesNotes;
 	private JList<String> mListChordChord;
 	private FretPanel mPanelFretSelect;
 	private FretPanel mPanelNeck;
 	private JTextField mTextRootNote;
 	private JList<String> mListMatches;
+	private JTabbedPane mTabbedPane;
+	
+	private ArrayList<String> mMatchList = new ArrayList<String>();
 	
 	/**
 	 * Launch the application.
@@ -67,7 +72,7 @@ public class Choordinates extends JFrame {
 		});
 	}
 
-	public void search_by_chord()
+	public void searchByChord()
 	{
 		ChoordData choord_data = ChoordData.getInstance();
 		String root_name = mTextRootNote.getText();
@@ -81,13 +86,89 @@ public class Choordinates extends JFrame {
 			return;
 		}
 		
+		ToneChord match_chord = new ToneChord( root_note, choord_data.getChord(chord_id) );
+		flushMatchList();
+		addMatch(match_chord.getName());
+		refreshMatches();
+		
 		mPanelNeck.setRootAndChord(root_note, choord_data.getChord(chord_id));	
 	}
 	
-	public void search()
+	private void addMatches( ToneNote root_note, IntervalChord chord )
 	{
-		//TODO do search by current pane
-		search_by_chord();
+		ChoordData choord_data = ChoordData.getInstance();
+
+		
+		boolean found_any=false;
+		
+		flushMatchList();
+		
+		for (int i=0;i<choord_data.getNumChords(); ++i)
+		{
+			if ( choord_data.getChord(i).similar( chord ) )
+			{
+				//The CTOR generates a nice name for us.
+				ToneChord tone_chord = new ToneChord( root_note, choord_data.getChord(i) );
+
+				addMatch( tone_chord.getName() );
+				found_any = true;
+			}
+		}
+		
+		if (!found_any)
+		{
+			ArrayList<String> string_names= chord.getAllNoteNames();
+			String name = root_note.getName() + String.join(" ", string_names) + " <UNMATCHED> ";
+			addMatch( name );
+		}
+
+		refreshMatches();
+	}
+	
+	private void searchByNotes()
+	{
+		ToneChord tone_chord = new ToneChord();
+		
+		try
+		{
+			tone_chord = ToneChord.parse( mTextNotesNotes.getText() );
+        }
+        catch (IllegalArgumentException exception)
+        {
+        	JOptionPane.showMessageDialog(null, exception.getMessage());
+        	return;
+        }
+		
+		if ( tone_chord.getNumNotes() < 1)
+		{
+			JOptionPane.showMessageDialog(null,  "Chord has no notes.");
+			return;
+		}
+		
+		IntervalChord interval_chord = new IntervalChord( tone_chord );
+		
+		addMatches( tone_chord.getNote(0), interval_chord );
+		
+		mPanelNeck.setRootAndChord(tone_chord.getNote(0), interval_chord);		
+	}
+	
+	private void search()
+	{
+		int tab_no = mTabbedPane.getSelectedIndex();
+			//TODO WARNING!  Just raw associating numbers of tabs.  Fix this!
+		
+		if (tab_no <= 0)
+		{
+			searchByChord();
+		}
+		else if (tab_no == 1)
+		{
+			searchByNotes();
+		}
+		else
+		{
+			
+		}
 	}
 	
 	private void refreshAll()
@@ -102,6 +183,31 @@ public class Choordinates extends JFrame {
 		{
 			mChordDialog.refresh();
 		}
+	}
+	
+	public void refreshMatches()
+	{
+		mListMatches.removeAll();
+		
+        DefaultListModel<String> listModel = new DefaultListModel<>();
+        
+        for (int i=0;i<mMatchList.size();++i)
+        {
+        	listModel.addElement(mMatchList.get(i));
+        }
+
+        mListMatches.setModel(listModel);
+        mListMatches.setSelectedIndex(0);
+	}
+	
+	public void flushMatchList()
+	{
+		mMatchList.clear();
+	}
+	
+	public void addMatch(String match_name)
+	{
+		mMatchList.add(match_name);
 	}
 	
 	public void refresh()
@@ -263,12 +369,14 @@ public class Choordinates extends JFrame {
         		int id = mComboTuning.getSelectedIndex();
         		ChoordData.getInstance().setCurrentTuning(id);
 
+        		mPanelNeck.updateTuning();
+        		mPanelNeck.refresh();
         		refresh();
         	}
         });
 		contentPane.add(mComboTuning, gbc_mComboTuning);
 //TABBED Pane		
-		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
+		mTabbedPane = new JTabbedPane(JTabbedPane.TOP);
 		GridBagConstraints gbc_tabbedPane = new GridBagConstraints();
 		gbc_tabbedPane.gridheight = 4;
 		gbc_tabbedPane.gridwidth = 2;
@@ -276,11 +384,11 @@ public class Choordinates extends JFrame {
 		gbc_tabbedPane.fill = GridBagConstraints.BOTH;
 		gbc_tabbedPane.gridx = 0;
 		gbc_tabbedPane.gridy = 1;
-		contentPane.add(tabbedPane, gbc_tabbedPane);
+		contentPane.add(mTabbedPane, gbc_tabbedPane);
 
 //Chord select Pane
 		JPanel panelChordSelect = new JPanel();
-		tabbedPane.addTab("Chord", null, panelChordSelect, null);
+		mTabbedPane.addTab("Chord", null, panelChordSelect, null);
 		GridBagLayout gbl_panelChordSelect = new GridBagLayout();
 		gbl_panelChordSelect.columnWidths = new int[]{0, 0, 0};
 		gbl_panelChordSelect.rowHeights = new int[]{0, 0, 0, 0};
@@ -336,17 +444,17 @@ public class Choordinates extends JFrame {
 		panelChordSelect.add(mListChordChord, gbc_mListChordChord);
 //Select by NOTES pane		
 		JPanel panelNotesSelect = new JPanel();
-		tabbedPane.addTab("Notes", null, panelNotesSelect, null);
+		mTabbedPane.addTab("Notes", null, panelNotesSelect, null);
 		
-		textNotesNotes = new JTextField();
-		panelNotesSelect.add(textNotesNotes);
-		textNotesNotes.setColumns(10);
+		mTextNotesNotes = new JTextField();
+		panelNotesSelect.add(mTextNotesNotes);
+		mTextNotesNotes.setColumns(10);
 		
 //Select by FRETS pane
 		mPanelFretSelect = new FretPanel();
 		mPanelFretSelect.setOrientation(false);
 		mPanelFretSelect.setNumFrets(7);
-		tabbedPane.addTab("Frets", null, mPanelFretSelect, null);
+		mTabbedPane.addTab("Frets", null, mPanelFretSelect, null);
 		
 
 //Matches components.

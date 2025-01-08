@@ -111,24 +111,21 @@ public class ChordDialog extends JDialog
 	                	}
 	                }
 	            });
-				 {
-				 	JLabel lblName = new JLabel("Name");
-				 	GridBagConstraints gbc_lblName = new GridBagConstraints();
-				 	gbc_lblName.insets = new Insets(0, 0, 5, 5);
-				 	gbc_lblName.gridx = 2;
-				 	gbc_lblName.gridy = 1;
-				 	panelChordDict.add(lblName, gbc_lblName);
-				 }
-				 {
-				 	mTextName = new JTextField();
-				 	GridBagConstraints gbc_mTextName = new GridBagConstraints();
-				 	gbc_mTextName.insets = new Insets(0, 0, 5, 0);
-				 	gbc_mTextName.gridx = 3;
-				 	gbc_mTextName.gridy = 1;
-				 	panelChordDict.add(mTextName, gbc_mTextName);
-				 	mTextName.setToolTipText("Name of the chord eg: Major, minor, dominant, 7th");
-				 	mTextName.setColumns(10);
-				 }
+			 	JLabel lblName = new JLabel("Name");
+			 	GridBagConstraints gbc_lblName = new GridBagConstraints();
+			 	gbc_lblName.insets = new Insets(0, 0, 5, 5);
+			 	gbc_lblName.gridx = 2;
+			 	gbc_lblName.gridy = 1;
+			 	panelChordDict.add(lblName, gbc_lblName);
+	
+			 	mTextName = new JTextField();
+			 	GridBagConstraints gbc_mTextName = new GridBagConstraints();
+			 	gbc_mTextName.insets = new Insets(0, 0, 5, 0);
+			 	gbc_mTextName.gridx = 3;
+			 	gbc_mTextName.gridy = 1;
+			 	panelChordDict.add(mTextName, gbc_mTextName);
+			 	mTextName.setToolTipText("Name of the chord eg: Major, minor, dominant, 7th");
+			 	mTextName.setColumns(10);
 
 				 panelChordDict.add(mListChords, gbc_mListChords);
 			}

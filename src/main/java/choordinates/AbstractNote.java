@@ -35,7 +35,7 @@ public abstract class AbstractNote {
 	{
 		if (id < 0 || id > 6)
 		{
-			throw new IllegalArgumentException("Note ID valid range 0-11");
+			throw new IllegalArgumentException("Note ID valid range 0-6");
 		}
 		mID = id;
 	}
