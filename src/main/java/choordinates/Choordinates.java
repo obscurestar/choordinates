@@ -31,6 +31,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
 import java.util.ArrayList;
+import javax.swing.BoxLayout;
 
 public class Choordinates extends JFrame {
 
@@ -51,6 +52,7 @@ public class Choordinates extends JFrame {
 	private JTabbedPane mTabbedPane;
 	
 	private ArrayList<String> mMatchList = new ArrayList<String>();
+	private JTextField mTextFretsNum;
 	
 	/**
 	 * Launch the application.
@@ -135,13 +137,13 @@ public class Choordinates extends JFrame {
         }
         catch (IllegalArgumentException exception)
         {
-        	JOptionPane.showMessageDialog(null, exception.getMessage());
+        	alert(null, exception.getMessage());
         	return;
         }
 		
 		if ( tone_chord.getNumNotes() < 1)
 		{
-			JOptionPane.showMessageDialog(null,  "Chord has no notes.");
+			alert(null,  "Chord has no notes.");
 			return;
 		}
 		
@@ -150,6 +152,34 @@ public class Choordinates extends JFrame {
 		addMatches( tone_chord.getNote(0), interval_chord );
 		
 		mPanelNeck.setRootAndChord(tone_chord.getNote(0), interval_chord);		
+	}
+	
+	private void searchByFrets()
+	{
+		/*TODO really should override insertString and replace on the text box
+		 * And build in a validator but let's do the easy thing for V 1.
+		 */
+		String fret_num_str = mTextFretsNum.getText();
+		
+		int max_allowed = 18; 
+		/*TODO max_allowed should be derived from number of frets in fret
+		 * selection panel and number of frets on fretboard display.
+		 * fix this when adding preferences.
+		 */
+		int fret_num = 0;
+		
+		if (!fret_num_str.matches(""))
+		{
+			try {
+			    fret_num = Integer.parseInt(fret_num_str);
+			} catch (NumberFormatException e) {
+				alert(null,  "Fret number must be between 0 and 18");
+			}
+		}
+		
+		fret_num = Math.min( Math.max(0, fret_num), max_allowed );
+		
+		//TODO sleep now, code later.
 	}
 	
 	private void search()
@@ -167,7 +197,7 @@ public class Choordinates extends JFrame {
 		}
 		else
 		{
-			
+			searchByFrets();
 		}
 	}
 	
@@ -344,7 +374,7 @@ public class Choordinates extends JFrame {
 		GridBagLayout gbl_contentPane = new GridBagLayout();
 		gbl_contentPane.columnWidths = new int[]{0, 0, 0, 0, 0};
 		gbl_contentPane.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-		gbl_contentPane.columnWeights = new double[]{0.0, 0.5, 0.0, 1.0, Double.MIN_VALUE};
+		gbl_contentPane.columnWeights = new double[]{0.0, 0.5, 0.0, 2.0, Double.MIN_VALUE};
 		gbl_contentPane.rowWeights = new double[]{0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 2.0, 2.0, Double.MIN_VALUE};
 		contentPane.setLayout(gbl_contentPane);
 //Tuning select		
@@ -455,10 +485,46 @@ public class Choordinates extends JFrame {
 		mTextNotesNotes.setColumns(10);
 		
 //Select by FRETS pane
+
+		JPanel panelFretsSelect = new JPanel();
+		mTabbedPane.addTab("Frets", null, panelFretsSelect, null);
+		panelFretsSelect.setLayout(new BoxLayout(panelFretsSelect, BoxLayout.X_AXIS));
+		
+		JPanel panelFretsNum = new JPanel();
+		panelFretsSelect.add(panelFretsNum);
+		GridBagLayout gbl_panelFretsNum = new GridBagLayout();
+		gbl_panelFretsNum.columnWidths = new int[]{40, 60};
+		gbl_panelFretsNum.rowHeights = new int[]{16, 0, 0, 0};
+		gbl_panelFretsNum.columnWeights = new double[]{0.0, 3.0};
+		gbl_panelFretsNum.rowWeights = new double[]{0.0, 0.0, 2.0, Double.MIN_VALUE};
+		panelFretsNum.setLayout(gbl_panelFretsNum);
+		
+		JLabel lblFretsNum = new JLabel("Fret#");
+		GridBagConstraints gbc_lblFretsNum = new GridBagConstraints();
+		gbc_lblFretsNum.insets = new Insets(0, 0, 5, 5);
+		gbc_lblFretsNum.anchor = GridBagConstraints.NORTHWEST;
+		gbc_lblFretsNum.gridx = 0;
+		gbc_lblFretsNum.gridy = 0;
+		panelFretsNum.add(lblFretsNum, gbc_lblFretsNum);
+		
+		mTextFretsNum = new JTextField();
+		GridBagConstraints gbc_mTextFretsNum = new GridBagConstraints();
+		gbc_mTextFretsNum.insets = new Insets(0, 0, 5, 5);
+		gbc_mTextFretsNum.fill = GridBagConstraints.HORIZONTAL;
+		gbc_mTextFretsNum.gridx = 0;
+		gbc_mTextFretsNum.gridy = 1;
+		panelFretsNum.add(mTextFretsNum, gbc_mTextFretsNum);
+		mTextFretsNum.setColumns(3);
+		
 		mPanelFretSelect = new FretPanel();
 		mPanelFretSelect.setOrientation(false);
 		mPanelFretSelect.setNumFrets(7);
-		mTabbedPane.addTab("Frets", null, mPanelFretSelect, null);
+		GridBagConstraints gbc_panelFretSelect = new GridBagConstraints();
+		gbc_panelFretSelect.gridheight = 3;
+		gbc_panelFretSelect.fill = GridBagConstraints.BOTH;
+		gbc_panelFretSelect.gridx = 1;
+		gbc_panelFretSelect.gridy = 0;
+		panelFretsNum.add(mPanelFretSelect, gbc_panelFretSelect);
 		
 
 //Matches components.
@@ -507,7 +573,6 @@ public class Choordinates extends JFrame {
 			}
 		});
 		GridBagConstraints gbc_btnSearch = new GridBagConstraints();
-		gbc_btnSearch.gridwidth = 2;
 		gbc_btnSearch.insets = new Insets(0, 0, 5, 5);
 		gbc_btnSearch.gridx = 0;
 		gbc_btnSearch.gridy = 5;
@@ -522,6 +587,13 @@ public class Choordinates extends JFrame {
 		gbc_mPanelNeck.gridx = 0;
 		gbc_mPanelNeck.gridy = 6;
 		mPanelNeck.selectAny(false);
+		
+		JButton mBtnAddFavorite = new JButton("Add Favorite");
+		GridBagConstraints gbc_mBtnAddFavorite = new GridBagConstraints();
+		gbc_mBtnAddFavorite.insets = new Insets(0, 0, 5, 5);
+		gbc_mBtnAddFavorite.gridx = 1;
+		gbc_mBtnAddFavorite.gridy = 5;
+		contentPane.add(mBtnAddFavorite, gbc_mBtnAddFavorite);
 		contentPane.add(mPanelNeck, gbc_mPanelNeck);
 		refresh();
 	}
