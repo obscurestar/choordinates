@@ -178,6 +178,8 @@ public class Choordinates extends JFrame {
 		}
 		
 		fret_num = Math.min( Math.max(0, fret_num), max_allowed );
+		mPanelFretSelect.setFirstFret(fret_num);
+		refreshFretPanel(mPanelFretSelect);
 		
 		//TODO sleep now, code later.
 	}
@@ -199,6 +201,28 @@ public class Choordinates extends JFrame {
 		{
 			searchByFrets();
 		}
+	}
+	
+	public void refreshFretPanel( FretPanel panel )
+	{
+		panel.updateTuning();
+		panel.flushSelections();
+		panel.refresh();
+	}
+	
+	private void refreshFretPanels()
+	{
+		/*Update all the fret panes when we do stuff 
+		 * like changing the tuning or doing a search.
+		 */
+		refreshFretPanel( mPanelNeck );
+		refreshFretPanel( mPanelFretSelect );
+		/*mPanelNeck.updateTuning();
+		mPanelNeck.flushSelections();
+		mPanelNeck.refresh();
+		mPanelFretSelect.updateTuning();
+		mPanelFretSelect.flushSelections();
+		mPanelFretSelect.refresh();*/
 	}
 	
 	private void refreshAll()
@@ -399,12 +423,7 @@ public class Choordinates extends JFrame {
         		int id = mComboTuning.getSelectedIndex();
         		ChoordData.getInstance().setCurrentTuning(id);
 
-        		mPanelNeck.updateTuning();
-        		mPanelNeck.flushSelections();
-        		mPanelNeck.refresh();
-        		mPanelFretSelect.updateTuning();
-        		mPanelFretSelect.flushSelections();
-        		mPanelFretSelect.refresh();
+        		refreshFretPanels();
         		refresh();
         	}
         });
@@ -513,6 +532,11 @@ public class Choordinates extends JFrame {
 		gbc_mTextFretsNum.fill = GridBagConstraints.HORIZONTAL;
 		gbc_mTextFretsNum.gridx = 0;
 		gbc_mTextFretsNum.gridy = 1;
+		mTextFretsNum.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				searchByFrets();
+			}
+		});
 		panelFretsNum.add(mTextFretsNum, gbc_mTextFretsNum);
 		mTextFretsNum.setColumns(3);
 		
