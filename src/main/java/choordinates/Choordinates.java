@@ -370,7 +370,11 @@ public class Choordinates extends JFrame {
         		ChoordData.getInstance().setCurrentTuning(id);
 
         		mPanelNeck.updateTuning();
+        		mPanelNeck.flushSelections();
         		mPanelNeck.refresh();
+        		mPanelFretSelect.updateTuning();
+        		mPanelFretSelect.flushSelections();
+        		mPanelFretSelect.refresh();
         		refresh();
         	}
         });

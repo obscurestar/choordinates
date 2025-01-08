@@ -58,6 +58,7 @@ public class FretPanel extends JPanel implements MouseListener, MouseMotionListe
     	mNumFrets = frets+1;
     	
     	updateTuning();
+    	flushSelections();
     	refresh();
     }
     
@@ -155,6 +156,7 @@ public class FretPanel extends JPanel implements MouseListener, MouseMotionListe
     {
     	mRootNote = note;
     	mSearchChord = chord;
+    	flushSelections();
     	markFrets();
     }
     
@@ -384,6 +386,10 @@ public class FretPanel extends JPanel implements MouseListener, MouseMotionListe
     			}
     		}
     	}
+    	
+    	//Done with mouse position for now.
+    	mClickX = -1;
+    	mClickY = -1;
     	
         g.setColor(Color.BLACK);
         
