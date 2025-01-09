@@ -83,20 +83,20 @@ public class ToneChord extends AbstractChord {
 		 * 	g C E A  //In this representation, g's pitch is between E and A. 
 		 */
 		
+		tuning.trim();
+		
 		String delims =" ,\t\r\n\0";
 				
 		int begin = 0;
 		int end;
 		boolean whitespace = true;
-		
-		ToneChord chord = new ToneChord();
-		
+				
 		//TODO: Sloppy lazy parser.  Could probably be more efficient and less ugly.
 		tuning += " ";  //This is just shameful.
 		
 		for (end = begin; end < tuning.length(); ++end)
 		{
-			ToneNote note = new ToneNote();
+			ToneNote note;
 			
 			//Look for a delimiter character
 			if ( delims.indexOf( tuning.charAt(end) ) > -1 )
@@ -105,15 +105,17 @@ public class ToneChord extends AbstractChord {
 				{
 					String string_name = tuning.substring(begin, end);
 					begin = end;
-					if (note.parse(string_name))
+					
+					try
 					{
-						chord.addNote(note);
+						note = new ToneNote(string_name);
 					}
-					else
-					{
-						throw new IllegalArgumentException("'" + string_name + "' is not a valid note name. Must be A-G followed by flats or sharps");
-
+			        catch (IllegalArgumentException exception)
+			        {
+			        	throw exception;
 					}
+					System.out.print("Adding note " + note.getName() + " with ID " + note.getID() );
+					mNotes.add(note);
 				}
 				begin = end;
 				whitespace = true;
@@ -127,7 +129,7 @@ public class ToneChord extends AbstractChord {
 				whitespace = false;
 			}
 		}
-		if (chord.getNumNotes() ==0)
+		if (getNumNotes() ==0)
 		{
 			throw new IllegalArgumentException("Must contain at least one note.");
 		}

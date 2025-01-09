@@ -80,12 +80,16 @@ public class Choordinates extends JFrame {
 		String root_name = mTextRootNote.getText();
 		int chord_id = choord_data.getCurrentChord();
 		
-		ToneNote root_note = new ToneNote();
+		ToneNote root_note;
 		
-		if (!root_note.parse(root_name))
+		try
 		{
-			alert( "Search", "'" + root_name + "' is not a valid note name.");
-			return;
+			root_note = new ToneNote( root_name );
+		}
+        catch (IllegalArgumentException exception)
+        {
+        	alert(null, exception.getMessage());
+        	return;
 		}
 		
 		ToneChord match_chord = new ToneChord( root_note, choord_data.getChord(chord_id) );
@@ -129,7 +133,7 @@ public class Choordinates extends JFrame {
 	
 	private void searchByNotes()
 	{
-		ToneChord tone_chord = new ToneChord();
+		ToneChord tone_chord;
 		
 		try
 		{
@@ -140,12 +144,6 @@ public class Choordinates extends JFrame {
         	alert(null, exception.getMessage());
         	return;
         }
-		
-		if ( tone_chord.getNumNotes() < 1)
-		{
-			alert(null,  "Chord has no notes.");
-			return;
-		}
 		
 		IntervalChord interval_chord = new IntervalChord( tone_chord );
 		
@@ -179,10 +177,11 @@ public class Choordinates extends JFrame {
 		
 		fret_num = Math.min( Math.max(0, fret_num), max_allowed );
 		mPanelFretSelect.setFirstFret(fret_num);
-		refreshFretPanel(mPanelFretSelect);
 		
 		ToneChord chord = mPanelFretSelect.getSelections();
 		System.out.println(chord.getAllNoteNames());
+		
+		refreshFretPanel(mPanelFretSelect);
 	}
 	
 	private void search()

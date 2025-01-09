@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonCreator;
 
 /*
  * An abstract concept of a note.
@@ -25,11 +26,11 @@ public abstract class AbstractNote {
 	public abstract int getOctaveSemitone();
 	@JsonIgnore
 	public abstract int getSemitone();
-	public abstract boolean parse(String note);
 	public abstract boolean isNote(AbstractNote note);
 
+	@JsonCreator
 	public AbstractNote() {};
-	
+
 	@JsonIgnore
 	public void setID(int id)
 	{

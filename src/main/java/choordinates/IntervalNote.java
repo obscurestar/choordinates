@@ -2,6 +2,7 @@ package choordinates;
 
 import java.awt.Color;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 //import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -14,6 +15,8 @@ public class IntervalNote extends AbstractNote{
 	@JsonIgnore 
 	private static final Color[] mNoteColors = { Color.BLACK, Color.WHITE, Color.YELLOW, Color.ORANGE, Color.RED, Color.PINK };
     
+	@JsonCreator
+	IntervalNote(){ super(); }
 
 	@JsonIgnore
 	public String getName()
@@ -66,19 +69,23 @@ public class IntervalNote extends AbstractNote{
 		return (id * -12) + semitone;
 	}
 	
-	public boolean parse(String note)
+	@JsonIgnore
+	public IntervalNote(String note)
 	{
 		/*
 		 * Tries to generate a note from a string.
 		 * On success, sets the member variables accordingly, returns true
 		 * else false.
 		 */
-		 
+		
+		IllegalArgumentException bad_name = new IllegalArgumentException("'" + note + "' is not a valid note name. Must be 1-7followed by flats or sharps");	 
+		
+		note = note.trim();
 		
 		if (note.length() < 1)
 		{
 			//String too long or short.
-			return false;
+			throw bad_name;
 		}
 		
 		String flats = "♭b-";
@@ -97,7 +104,7 @@ public class IntervalNote extends AbstractNote{
 		//0 is not a valid interval but 10 could be.
 		if ( note.charAt(end) == '0' )
 		{
-			return false;
+			throw bad_name;
 		}
 		
 		while( end < note.length() 
@@ -108,7 +115,7 @@ public class IntervalNote extends AbstractNote{
 		
 		if (end == begin)
 		{
-			return false;   //Character wasn't a number.
+			throw bad_name;   //Character wasn't a number.
 		}
 		
 		mID = Integer.valueOf( note.substring(0, end) );
@@ -128,10 +135,9 @@ public class IntervalNote extends AbstractNote{
 			else
 			{
 				//Some other character.
-				return false;
+				throw bad_name;
 			}
 		}
-		return true;
 	}
 	
 	public boolean isNote(AbstractNote note)

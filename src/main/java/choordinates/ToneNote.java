@@ -47,7 +47,6 @@ public class ToneNote extends AbstractNote{
 				}
 			}
 		}
-		System.out.println("Note now named " + getName());
 	}
 	
 	@JsonIgnore
@@ -105,20 +104,21 @@ public class ToneNote extends AbstractNote{
 		return mOctave * 12 + getOctaveSemitone();
 	}
 	
-	public boolean parse(String note)
+	public ToneNote(String note)
 	{
 		/*
 		 * Tries to generate a note from a string.
-		 * On success, sets the member variables accordingly, returns true
-		 * else false.
+		 * Throws exception on failure.
 		 */
 		 
+		IllegalArgumentException bad_name = new IllegalArgumentException("'" + note + "' is not a valid note name. Must be A-G followed by flats or sharps");
+
 		note = note.trim();
-		
+
 		if (note.length() < 1)
 		{
 			//String too long or short.
-			return false;
+			throw bad_name;
 		}
 		
 		String flats = "♭b-";
@@ -130,7 +130,7 @@ public class ToneNote extends AbstractNote{
 		if (note_index < 0 || note_index > 6)
 		{
 			//Not a valid note name.
-			return false;
+			throw bad_name;
 		}
 				
 		mID = note_index;
@@ -153,10 +153,9 @@ public class ToneNote extends AbstractNote{
 			else
 			{
 				//Some other character.
-				return false;
+				throw bad_name;
 			}
 		}
-		return true;
 	}
 
 	@Override

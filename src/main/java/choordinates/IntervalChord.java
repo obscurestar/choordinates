@@ -136,7 +136,7 @@ public class IntervalChord extends AbstractChord
 		
 		for (end = begin; end < intervals.length(); ++end)
 		{
-			IntervalNote note = new IntervalNote();
+			IntervalNote note;
 			
 			//Look for a delimiter character
 			if ( delims.indexOf( intervals.charAt(end) ) > -1 )
@@ -145,14 +145,13 @@ public class IntervalChord extends AbstractChord
 				{
 					String string_name = intervals.substring(begin, end);
 					begin = end;
-					if (note.parse(string_name))
+					try
 					{
-						chord.addNote(note);
+						note = new IntervalNote( string_name );
 					}
-					else
-					{
-						throw new IllegalArgumentException("'" + string_name + "' is not a valid interval.  Must be non-zero number followed by flats or sharps");
-
+			        catch (IllegalArgumentException exception)
+			        {
+			        	throw exception;
 					}
 				}
 				begin = end;
