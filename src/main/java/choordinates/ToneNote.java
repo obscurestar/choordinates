@@ -18,11 +18,12 @@ public class ToneNote extends AbstractNote{
 	ToneNote(){ super(); }
 	
 	@JsonIgnore
-	public ToneNote(ToneNote root, int semitones)
+	public ToneNote(ToneNote root, int in_semitones)
 	{
+		
 		/*Given a tone note and semitones create a relative note.*/
 		
-		semitones = (root.getOctaveSemitone() + semitones) % 12;
+		int semitones = (root.getOctaveSemitone() + in_semitones) % 12;
 		
 		mID = -1;
 		
@@ -37,11 +38,12 @@ public class ToneNote extends AbstractNote{
 		
 		if (mID == -1)
 		{
+			semitones --;
 			for (int i=0;i<mToneMap.length;++i)
 			{
-				if (semitones == mToneMap[i]+1)
+				if (semitones == mToneMap[i])
 				{
-					mID = i;
+					mID = (i+1)%7;
 					mSharp = -1;
 					break;
 				}
@@ -50,7 +52,8 @@ public class ToneNote extends AbstractNote{
 	}
 	
 	@JsonIgnore
-	public String getName()
+	@Override
+	public String getNoteName()
 	{
 		/*
 		 * Generate the name of this note from the data.
@@ -61,18 +64,6 @@ public class ToneNote extends AbstractNote{
 		if (mOctave > 0) //Make higher octaves lower case
 		{
 			name = name.toLowerCase();
-		}
-		
-		for (int i=0;i< Math.abs(mSharp); ++i)
-		{
-			if (mSharp > 0)
-			{
-				name += "♯";
-			}
-			else
-			{
-				name +="♭";
-			}
 		}
 
 		return name;
@@ -120,9 +111,6 @@ public class ToneNote extends AbstractNote{
 			//String too long or short.
 			throw bad_name;
 		}
-		
-		String flats = "♭b-";
-		String sharps = "♯#+";
 
 		String note_up = note.toUpperCase();
 		int note_index = note_up.charAt(0) - 'A';
@@ -142,11 +130,11 @@ public class ToneNote extends AbstractNote{
 		
 		for (int i=1;i<note.length();++i)
 		{
-			if (flats.indexOf( note.charAt(i)) != -1)
+			if (mFlatChars.indexOf( note.charAt(i)) != -1)
 			{
 				mSharp--;
 			}
-			else if (sharps.indexOf( note.charAt(i)) != -1)
+			else if (mSharpChars.indexOf( note.charAt(i)) != -1)
 			{
 				mSharp++;
 			}

@@ -14,20 +14,19 @@ public class ToneChord extends AbstractChord {
 	
 	@JsonIgnore
 	public ToneChord( ToneNote root, IntervalChord intervals)
-	{
-		int root_id = root.getID();
-		
+	{		
 		mName = root.getName().toUpperCase() + " " + intervals.getName() //C minor Seventh
 		+ " (" + root.getName().toUpperCase() + intervals.getSymbol() + ") -";  //(Cm7)
 		
+		int root_semitones = intervals.getNote(0).getOctaveSemitone();
+		
 		for (int i=0; i < intervals.getNumNotes(); ++i)
 		{
-			int offset = intervals.getNote(i).getID() - 1;
+			int semitones = intervals.getNote(i).getOctaveSemitone() - root_semitones;
 			
-			ToneNote note = new ToneNote();
+			if (semitones < 0) semitones += 12;
 			
-			note.setID( (root_id + offset) % 7);
-			note.setSharp( root.getSharp() + intervals.getNote(i).getSharp());
+			ToneNote note = new ToneNote( root, semitones);
 			
 			mName += " " + note.getName();
 			
@@ -114,7 +113,6 @@ public class ToneChord extends AbstractChord {
 			        {
 			        	throw exception;
 					}
-					System.out.print("Adding note " + note.getName() + " with ID " + note.getID() );
 					mNotes.add(note);
 				}
 				begin = end;

@@ -21,13 +21,37 @@ public abstract class AbstractNote {
 	protected int mSharp = 0; //A positive or negative number representing how many semitones to move the named note.
 	
 	@JsonIgnore
-	public abstract String getName();
+	public static final String mFlatChars = "♭b-";
+	@JsonIgnore
+	public static final String mSharpChars = "♯#+";
+	
+	@JsonIgnore
+	public abstract String getNoteName();
+	
 	@JsonIgnore
 	public abstract int getOctaveSemitone();
 	@JsonIgnore
 	public abstract int getSemitone();
 	public abstract boolean isNote(AbstractNote note);
 
+	@JsonIgnore
+	public String getName()
+	{
+		String result = getNoteName();
+		for (int i=0;i<Math.abs(mSharp);++i )
+		{
+			if (mSharp < 0)
+			{
+				result += mFlatChars.charAt(0);
+			}
+			else
+			{
+				result += mSharpChars.charAt(0);
+			}
+		}
+		return result;
+	}
+	
 	@JsonCreator
 	public AbstractNote() {};
 
@@ -58,6 +82,4 @@ public abstract class AbstractNote {
 	{
 		return mSharp;
 	}
-	
-	
 }

@@ -104,7 +104,6 @@ public class Choordinates extends JFrame {
 	{
 		ChoordData choord_data = ChoordData.getInstance();
 
-		
 		boolean found_any=false;
 		
 		flushMatchList();
@@ -178,10 +177,14 @@ public class Choordinates extends JFrame {
 		fret_num = Math.min( Math.max(0, fret_num), max_allowed );
 		mPanelFretSelect.setFirstFret(fret_num);
 		
-		ToneChord chord = mPanelFretSelect.getSelections();
-		System.out.println(chord.getAllNoteNames());
+		ToneChord tone_chord = mPanelFretSelect.getSelections();
 		
-		refreshFretPanel(mPanelFretSelect);
+		IntervalChord interval_chord = new IntervalChord( tone_chord );
+		mPanelNeck.setRootAndChord(tone_chord.getNote(0), interval_chord);		
+
+		addMatches( tone_chord.getNote(0), interval_chord );
+
+		//refreshFretPanel(mPanelFretSelect);
 	}
 	
 	private void search()
@@ -201,6 +204,16 @@ public class Choordinates extends JFrame {
 		{
 			searchByFrets();
 		}
+	}
+	
+	private void addFavorite()
+	{		
+		ChordShape chord_shape = mPanelNeck.getSelectionShape();
+		if (chord_shape.isValid())
+		{
+			System.out.println("Got a valid shape!");
+		}
+		//SPATTERS TODO pick up here in the morning.
 	}
 	
 	public void refreshFretPanel( FretPanel panel )
@@ -606,12 +619,17 @@ public class Choordinates extends JFrame {
 		gbc_mPanelNeck.gridy = 6;
 		mPanelNeck.selectAny(false);
 		
-		JButton mBtnAddFavorite = new JButton("Add Favorite");
+		JButton btnAddFavorite = new JButton("Add Favorite");
+		btnAddFavorite.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				addFavorite();
+			}
+		});
 		GridBagConstraints gbc_mBtnAddFavorite = new GridBagConstraints();
 		gbc_mBtnAddFavorite.insets = new Insets(0, 0, 5, 5);
 		gbc_mBtnAddFavorite.gridx = 1;
 		gbc_mBtnAddFavorite.gridy = 5;
-		contentPane.add(mBtnAddFavorite, gbc_mBtnAddFavorite);
+		contentPane.add(btnAddFavorite, gbc_mBtnAddFavorite);
 		contentPane.add(mPanelNeck, gbc_mPanelNeck);
 		refresh();
 	}

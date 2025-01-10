@@ -37,13 +37,33 @@ public class IntervalChord extends AbstractChord
 	public IntervalChord( ToneChord tone_chord )
 	{
 		//Create an intervalchord from a tone chord
-		mName = tone_chord.getNote(0).getName();
+		ToneNote root_note = tone_chord.getNote(0);
+
+		mName = root_note.getName();
+		int root_semi = root_note.getOctaveSemitone();
+
 		for (int i=0;i<tone_chord.getNumNotes();++i)
 		{
-			IntervalNote note = new IntervalNote();
-			note.setID( (tone_chord.getAbsoluteInterval(i) +1) % 7 );
-			note.setSharp( tone_chord.getNote(i).getSharp());
-			mNotes.add(note);
+			IntervalNote interval_note = new IntervalNote();
+			ToneNote tone_note = tone_chord.getNote(i);
+			
+			if (i==0)
+			{
+				interval_note.setID(1);
+			}
+			else
+			{
+				int semitones = ( tone_note.getOctaveSemitone() - root_semi ) % 12;
+				
+				if (semitones < 0)
+				{
+					semitones += 12;
+				}
+
+				interval_note = new IntervalNote( semitones );
+			}
+
+			mNotes.add(interval_note);
 		}
 	}
 	public void addAlias(String name) {

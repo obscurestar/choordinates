@@ -3,6 +3,7 @@ package choordinates;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.Arrays;
+import java.util.ArrayList;
 
 //TODO reduce amount of stuff imported.
 //import java.awt.Color;
@@ -79,6 +80,11 @@ public class FretPanel extends JPanel implements MouseListener, MouseMotionListe
     	}
     }
     
+    public ChordShape getSelectionShape()
+    {
+    	return new ChordShape(mFirstFret, mNumStrings, mSelections);
+    }
+    
     public ToneChord getSelections()
     {    	
     	/*SO Lazy!  Rather than implement another function, I'm going to
@@ -87,15 +93,25 @@ public class FretPanel extends JPanel implements MouseListener, MouseMotionListe
     	 */
     	String chord_string = "";
     	
+    	ArrayList<String> note_names = new ArrayList<String>(); 
     	
-    	for (int i=0;i<mTuning.getNumNotes();++i )
+    	for ( int i=0;i<mTuning.getNumNotes();++i )
     	{
     		if (mSelections[i] != -1)
     		{
-    			ToneNote string_note = new ToneNote(  mTuning.getNote(i), mSelections[i] );
-    			chord_string = chord_string + " " + string_note.getName();
-    			System.out.println("String " + i + " note: " + string_note.getName());
+    			ToneNote string_note = new ToneNote(  mTuning.getNote(i), mSelections[i] + mFirstFret + 1);
+
+    			//TODO:  Make note names a set after debugging and skip this silly if.
+    			if (! note_names.contains( string_note.getName() ) )
+    			{
+    				note_names.add( string_note.getName() );
+    			}
     		}
+    	}
+    	
+    	for (String name:note_names)
+    	{
+    		chord_string = chord_string + name + " ";
     	}
     	
     	return new ToneChord( chord_string );
@@ -194,6 +210,7 @@ public class FretPanel extends JPanel implements MouseListener, MouseMotionListe
     {
     	mRootNote = note;
     	mSearchChord = chord;
+
     	flushSelections();
     	markFrets();
     }
@@ -220,6 +237,7 @@ public class FretPanel extends JPanel implements MouseListener, MouseMotionListe
     	ChoordData.getInstance();
     	flushFrets();
     	flushSelections();
+    	updateTuning();
     	
         addMouseListener(this);
         addMouseMotionListener(this);
@@ -261,8 +279,6 @@ public class FretPanel extends JPanel implements MouseListener, MouseMotionListe
         
         //Max size of cells in the space of the pane.
         int max_cell_x, max_cell_y;
-        
-        updateTuning();
         
         //Number of cells in x and y.
         int cells_x = mNumFrets;

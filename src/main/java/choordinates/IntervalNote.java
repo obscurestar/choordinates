@@ -17,25 +17,33 @@ public class IntervalNote extends AbstractNote{
     
 	@JsonCreator
 	IntervalNote(){ super(); }
-
+	
 	@JsonIgnore
-	public String getName()
+	public IntervalNote( int semitones )
 	{
-		String name = String.valueOf(mID);
-		
-		for( int i=0; i<Math.abs(mSharp); ++i)
+		for (int i=0;i<mIntervalMap.length;++i)
 		{
-			if (mSharp > 0)
+			if (semitones == mIntervalMap[i])
 			{
-				name += "♯";
-			}
-			else
-			{
-				name +="♭";
+				mID = i+1;
+				break;
 			}
 		}
-
-		return name;
+		
+		if (mID == -1)
+		{
+			semitones --;
+			for (int i=0;i<mIntervalMap.length;++i)
+			{
+				if (semitones == mIntervalMap[i])
+				{
+					mID = i+2;
+					mSharp = -1;
+					break;
+				}
+			}
+		}
+		mID = mID % 7;
 	}
 	
 	@JsonIgnore
@@ -88,8 +96,6 @@ public class IntervalNote extends AbstractNote{
 			throw bad_name;
 		}
 		
-		String flats = "♭b-";
-		String sharps = "♯#+";
 		String numchars = "0123456789";
 		
 		int begin=0;
@@ -123,11 +129,11 @@ public class IntervalNote extends AbstractNote{
 		begin = end;
 		for (end = begin; end < note.length(); ++end)
 		{
-			if (flats.indexOf( note.charAt(end)) != -1)
+			if (mFlatChars.indexOf( note.charAt(end)) != -1)
 			{
 				mSharp--;
 			}
-			else if (sharps.indexOf( note.charAt(end)) != -1)
+			else if (mSharpChars.indexOf( note.charAt(end)) != -1)
 			{
 	
 				mSharp++;
@@ -138,6 +144,29 @@ public class IntervalNote extends AbstractNote{
 				throw bad_name;
 			}
 		}
+	}
+	
+	public String getNoteName()
+	{
+		return new String( String.valueOf( mID ) );
+	}
+	
+	public void reduceSharps()
+	{
+		/*While Ebb and E# are valid notes in some contexts, it can be annoying in others.*/
+		
+		int semitones = getOctaveSemitone();
+		
+		if (mSharp == 0)
+		{
+			//Already good.
+			return;
+		}
+		
+		//How much does a ctor cost, really?
+		IntervalNote note = new IntervalNote( semitones );
+		mID = note.getID();
+		mSharp = note.getSharp();
 	}
 	
 	public boolean isNote(AbstractNote note)
