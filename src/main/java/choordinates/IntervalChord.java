@@ -53,12 +53,7 @@ public class IntervalChord extends AbstractChord
 			}
 			else
 			{
-				int semitones = ( tone_note.getOctaveSemitone() - root_semi ) % 12;
-				
-				if (semitones < 0)
-				{
-					semitones += 12;
-				}
+				int semitones = tone_note.getOctaveSemitone() - root_semi;
 
 				interval_note = new IntervalNote( semitones );
 			}

@@ -177,7 +177,7 @@ public class Choordinates extends JFrame {
 		fret_num = Math.min( Math.max(0, fret_num), max_allowed );
 		mPanelFretSelect.setFirstFret(fret_num);
 		
-		ToneChord tone_chord = mPanelFretSelect.getSelections();
+		ToneChord tone_chord = mPanelFretSelect.getSelections(true);
 		
 		IntervalChord interval_chord = new IntervalChord( tone_chord );
 		mPanelNeck.setRootAndChord(tone_chord.getNote(0), interval_chord);		
@@ -207,13 +207,20 @@ public class Choordinates extends JFrame {
 	}
 	
 	private void addFavorite()
-	{		
-		ChordShape chord_shape = mPanelNeck.getSelectionShape();
-		if (chord_shape.isValid())
+	{	
+		ChordShape chord_shape;
+		
+		try
 		{
-			System.out.println("Got a valid shape!");
+			chord_shape = mPanelNeck.getSelectionShape();
 		}
-		//SPATTERS TODO pick up here in the morning.
+		catch (IllegalArgumentException exception)
+		{
+			alert("Add favorite", exception.getMessage());
+			return;
+		}
+		
+		//System.out.println("Favorite first string: " + chord_shape.getFirstString() + " interval "  + chord_shape.getFirstNote().getName());
 	}
 	
 	public void refreshFretPanel( FretPanel panel )

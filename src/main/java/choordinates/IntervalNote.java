@@ -21,6 +21,13 @@ public class IntervalNote extends AbstractNote{
 	@JsonIgnore
 	public IntervalNote( int semitones )
 	{
+		semitones = semitones % 12;
+		
+		if (semitones < 0)
+		{
+			semitones += 12;
+		}
+		
 		for (int i=0;i<mIntervalMap.length;++i)
 		{
 			if (semitones == mIntervalMap[i])
