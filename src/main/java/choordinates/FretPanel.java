@@ -458,67 +458,60 @@ public class FretPanel extends JPanel implements MouseListener, MouseMotionListe
         g.setColor(Color.BLACK);
         
         //TODO refactor this orientx orienty into a less duplicate-code function some day.
+
         if (mOrientX)  //Horizontal strings, vertical frets
         {
         	for (int x=0; x<mNumFrets; ++x)
         	{
-        		g.drawLine( (x+1) * cell_size + cell_half,  fret_area.Y[0],  (x+1) * cell_size + cell_half, fret_area.Y[1]);
+        		Cell cell = new Cell(0, x, cell_size, fret_area);
+
+        		g.drawLine( cell.X[0],  fret_area.Y[0], cell.X[0], fret_area.Y[1]);
         		if (((mFirstFret + x) % 12) == 0)
         		{
         			//Draw double-lines at 0 12 24
-            		g.drawLine( (x+1) * cell_size + cell_half - 2,  fret_area.Y[0],  (x+1) * cell_size + cell_half -2, fret_area.Y[1]);
+            		g.drawLine( cell.X[0] - 2,  fret_area.Y[0],  cell.X[0] - 2, fret_area.Y[1]);
 
         		}
+        		
+           		//Draw the string labels
+        		int fret_no = mFirstFret+x;
+        		if (Arrays.binarySearch(labeled_frets, fret_no) >= 0)
+        		{
+        			int offset = 0;
+        			if (mFirstFret > 0)
+        			{
+        				offset -= cell_size;
+        			}
+        			String numeral = getRomanNumeral(fret_no);
+        			//TODO get graphic width of string and use it to calculate the offset, not this pile of goo.
+        			g.drawString(numeral, cell.X[0]+ offset - 5, cell_size);
+        		}
         	}
+        	
         	for (int y=0; y<mNumStrings; ++y)
         	{
-        		g.drawLine(fret_area.X[0], (y+1) * cell_size + cell_half, fret_area.X[1], (y+1) * cell_size + cell_half);
-        		if (mLefty)
-        		{
-        			g.drawString(mTuning.getNote(y).getName(), cell_half, (y+1) * cell_size + cell_half);
-        		}
-        		else
-        		{
-        			g.drawString(mTuning.getNote(y).getName(), cell_half, (mNumStrings - y) * cell_size + cell_half);
-        		}
+        		Cell cell = new Cell(y, 0, cell_size, fret_area);
+        		
+        		g.drawLine(fret_area.X[0], cell.Y[0], fret_area.X[1], cell.Y[0]);
+        		g.drawString(mTuning.getNote(y).getName(), cell_half, cell.Y[0]);
         	}
         	
         	for (int i=0; i<mNumFrets; ++i)
         	{
-        		//Draw the string labels
-        		int fret_no = mFirstFret+i;
-        		if (Arrays.binarySearch(labeled_frets, fret_no) >= 0)
-        		{
-        			int offset = 0;
-        			if (mFirstFret < 1)
-        			{
-        				offset = cell_size;
-        			}
-        			String numeral = getRomanNumeral(fret_no);
-        			//TODO get graphic width of string and use it to calculate the offset, not this pile of goo.
-        			g.drawString(numeral, cell_size * i + offset + cell_half - 5, cell_size);
-        		}
         		//Draw the selected frets;
         		if (i < (mNumFrets-1))
         		{
 	        		for (int j=0; j<mNumStrings; ++j)
 	        		{
+	        			Cell cell = new Cell(j, i, cell_size, fret_area);
+	        			cell.Y[0] -= cell_half;
+	        			cell.X[0] -= cell_half;
 	        			if (mFrets[j][i] != -1)
 	        			{
-	        				if (mLefty)
-	        				{
-	        					g.setColor(IntervalNote.getColor(mFrets[j][i]));
-	        					g.fillOval( (i+1) * cell_size + cell23, (j+1) * cell_size + cell16, cell34, cell34);
-	        					g.setColor(Color.BLACK);
-	        					g.drawOval( (i+1) * cell_size + cell23, (j+1) * cell_size + cell16, cell34, cell34);
-	        				}
-	        				else
-	        				{
-	        					g.setColor(IntervalNote.getColor(mFrets[j][i]));
-	        					g.fillOval( (i+1) * cell_size + cell23, (mNumStrings - j) * cell_size + cell16, cell34, cell34);
-	        					g.setColor(Color.BLACK);
-	        					g.drawOval( (i+1) * cell_size + cell23, (mNumStrings - j) * cell_size + cell16, cell34, cell34);
-	        				}
+        					g.setColor(IntervalNote.getColor(mFrets[j][i]));
+        					g.fillOval( cell.X[0] + cell23, cell.Y[0] + cell16, cell34, cell34);
+        					g.setColor(Color.BLACK);
+        					g.drawOval( cell.X[0] + cell23, cell.Y[0]+ cell16, cell34, cell34);
 	        			}
 	        		}
         		}
@@ -526,32 +519,19 @@ public class FretPanel extends JPanel implements MouseListener, MouseMotionListe
         }
         else
         {				//Horizontal fret, vertical strings.
-        	for (int x=0; x < mNumStrings; ++x)
-        	{
-        		g.drawLine( (x+1) * cell_size + cell_half, fret_area.Y[0], (x+1) * cell_size + cell_half, fret_area.Y[1]);
-        		if (mLefty)
-        		{
-        			g.drawString(mTuning.getNote(x).getName(), (mNumStrings - x) * cell_size + cell14, cell_size);
-        		}
-        		else
-        		{
-        			g.drawString(mTuning.getNote(x).getName(), (x+1) * cell_size + cell14, cell_size);
-        		}
-        	}
-
         	for (int y=0; y < mNumFrets; ++y)
         	{
-        		g.drawLine(fret_area.Y[0], (y+1) * cell_size + cell_half, fret_area.X[1], (y+1) * cell_size + cell_half);
+        		Cell cell = new Cell(0, y, cell_size, fret_area);
+
+        		g.drawLine(fret_area.X[0], cell.Y[0], fret_area.X[1], cell.Y[0]);
         		if (((mFirstFret + y) % 12) == 0)
         		{
         			//Draw double-lines at 0 12 24
-            		g.drawLine(cell_size + cell_half, (y+1) * cell_size + cell_half - 2, cell_size * mNumStrings + cell_half, (y+1) * cell_size + cell_half -2);
+            		g.drawLine(cell.X[0], cell.Y[0] - 2, cell_size * mNumStrings + cell_half, cell.Y[0] -2);
         		}
-        	}
-        	for (int i=0; i<mNumFrets; ++i)
-        	{
+        		
         		//Draw fret numbers.
-        		int fret_no = mFirstFret+i;
+        		int fret_no = mFirstFret+y;
         		if (Arrays.binarySearch(labeled_frets, fret_no) >= 0)
         		{
         			int offset = 0;
@@ -559,33 +539,36 @@ public class FretPanel extends JPanel implements MouseListener, MouseMotionListe
         			{
         				offset = cell_size;
         			}
-        			if (i>0)
+        			if (y>0)
         			{
         				String numeral = getRomanNumeral(fret_no);
-        				g.drawString(numeral, (cell_size/3), cell_size * i + offset + cell_half + 5);
+        				g.drawString(numeral, (cell_size/3), cell.Y[0] + 5);
         			}
         		}
+        	}
+        	
+        	for (int x=0; x < mNumStrings; ++x)
+        	{
+        		Cell cell = new Cell(x, 0, cell_size, fret_area);
+        		
+        		g.drawLine( cell.X[0], fret_area.Y[0], cell.X[0], fret_area.Y[1]);
+        		g.drawString(mTuning.getNote(x).getName(), cell.X[0] - cell14, cell_size);
+        	}
+        	
+        	for (int i=0; i<mNumFrets; ++i)
+        	{
         		//Draw the selected frets;
         		for (int j=0; j<mNumStrings; ++j)
         		{
+        			Cell cell = new Cell(j, i, cell_size, fret_area);
         			if (i < (mNumFrets-1))
         			{
 	        			if (mFrets[j][i] != -1)
 	        			{
-	        				if (mLefty)
-	        				{
-	        					g.setColor(IntervalNote.getColor(mFrets[j][i]));
-	        					g.fillOval( (mNumStrings - j) * cell_size + cell16, (i+1) * cell_size + cell_half+ cell16, cell34, cell34);
-	        					g.setColor(Color.BLACK);
-	        					g.fillOval( (mNumStrings - j) * cell_size + cell16, (i+1) * cell_size + cell_half+ cell16, cell34, cell34);
-	        				}
-	        				else
-	        				{
-	        					g.setColor(IntervalNote.getColor(mFrets[j][i]));
-	        					g.fillOval( (j+1) * cell_size + cell16, (i+1) * cell_size + cell_half + cell16, cell34, cell34);
-	        					g.setColor(Color.BLACK);
-	        					g.fillOval( (j+1) * cell_size + cell16, (i+1) * cell_size + cell_half + cell16, cell34, cell34);
-	        				}
+        					g.setColor(IntervalNote.getColor(mFrets[j][i]));
+        					g.fillOval( cell.X[0] + cell16, cell.Y[0]+ cell16, cell34, cell34);
+        					g.setColor(Color.BLACK);
+        					g.fillOval( cell.X[0] + cell16, cell.Y[0]+ cell16, cell34, cell34);
 	        			}
         			}
         		}
