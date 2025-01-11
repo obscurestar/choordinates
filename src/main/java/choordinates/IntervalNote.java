@@ -19,6 +19,12 @@ public class IntervalNote extends AbstractNote{
 	IntervalNote(){ super(); }
 	
 	@JsonIgnore
+	IntervalNote( IntervalNote note )
+	{
+		super( note );
+	}
+	
+	@JsonIgnore
 	public IntervalNote( int semitones )
 	{
 		semitones = semitones % 12;
@@ -176,7 +182,7 @@ public class IntervalNote extends AbstractNote{
 		mSharp = note.getSharp();
 	}
 	
-	public boolean isNote(AbstractNote note)
+	public boolean equals(AbstractNote note)
 	{
 		return false;
 	}

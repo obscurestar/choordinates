@@ -255,12 +255,18 @@ public class FretPanel extends JPanel implements MouseListener, MouseMotionListe
     }
     
     public void setRootAndChord(ToneNote note, IntervalChord chord)
-    {
-    	mRootNote = note;
-    	mSearchChord = chord;
+    {    	
+    	if (mRootNote == null 
+    			|| !mRootNote.equals(note)
+    			|| !mSearchChord.equals(chord))
+    	{
+    		mRootNote = note;
+    		mSearchChord = chord;
 
-    	flushSelections();
-    	markFrets();
+    		flushSelections();
+    		flushFavorite();
+    		markFrets();
+    	}
     }
     
     public void updateTuning()

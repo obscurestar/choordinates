@@ -321,16 +321,6 @@ public class Choordinates extends JFrame {
 		//updateFretDisplays();
 		mRefreshing = false;
 	}
-
-/*	public void updateFretDisplays()
-	{
-		ChoordData choords_data = ChoordData.getInstance();
-		
-		int num_frets = 24;
-		int tuning_id = choords_data.getCurrentTuning();
-		
-		mPanelNeck.setNumFrets(num_frets);
-	}*/
 	
 	private void alert(String title, String message)
 	{
@@ -434,6 +424,7 @@ public class Choordinates extends JFrame {
         	{
         		int id = mComboTuning.getSelectedIndex();
         		ChoordData.getInstance().setCurrentTuning(id);
+        		ChoordData.getInstance().write();
 
         		refreshFretPanels();
         		refresh();
@@ -501,6 +492,7 @@ public class Choordinates extends JFrame {
             		ChoordData choord_data = ChoordData.getInstance();
                     if (!e.getValueIsAdjusting()) { // Check if selection is finalized
                     	choord_data.setCurrentChord( mListChordChord.getSelectedIndex());
+                		ChoordData.getInstance().write();
                     	refresh();
                     }
             	}

@@ -32,8 +32,19 @@ public abstract class AbstractNote {
 	public abstract int getOctaveSemitone();
 	@JsonIgnore
 	public abstract int getSemitone();
-	public abstract boolean isNote(AbstractNote note);
-
+	public abstract boolean equals(AbstractNote note);
+ 
+	@JsonCreator
+	public AbstractNote() {};
+	
+	@JsonIgnore
+	public AbstractNote( AbstractNote note )
+	{
+		//Copy constructor.
+		mID = note.getID();
+		mSharp = note.getSharp();
+	}
+	
 	@JsonIgnore
 	public String getName()
 	{
@@ -52,9 +63,6 @@ public abstract class AbstractNote {
 		return result;
 	}
 	
-	@JsonCreator
-	public AbstractNote() {};
-
 	@JsonIgnore
 	public void setID(int id)
 	{

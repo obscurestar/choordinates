@@ -18,6 +18,14 @@ public class ToneNote extends AbstractNote{
 	ToneNote(){ super(); }
 	
 	@JsonIgnore
+	ToneNote( ToneNote note )
+	{
+		//Copy constructor
+		super( note );
+		mOctave = note.getOctave();
+	}
+	
+	@JsonIgnore
 	public ToneNote(ToneNote root, int in_semitones)
 	{
 		
@@ -146,8 +154,7 @@ public class ToneNote extends AbstractNote{
 		}
 	}
 
-	@Override
-	public boolean isNote(AbstractNote abs_note)
+	public boolean equals(AbstractNote abs_note)
 	{
 		//Notes must be of same subclass to be identical.
 		ToneNote note;

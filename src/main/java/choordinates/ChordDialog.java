@@ -453,7 +453,7 @@ public class ChordDialog extends JDialog
         
         try
         {
-        	chord = IntervalChord.parse(intervals);
+        	chord = new IntervalChord(intervals);
         }
         catch (IllegalArgumentException exception)
         {

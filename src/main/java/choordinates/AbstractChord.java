@@ -1,11 +1,11 @@
 package choordinates;
 
 import java.util.ArrayList;
+import java.util.UUID;
 import java.util.Iterator;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-
-//import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
@@ -22,6 +22,41 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 })
 public abstract class AbstractChord
 {
+	private UUID mUUID;  //Generate a UUID.
+	@JsonProperty("notes")
+	protected ArrayList<AbstractNote> mNotes = new ArrayList<AbstractNote>(); // List of notes comprising the chord.
+	@JsonProperty("name")
+	protected String mName; // Preferred name for chord
+	
+	@JsonCreator
+	public AbstractChord() {}
+	
+	@JsonIgnore
+	public AbstractChord( AbstractChord chord )
+	{
+		mUUID = chord.getUUID();
+		mName = chord.getName();
+		mNotes = new ArrayList<AbstractNote>();
+		for (int i=0;i<chord.getNumNotes();++i)
+		{
+			mNotes.add(chord.getNote(i));
+		}
+	}
+	
+	@JsonProperty("UUID")
+	public void setUUID(UUID uuid)
+	{
+		mUUID = uuid;
+	}
+	
+	@JsonProperty("UUID")
+	public UUID getUUID()
+	{
+		if (mUUID == null)
+		mUUID = UUID.randomUUID();
+		return mUUID;
+	}
+	
 	@JsonIgnore
 	public int getInterval( int note_id )
 	{
@@ -74,11 +109,6 @@ public abstract class AbstractChord
 		return result;
 	}
 	
-	@JsonProperty("notes")
-	protected ArrayList<AbstractNote> mNotes = new ArrayList<AbstractNote>(); // List of notes comprising the chord.
-	@JsonProperty("name")
-	protected String mName; // Preferred name for chord
-
 	@JsonIgnore
 	public void setName(String name) {
 		mName = name;
@@ -110,7 +140,7 @@ public abstract class AbstractChord
 	public void addNoteIfNew(AbstractNote note) {
 		// Add note only if unique
 		for (AbstractNote c : mNotes) {
-			if (c.isNote(note)) {
+			if (c.equals(note)) {
 				return; // Don't add note already in chord.
 			}
 		}
@@ -123,7 +153,7 @@ public abstract class AbstractChord
 
 		while (iter.hasNext()) {
 			AbstractNote item = iter.next();
-			if (note.isNote(item)) {
+			if (note.equals(item)) {
 				iter.remove();
 			}
 		}

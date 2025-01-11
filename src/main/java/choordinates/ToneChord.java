@@ -13,6 +13,13 @@ public class ToneChord extends AbstractChord {
 	public ToneChord() {};
 	
 	@JsonIgnore
+	public ToneChord( ToneChord chord )
+	{
+		//Copy constructor.
+		super( chord );
+	}
+	
+	@JsonIgnore
 	public ToneChord( ToneNote root, IntervalChord intervals)
 	{		
 		mName = root.getName().toUpperCase() + " " + intervals.getName() //C minor Seventh
@@ -32,26 +39,6 @@ public class ToneChord extends AbstractChord {
 			
 			mNotes.add(note);
 		}
-	}
-	
-	@Override
-	@JsonIgnore
-	public int getInterval( int note_id )
-	{
-		//For tone chords, we want to get the interval relative to the root note.
-		return super.getInterval(note_id) - mNotes.get(0).getID();
-	}
-	
-	@Override
-	@JsonIgnore
-	public int getAbsoluteInterval( int note_id )
-	{
-		return AbstractChord.makeAbsoluteInterval( getInterval(note_id) );
-	}
-	
-	public ToneNote getNote(int id)
-	{
-		return (ToneNote) mNotes.get(id);
 	}
 	
 	public ToneChord(String tuning)
@@ -131,5 +118,25 @@ public class ToneChord extends AbstractChord {
 		{
 			throw new IllegalArgumentException("Must contain at least one note.");
 		}
+	}
+	
+	@Override
+	@JsonIgnore
+	public int getInterval( int note_id )
+	{
+		//For tone chords, we want to get the interval relative to the root note.
+		return super.getInterval(note_id) - mNotes.get(0).getID();
+	}
+	
+	@Override
+	@JsonIgnore
+	public int getAbsoluteInterval( int note_id )
+	{
+		return AbstractChord.makeAbsoluteInterval( getInterval(note_id) );
+	}
+	
+	public ToneNote getNote(int id)
+	{
+		return (ToneNote) mNotes.get(id);
 	}
 }

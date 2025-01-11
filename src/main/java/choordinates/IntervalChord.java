@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonCreator;
 
 /*
  * IntervalChords are abstract chords defined by their relationship
@@ -25,15 +26,17 @@ public class IntervalChord extends AbstractChord
 	@JsonProperty("aliases")
 	private ArrayList<String> mAliases = new ArrayList<String>(); // Aliases for the chord.
 
-	public IntervalNote getNote(int id)
+	@JsonCreator
+	public IntervalChord(){}
+	
+	@JsonIgnore
+	public IntervalChord( IntervalChord chord )
 	{
-		return (IntervalNote) mNotes.get(id);
+		//Copy constructor
+		super( chord );
 	}
 	
-	public IntervalChord()
-	{
-	}
-	
+	@JsonIgnore
 	public IntervalChord( ToneChord tone_chord )
 	{
 		//Create an intervalchord from a tone chord
@@ -61,6 +64,68 @@ public class IntervalChord extends AbstractChord
 			mNotes.add(interval_note);
 		}
 	}
+	
+	@JsonIgnore
+	public IntervalChord(String intervals)
+	{
+		/*
+		 * Tries to turn a delimited list into intervalchords.
+		 */
+		
+		String delims =" ,\t\r\n\0";
+				
+		int begin = 0;
+		int end;
+		boolean whitespace = true;
+		
+		IntervalChord chord = new IntervalChord();
+		
+		//TODO: Sloppy lazy parser.  Could probably be more efficient and less ugly.
+		intervals += " ";  //This is just shameful.
+		
+		for (end = begin; end < intervals.length(); ++end)
+		{
+			IntervalNote note;
+			
+			//Look for a delimiter character
+			if ( delims.indexOf( intervals.charAt(end) ) > -1 )
+			{
+				if (!whitespace)
+				{
+					String string_name = intervals.substring(begin, end);
+					begin = end;
+					try
+					{
+						note = new IntervalNote( string_name );
+					}
+			        catch (IllegalArgumentException exception)
+			        {
+			        	throw exception;
+					}
+				}
+				begin = end;
+				whitespace = true;
+			}
+			else
+			{
+				if (whitespace)
+				{
+					begin = end;
+				}
+				whitespace = false;
+			}
+		}
+		if (chord.getNumNotes() ==0)
+		{
+			throw new IllegalArgumentException("Must contain at least one note.");
+		}
+	}
+	
+	public IntervalNote getNote(int id)
+	{
+		return (IntervalNote) mNotes.get(id);
+	}
+	
 	public void addAlias(String name) {
 		// I don't care about duplicates. It's your computation time, user.
 		mAliases.add(name);
@@ -131,62 +196,4 @@ public class IntervalChord extends AbstractChord
 		notes.add(0, mName);
 		return notes;
 	}
-
-	public static IntervalChord parse(String intervals)
-	{
-		/*
-		 * Tries to turn a delimited list into intervalchords.
-		 */
-		
-		String delims =" ,\t\r\n\0";
-				
-		int begin = 0;
-		int end;
-		boolean whitespace = true;
-		
-		IntervalChord chord = new IntervalChord();
-		
-		//TODO: Sloppy lazy parser.  Could probably be more efficient and less ugly.
-		intervals += " ";  //This is just shameful.
-		
-		for (end = begin; end < intervals.length(); ++end)
-		{
-			IntervalNote note;
-			
-			//Look for a delimiter character
-			if ( delims.indexOf( intervals.charAt(end) ) > -1 )
-			{
-				if (!whitespace)
-				{
-					String string_name = intervals.substring(begin, end);
-					begin = end;
-					try
-					{
-						note = new IntervalNote( string_name );
-					}
-			        catch (IllegalArgumentException exception)
-			        {
-			        	throw exception;
-					}
-				}
-				begin = end;
-				whitespace = true;
-			}
-			else
-			{
-				if (whitespace)
-				{
-					begin = end;
-				}
-				whitespace = false;
-			}
-		}
-		if (chord.getNumNotes() ==0)
-		{
-			throw new IllegalArgumentException("Must contain at least one note.");
-		}
-		
-		return chord;
-	}
-
 }
