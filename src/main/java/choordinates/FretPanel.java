@@ -85,6 +85,9 @@ public class FretPanel extends JPanel implements MouseListener, MouseMotionListe
     public ChordShape getSelectionShape()
     {
     	mFavChord =  new ChordShape( mTuning, mRootNote, mSearchChord, mFirstFret, mNumStrings, mSelections );
+    	markFavorite();
+    	flushSelections();
+    	refresh();
     	return mFavChord;
     }
     
@@ -152,17 +155,66 @@ public class FretPanel extends JPanel implements MouseListener, MouseMotionListe
     		for (int j=0;j<mMaxFrets; ++j)
     		{
     			mFrets[i][j] = -1;
-    			mFavFrets[i][j] = false;
     		}
     	}
     }
     
+    public void flushFavorite()
+    {
+    	for ( int string_num=0; string_num<mMaxStrings; ++string_num )
+    	{
+    		for ( int fret_num=0; fret_num<mMaxFrets; ++fret_num )
+    		{
+    			mFavFrets[string_num][fret_num] = false;
+    		}
+    	}
+    }
+    
+    public void markFavorite()
+    {
+    	flushFavorite();
+    	if (!mFavChord.isValid())
+    	{
+    		return;
+    	}
+    	
+    	ChoordData choord_data = ChoordData.getInstance();
+    	ToneChord tuning = choord_data.getTuning( choord_data.getCurrentTuning() );
 
+    	int string_num = mFavChord.getLowestString();
+    	
+    	//Tone the open string is tuned to.
+    	ToneNote string_tone = tuning.getNote(string_num);
+    	
+    	//Tone relative to the root note of the displayed chord.
+    	IntervalNote string_interval = new IntervalNote( string_tone.getOctaveSemitone() - mRootNote.getOctaveSemitone() );
+    	
+    	int first_fret =( mFavChord.getFirstNote().getOctaveSemitone() - string_interval.getOctaveSemitone() ) % 12;
+    	
+    	if (first_fret < 0)
+    	{
+    		first_fret += 12;
+    	}
+    	
+    	while (first_fret + mFavChord.getSpan() < mMaxFrets)
+    	{
+    		for (string_num=0;string_num<mNumStrings;++string_num)
+    		{
+    			int offset = mFavChord.getString(string_num);
+    			if (offset >= 0)
+    			{
+    				mFavFrets[string_num][first_fret+offset] = true;
+    			}
+    		}
+        	
+        	first_fret += 12;
+    	}
+    }
+    
     public void markFrets()
     {
     	ChoordData choord_data = ChoordData.getInstance();
     	ToneChord tuning = choord_data.getTuning( choord_data.getCurrentTuning() );
-    	IntervalChord chord = mSearchChord;
     	
     	int root_tone=0;
     	
@@ -173,19 +225,17 @@ public class FretPanel extends JPanel implements MouseListener, MouseMotionListe
     	    	
     	flushFrets();   //Floosh
     	
-		ArrayList<Integer> favs = new ArrayList<Integer>();
-
     	//Loop through the strings on the instrument
-    	for (int i=0; i<tuning.getNumNotes(); ++i)
+    	for (int string_num=0; string_num<tuning.getNumNotes(); ++string_num)
     	{
-    		ToneNote string_note = tuning.getNote(i);
+    		ToneNote string_note = tuning.getNote(string_num);
     		    		
     		int string_tone = string_note.getSemitone();
     		
     		//Loop through the notes in the selected chord
-    		for (int string_num=0; string_num<chord.getNumNotes(); ++string_num)
+    		for (int interval_num=0; interval_num<mSearchChord.getNumNotes(); ++interval_num)
     		{
-    			int interval_tone = chord.getNote(string_num).getOctaveSemitone();
+    			int interval_tone = mSearchChord.getNote(interval_num).getOctaveSemitone();
     			
     			if (mRootNote != null)
     			{
@@ -194,30 +244,9 @@ public class FretPanel extends JPanel implements MouseListener, MouseMotionListe
 	    			{
 	    				if ( ( ( string_tone + fret ) % 12 ) == chord_tone)
 	    				{
-	    					mFrets[i][fret] = string_num;
-	    					
-	    					if (mFavChord.isValid() 
-	    							&& mFavChord.getLowestString() == string_num
-	    							&& mFavChord.getFirstNote().equals( chord.getNote(string_num) ) )
-	    					{
-	    						//Where to start favorites hilights.
-	    						favs.add(fret);
-	    					}		
+	    					mFrets[string_num][fret] = interval_num;
 	    				}
 	    			}
-    			}
-    		}
-    	}
-    	
-    	for (int fav:favs)
-    	{
-			//Hilight favorites if any.
-    		for (int string_num=0; string_num<chord.getNumNotes(); ++string_num)
-    		{
-    			int fav_fret = fav + mFavChord.getString(string_num);
-    			if (fav_fret >= fav && fav_fret < mMaxFrets)
-    			{
-    				mFavFrets[string_num][fav_fret] = true;
     			}
     		}
     	}
@@ -331,20 +360,16 @@ public class FretPanel extends JPanel implements MouseListener, MouseMotionListe
         
     	Cell fret_area = new Cell(); //X and Y mins and maxes of fret box.
     	
+    	fret_area.X[0] = cell_size + cell_half;		//X min
+    	fret_area.Y[0] =  cell_size + cell_half;    //Y min
     	if (mOrientX)
     	{
-    		fret_area.X[0] = cell_size + cell_half;		//X min
     		fret_area.X[1] = cell_size * mNumFrets + cell_half;	//X max
-    		
-    		fret_area.Y[0] =  cell_size + cell_half;
     		fret_area.Y[1] =  cell_size * mNumStrings + cell_half;
     	}
     	else
     	{
-    		fret_area.X[0] = cell_size + cell_half;
     		fret_area.X[1] =  cell_size * mNumStrings + cell_half;
-    		
-    		fret_area.Y[0] = cell_size + cell_half;
     		fret_area.Y[1] =  cell_size * mNumFrets + cell_half;
     	}
 
@@ -398,17 +423,27 @@ public class FretPanel extends JPanel implements MouseListener, MouseMotionListe
     	g.setColor(Color.GREEN);
     	if (mFavChord.isValid())
     	{
-    		for (int i=0;i<mNumStrings;++i)
+    		for (int string_num=0;string_num<mNumStrings;++string_num)
     		{
-    			for (int j=0;j<mMaxFrets;++i)
+    			for (int fret_num=0;fret_num<mMaxFrets;++fret_num)
     			{
-    				if (mFavFrets[i][j])
+    				if (mFavFrets[string_num][fret_num])
     				{
-    				
+    					Cell cell = new Cell(string_num, fret_num, cell_size, fret_area);
+    					
+    					if (mOrientX) 
+    	    			{
+    	    				g.fillRect( cell.X[0], cell.Y[0] - cell_half, cell_size, cell_size);
+    	    			}
+    	    			else
+    	    			{
+    	    				g.fillRect( cell.X[0] - cell_half, cell.Y[0], cell_size, cell_size);
+    	    			}
     				}
     			}
     		}
     	}
+    	
     	
     	//Draw the selections.  Note these will overwrite Favorites. (and that's OK!)
     	if (mSelectAny)

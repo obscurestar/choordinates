@@ -53,12 +53,10 @@ public class ChordShape {
 					
 					for (int j=0;j<selected.getNumNotes();++j)
 					{
-						System.out.println("String " + j + " Comparing " + string_note.getName() + " with " + selected.getNote(j).getName());
 						if ( string_note.getName().toUpperCase().compareTo(
 								selected.getNote(j).getName().toUpperCase()) == 0 )
 						{
 							//Found it.
-							System.out.println("Found note: " + string_note.getName() + " in chord " + selected.getAllNoteNames());
 							mFirstNote = new IntervalNote(  selected.getNote(j).getOctaveSemitone() - root_note.getOctaveSemitone());
 							break;
 						}
@@ -82,7 +80,6 @@ public class ChordShape {
 				mStrings[i] -= lowest;
 			}
 		}
-		System.out.println("First string is " + mLowestString + " First interval in chord shape is " + mFirstNote.getName() + " span " + mSpan);
 	}
 	
 	@JsonIgnore
@@ -103,9 +100,15 @@ public class ChordShape {
 		return mFirstNote;
 	}
 	
+	@JsonIgnore
+	public int getSpan()
+	{
+		return mSpan;
+	}
+	
 	public boolean isValid()
 	{
-		if (mLowestString == Integer.MAX_VALUE)
+		if (mSpan < 1)
 		{
 			return false;
 		}

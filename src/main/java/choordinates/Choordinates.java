@@ -219,8 +219,6 @@ public class Choordinates extends JFrame {
 			alert("Add favorite", exception.getMessage());
 			return;
 		}
-		
-		//System.out.println("Favorite first string: " + chord_shape.getFirstString() + " interval "  + chord_shape.getFirstNote().getName());
 	}
 	
 	public void refreshFretPanel( FretPanel panel )
