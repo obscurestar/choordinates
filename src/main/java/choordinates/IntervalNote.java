@@ -7,7 +7,8 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public class IntervalNote extends AbstractNote{
-	private final int[] mIntervalMap = { 0, 2, 4, 5, 7, 9, 11 };
+	@JsonIgnore
+	private static final int[] mOffsetMap = { 0, 2, 4, 5, 7, 9, 11 };
 	
     //TODO something better than colors but the order they appear in the chord.
     //Black white yellow orange red pink
@@ -16,78 +17,21 @@ public class IntervalNote extends AbstractNote{
 	private static final Color[] mNoteColors = { Color.BLACK, Color.WHITE, Color.YELLOW, Color.ORANGE, Color.RED, Color.PINK };
     
 	@JsonCreator
-	IntervalNote(){ super(); }
-	
-	@JsonIgnore
-	IntervalNote( IntervalNote note )
+	IntervalNote()
 	{
-		super( note );
+		super();
 	}
 	
 	@JsonIgnore
 	public IntervalNote( int semitones )
 	{
-		semitones = semitones % 12;
-		
-		if (semitones < 0)
-		{
-			semitones += 12;
-		}
-		
-		for (int i=0;i<mIntervalMap.length;++i)
-		{
-			if (semitones == mIntervalMap[i])
-			{
-				mID = i+1;
-				break;
-			}
-		}
-		
-		if (mID == -1)
-		{
-			semitones --;
-			for (int i=0;i<mIntervalMap.length;++i)
-			{
-				if (semitones == mIntervalMap[i])
-				{
-					mID = i+2;
-					mSharp = -1;
-					break;
-				}
-			}
-		}
-		mID = mID % 7;
+		super( semitones );
 	}
 	
 	@JsonIgnore
-	public int getOctaveSemitone()
+	IntervalNote( IntervalNote note )
 	{
-		//Lousy ancient Greeks and their lousy
-		//lack of understanding of the concept of 0.
-		//They don't know nothing.
-		if (mID > 0)
-		{
-			return mIntervalMap[ (mID-1) % 7 ] + mSharp;
-		}
-		
-		//Handle negative intervals.
-		return mIntervalMap[ (7 - (mID+1)) % 7] + mSharp;
-	}
-	
-	@JsonIgnore
-	public int getSemitone()
-	{
-		//TODO verify negative interval logic.
-		int semitone = getOctaveSemitone();
-		
-		int id = Math.abs(mID + 1) / 7;
-		
-		if (mID > 0)
-		{
-			return semitone + ( (id - 1) * 12);
-		}
-		
-		return (id * -12) + semitone;
+		super( note );
 	}
 	
 	@JsonIgnore
@@ -159,7 +103,38 @@ public class IntervalNote extends AbstractNote{
 		}
 	}
 	
-	public String getNoteName()
+	@JsonIgnore
+	public final int getOctaveSemitone()
+	{
+		//Lousy ancient Greeks and their lousy
+		//lack of understanding of the concept of 0.
+		//They don't know nothing.
+		if (mID > 0)
+		{
+			return mOffsetMap[ (mID-1) % 7 ] + mSharp;
+		}
+		
+		//Handle negative intervals.
+		return mOffsetMap[ (7 - (mID+1)) % 7] + mSharp;
+	}
+	
+	@JsonIgnore
+	public final int getSemitone()
+	{
+		//TODO verify negative interval logic.
+		int semitone = getOctaveSemitone();
+		
+		int id = Math.abs(mID + 1) / 7;
+		
+		if (mID > 0)
+		{
+			return semitone + ( (id - 1) * 12);
+		}
+		
+		return (id * -12) + semitone;
+	}
+	
+	public final String getNoteName()
 	{
 		return new String( String.valueOf( mID ) );
 	}

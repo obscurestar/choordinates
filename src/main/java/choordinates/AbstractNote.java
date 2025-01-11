@@ -15,6 +15,8 @@ import com.fasterxml.jackson.annotation.JsonCreator;
         @JsonSubTypes.Type(value = IntervalNote.class, name = "interval_note")
 })
 public abstract class AbstractNote {
+	@JsonIgnore
+	private static int[] mOffsetMap = { 0, 2, 4, 5, 7, 9, 11 };
 	@JsonProperty("id")
 	protected int mID = -1;   //A number from 0-6 representing A B C D E F G
 	@JsonProperty("sharps")
@@ -27,12 +29,12 @@ public abstract class AbstractNote {
 	
 	@JsonIgnore
 	public abstract String getNoteName();
-	
 	@JsonIgnore
 	public abstract int getOctaveSemitone();
 	@JsonIgnore
 	public abstract int getSemitone();
 	public abstract boolean equals(AbstractNote note);
+	public abstract void reduceSharps();
  
 	@JsonCreator
 	public AbstractNote() {};
@@ -46,7 +48,42 @@ public abstract class AbstractNote {
 	}
 	
 	@JsonIgnore
-	public String getName()
+	public AbstractNote( int semitones )
+	{
+		semitones = semitones % 12;
+		
+		if (semitones < 0)
+		{
+			semitones += 12;
+		}
+		
+		for (int i=0;i<mOffsetMap.length;++i)
+		{
+			if (semitones == mOffsetMap[i])
+			{
+				mID = i+1;
+				break;
+			}
+		}
+		
+		if (mID == -1)
+		{
+			semitones --;
+			for (int i=0;i<mOffsetMap.length;++i)
+			{
+				if (semitones == mOffsetMap[i])
+				{
+					mID = i+2;
+					mSharp = -1;
+					break;
+				}
+			}
+		}
+		mID = mID % 7;
+	}
+
+	@JsonIgnore
+	public final String getName()
 	{
 		String result = getNoteName();
 		for (int i=0;i<Math.abs(mSharp);++i )
@@ -80,13 +117,13 @@ public abstract class AbstractNote {
 	}
 	
 	@JsonIgnore
-	public int  getID()
+	public final int  getID()
 	{
 		return mID;
 	}
 	
 	@JsonIgnore
-	public int getSharp()
+	public final int getSharp()
 	{
 		return mSharp;
 	}

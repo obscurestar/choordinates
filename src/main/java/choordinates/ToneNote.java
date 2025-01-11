@@ -10,12 +10,22 @@ import com.fasterxml.jackson.annotation.JsonCreator;
  * with one or more flat or sharp modifiers.
  */
 public class ToneNote extends AbstractNote{
-	private final int[] mToneMap = { 0, 2, 3, 5, 7, 8, 10 };  //ABCDEFG  0 is A-flat.
+	@JsonIgnore
+	private static final int[] mOffsetMap = { 0, 2, 3, 5, 7, 8, 10 };  //ABCDEFG  0 is A-flat.
 	@JsonProperty("octave")
 	private int mOctave = 0; //A positive or negative number representing distance from middle octave.
 
 	@JsonCreator
-	ToneNote(){ super(); }
+	ToneNote()
+	{
+		super();
+	}
+	
+	@JsonIgnore
+	public ToneNote( int semitones )
+	{
+		super( semitones );
+	}
 	
 	@JsonIgnore
 	ToneNote( ToneNote note )
@@ -35,9 +45,9 @@ public class ToneNote extends AbstractNote{
 		
 		mID = -1;
 		
-		for (int i=0;i<mToneMap.length;++i)
+		for (int i=0;i<mOffsetMap.length;++i)
 		{
-			if (semitones == mToneMap[i])
+			if (semitones == mOffsetMap[i])
 			{
 				mID = i;
 				break;
@@ -47,9 +57,9 @@ public class ToneNote extends AbstractNote{
 		if (mID == -1)
 		{
 			semitones --;
-			for (int i=0;i<mToneMap.length;++i)
+			for (int i=0;i<mOffsetMap.length;++i)
 			{
-				if (semitones == mToneMap[i])
+				if (semitones == mOffsetMap[i])
 				{
 					mID = (i+1)%7;
 					mSharp = -1;
@@ -57,50 +67,6 @@ public class ToneNote extends AbstractNote{
 				}
 			}
 		}
-	}
-	
-	@JsonIgnore
-	@Override
-	public String getNoteName()
-	{
-		/*
-		 * Generate the name of this note from the data.
-		 */
-		String name = "";
-		name += (char)('A'+mID);
-		
-		if (mOctave > 0) //Make higher octaves lower case
-		{
-			name = name.toLowerCase();
-		}
-
-		return name;
-	}
-	
-	@JsonIgnore
-	public void setOctave(int octave)
-	{
-		mOctave = octave;
-	}
-	
-	@JsonIgnore
-	public int getOctave()
-	{
-		return mOctave;
-	}
-
-	@JsonIgnore
-	public int getOctaveSemitone()
-	{
-		//Semitones from nearest A.
-		return mToneMap[mID] + mSharp;
-	}
-	
-	@JsonIgnore
-	public int getSemitone()
-	{
-		//Semitones from middle A.
-		return mOctave * 12 + getOctaveSemitone();
 	}
 	
 	public ToneNote(String note)
@@ -154,6 +120,50 @@ public class ToneNote extends AbstractNote{
 		}
 	}
 
+	@JsonIgnore
+	@Override
+	public final String getNoteName()
+	{
+		/*
+		 * Generate the name of this note from the data.
+		 */
+		String name = "";
+		name += (char)('A'+mID);
+		
+		if (mOctave > 0) //Make higher octaves lower case
+		{
+			name = name.toLowerCase();
+		}
+
+		return name;
+	}
+	
+	@JsonIgnore
+	public final void setOctave(int octave)
+	{
+		mOctave = octave;
+	}
+	
+	@JsonIgnore
+	public final int getOctave()
+	{
+		return mOctave;
+	}
+
+	@JsonIgnore
+	public final int getOctaveSemitone()
+	{
+		//Semitones from nearest A.
+		return mOffsetMap[mID] + mSharp;
+	}
+	
+	@JsonIgnore
+	public final int getSemitone()
+	{
+		//Semitones from middle A.
+		return mOctave * 12 + getOctaveSemitone();
+	}
+
 	public boolean equals(AbstractNote abs_note)
 	{
 		//Notes must be of same subclass to be identical.
@@ -174,5 +184,23 @@ public class ToneNote extends AbstractNote{
 			return true;
 		}
 		return false;
+	}
+	
+	public void reduceSharps()
+	{
+		/*While Ebb and E# are valid notes in some contexts, it can be annoying in others.*/
+		
+		int semitones = getOctaveSemitone();
+		
+		if (mSharp == 0)
+		{
+			//Already good.
+			return;
+		}
+		
+		//How much does a ctor cost, really?
+		ToneNote note = new ToneNote( semitones );
+		mID = note.getID();
+		mSharp = note.getSharp();
 	}
 }

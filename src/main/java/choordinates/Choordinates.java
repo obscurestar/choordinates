@@ -108,22 +108,34 @@ public class Choordinates extends JFrame {
 		
 		flushMatchList();
 		
+		ToneChord search_chord = new ToneChord( root_note, chord );
+		
 		for (int i=0;i<choord_data.getNumChords(); ++i)
 		{
-			if ( choord_data.getChord(i).similar( chord ) )
-			{
-				//The CTOR generates a nice name for us.
-				ToneChord tone_chord = new ToneChord( root_note, choord_data.getChord(i) );
+			System.out.println("Comparing: chord " + chord.getAllNoteNames() + " with " + choord_data.getChord(i).getAllNoteNames());
 
-				addMatch( tone_chord.getName() );
+			ToneChord known_chord = new ToneChord( root_note, choord_data.getChord(i) );
+
+			int combo = search_chord.findPermutation(known_chord);
+			if ( combo > -1 )
+			{
+				//known_chord = new ToneChord( search_chord.getNote(perm), choord_data.getChord(i) );
+				
+				ToneNote first = new ToneNote(search_chord.getNote(combo).getName());
+				//known_chord = new ToneChord( first, chord );
+				
+				System.out.println("First note: " + first.getName() + " matched name " + known_chord.getAllNoteNames());
+				addMatch( known_chord.getName() );
 				found_any = true;
 			}
 		}
 		
 		if (!found_any)
 		{
-			ArrayList<String> string_names= chord.getAllNoteNames();
-			String name = root_note.getName() + String.join(" ", string_names) + " <UNMATCHED> ";
+			String name = root_note.getName() + " "
+						+ String.join(" ", chord.getAllNoteNames() ) 
+						+ " ( " + String.join(" ", search_chord.getAllNoteNames() )
+						+ ") <UNMATCHED> ";
 			addMatch( name );
 		}
 

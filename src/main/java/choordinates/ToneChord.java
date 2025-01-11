@@ -122,7 +122,7 @@ public class ToneChord extends AbstractChord {
 	
 	@Override
 	@JsonIgnore
-	public int getInterval( int note_id )
+	public final int getInterval( int note_id )
 	{
 		//For tone chords, we want to get the interval relative to the root note.
 		return super.getInterval(note_id) - mNotes.get(0).getID();
@@ -130,7 +130,7 @@ public class ToneChord extends AbstractChord {
 	
 	@Override
 	@JsonIgnore
-	public int getAbsoluteInterval( int note_id )
+	public final int getAbsoluteInterval( int note_id )
 	{
 		return AbstractChord.makeAbsoluteInterval( getInterval(note_id) );
 	}
@@ -138,5 +138,52 @@ public class ToneChord extends AbstractChord {
 	public ToneNote getNote(int id)
 	{
 		return (ToneNote) mNotes.get(id);
+	}
+	
+	public int findPermutation(ToneChord chord)
+	{
+		/* Returns -1 on failure, notindex on success.*/
+		int num_notes = getNumNotes();
+		if ( num_notes < 0 || chord.getNumNotes() != num_notes )
+		{
+			return -1;
+		}
+		
+		//To heck with it, let's do a O(n^2) computation!
+		ArrayList<String> names = getAllNoteNames();
+		ToneChord test_chord = new ToneChord(chord);
+		
+		for (int combo=0;combo<num_notes;++combo)
+		{
+			int match_count = 0;
+						
+			for (int i=0;i<getNumNotes();++i)
+			{
+				int semi1 = mNotes.get(i).getOctaveSemitone();
+				
+				for (int j=0;j<getNumNotes();++j)
+				{
+					int semi2 = test_chord.getNote(j).getOctaveSemitone();
+					
+					//System.out.println("Comparing " + semi1 + " with " + semi2);
+					if(semi1 == semi2)
+					{
+						//System.out.println("Matched " + names);
+						match_count++;
+						break;
+					}
+				}
+			}
+			if (match_count == getNumNotes())
+			{
+				System.out.println("Winning match was " + test_chord.getAllNoteNames());
+				return combo;
+			}
+			String name = names.get(0);
+			names.remove(0);
+			names.add(name);
+			test_chord = new ToneChord( String.join(" ",names) );
+		}
+		return -1;
 	}
 }

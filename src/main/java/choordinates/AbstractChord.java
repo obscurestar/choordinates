@@ -50,7 +50,7 @@ public abstract class AbstractChord
 	}
 	
 	@JsonProperty("UUID")
-	public UUID getUUID()
+	public final UUID getUUID()
 	{
 		if (mUUID == null)
 		mUUID = UUID.randomUUID();
@@ -82,7 +82,7 @@ public abstract class AbstractChord
 	}
 	
 	@JsonIgnore
-	public ArrayList<Integer> getIntervals( )
+	public final ArrayList<Integer> getIntervals( )
 	{
 		ArrayList<Integer> result = new ArrayList<Integer>();
 				
@@ -95,7 +95,7 @@ public abstract class AbstractChord
 	}
 	
 	@JsonIgnore
-	public ArrayList<Integer> getAbsoluteIntervals( )
+	public final ArrayList<Integer> getAbsoluteIntervals( )
 	{
 		//Return intervals in positive single-octave space.
 		ArrayList<Integer> result = new ArrayList<Integer>();
@@ -115,12 +115,12 @@ public abstract class AbstractChord
 	}
 
 	@JsonIgnore
-	public String getName() {
+	public final String getName() {
 		return mName;
 	}
 
 	@JsonIgnore
-	public ArrayList<String> getAllNoteNames()
+	public final ArrayList<String> getAllNoteNames()
 	{
 		//Return names of all notes in the chord.
 		
@@ -173,38 +173,20 @@ public abstract class AbstractChord
 	}
 
 	@JsonIgnore
-	public int getNumNotes() {
+	public final int getNumNotes() {
 		return mNotes.size();
+	}
+	
+	public void reduceSharps()
+	{
+		for(int i=0;i<getNumNotes();++i)
+		{
+			getNote(i).reduceSharps();
+		}
 	}
 	
 	public AbstractNote getNote(int id)
 	{
 		return (AbstractNote) mNotes.get(id);
-	}
-	
-	public boolean similar(AbstractChord chord)
-	{
-		if ( chord.getNumNotes() != getNumNotes()  || getNumNotes() < 0 )
-		{
-			return false;
-		}
-		
-		ArrayList<Integer> semitones = new ArrayList<Integer>();
-		
-		for (int i=0; i<getNumNotes(); ++i )
-		{
-			semitones.add( getNote(i).getOctaveSemitone() );
-		}
-		
-		//Accept notes in any order with any number of repeats.
-		for (int i=0; i<getNumNotes(); ++i )
-		{
-			if ( semitones.indexOf( chord.getNote(i).getOctaveSemitone() ) == -1 )
-			{
-				return false;
-			}
-		}
-		
-		return true;
 	}
 }
