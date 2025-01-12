@@ -108,34 +108,22 @@ public class Choordinates extends JFrame {
 		
 		flushMatchList();
 		
-		ToneChord search_chord = new ToneChord( root_note, chord );
-		
 		for (int i=0;i<choord_data.getNumChords(); ++i)
 		{
-			System.out.println("Comparing: chord " + chord.getAllNoteNames() + " with " + choord_data.getChord(i).getAllNoteNames());
-
-			ToneChord known_chord = new ToneChord( root_note, choord_data.getChord(i) );
-
-			int combo = search_chord.findPermutation(known_chord);
-			if ( combo > -1 )
+			if ( choord_data.getChord(i).similar( chord ) )
 			{
-				//known_chord = new ToneChord( search_chord.getNote(perm), choord_data.getChord(i) );
-				
-				ToneNote first = new ToneNote(search_chord.getNote(combo).getName());
-				//known_chord = new ToneChord( first, chord );
-				
-				System.out.println("First note: " + first.getName() + " matched name " + known_chord.getAllNoteNames());
-				addMatch( known_chord.getName() );
+				//The CTOR generates a nice name for us.
+				ToneChord tone_chord = new ToneChord( root_note, choord_data.getChord(i) );
+
+				addMatch( tone_chord.getName() );
 				found_any = true;
 			}
 		}
 		
 		if (!found_any)
 		{
-			String name = root_note.getName() + " "
-						+ String.join(" ", chord.getAllNoteNames() ) 
-						+ " ( " + String.join(" ", search_chord.getAllNoteNames() )
-						+ ") <UNMATCHED> ";
+			ArrayList<String> string_names= chord.getAllNoteNames();
+			String name = root_note.getName() + String.join(" ", string_names) + " <UNMATCHED> ";
 			addMatch( name );
 		}
 
@@ -351,6 +339,9 @@ public class Choordinates extends JFrame {
 		 * The lambdas will make you cry.
 		 */
 		ChoordData.read();   //Initialize data structures from JSON file.
+		
+		//SPATTERS debug
+		new Tests();
 		
 		//Set up the window.
 		setTitle("Choordinates");

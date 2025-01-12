@@ -171,19 +171,19 @@ public class IntervalChord extends AbstractChord
 	}
 	
 	@JsonIgnore
-	public final String getSymbol()
+	public String getSymbol()
 	{
 		return mSymbol;
 	}
 	
 	@JsonIgnore
-	public final ArrayList<String> getAliases() {
+	public ArrayList<String> getAliases() {
 		// Return the list of aliases.
 		return mAliases;
 	}
 
 	@JsonIgnore
-	public final String getAliasesString()
+	public String getAliasesString()
 	{
 		return String.join(" ", mAliases);
 	}
@@ -195,70 +195,5 @@ public class IntervalChord extends AbstractChord
 		// It's a short list. Who cares about the cost?
 		notes.add(0, mName);
 		return notes;
-	}
-	
-	public boolean similar( IntervalChord chord )
-	{
-		int num_notes = getNumNotes();
-		if ( num_notes < 0 || chord.getNumNotes() != num_notes )
-		{
-			return false;
-		}
-		
-		//To heck with it, let's do a O(n^2) computation!
-
-		IntervalChord test_chord = new IntervalChord(chord);
-		
-		for (int combo=0;combo<num_notes;++combo)
-		{
-			int match_count = 0;
-			
-			System.out.println("Permutation " + test_chord.getAllNoteNames());
-			
-			for (int i=0;i<getNumNotes();++i)
-			{
-				int semi1 = mNotes.get(i).getOctaveSemitone();
-				
-				for (int j=0;j<getNumNotes();++j)
-				{
-					int semi2 = test_chord.getNote(j).getOctaveSemitone();
-					
-					//System.out.println("Comparing " + semi1 + " with " + semi2);
-					if(semi1 == semi2)
-					{
-						match_count++;
-						break;
-					}
-				}
-			}
-			if (match_count == getNumNotes())
-			{
-				return true;
-			}
-
-			IntervalNote first = test_chord.getNote(0);
-			int offset = first.getOctaveSemitone();
-			
-			ArrayList<IntervalNote> notes = new ArrayList<IntervalNote>();
-			for (int i=0;i<num_notes;++i)
-			{
-				//Offset the notes.
-				IntervalNote note = new IntervalNote( offset - test_chord.getNote(i).getOctaveSemitone() );
-				notes.add(note);
-			}
-			
-			//Rotate the list
-			IntervalNote note = notes.get(0);
-			notes.remove(0);
-			notes.add(note);
-			
-			//Add notes to test chord.
-			test_chord = new IntervalChord();
-			for (int i=0;i<num_notes;++i)
-			{
-				test_chord.addNote(notes.get(i));
-			}			
-		}
-		return false;
 	}
 }

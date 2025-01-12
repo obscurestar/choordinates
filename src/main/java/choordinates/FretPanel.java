@@ -1,6 +1,5 @@
 package choordinates;
 
-
 import java.awt.*;
 import java.awt.event.*;
 import java.util.Arrays;
@@ -258,7 +257,7 @@ public class FretPanel extends JPanel implements MouseListener, MouseMotionListe
     public void setRootAndChord(ToneNote note, IntervalChord chord)
     {    	
     	if (mRootNote == null 
-    			|| !mRootNote.equals(note)
+    			|| !mRootNote.equivalent(note)
     			|| !mSearchChord.equals(chord))
     	{
     		mRootNote = note;

@@ -7,8 +7,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public class IntervalNote extends AbstractNote{
-	@JsonIgnore
-	private static final int[] mOffsetMap = { 0, 2, 4, 5, 7, 9, 11 };
+	@JsonIgnore public static final int[] mNoteMap = { 0, 2, 4, 5, 7, 9, 11 };
 	
     //TODO something better than colors but the order they appear in the chord.
     //Black white yellow orange red pink
@@ -17,21 +16,25 @@ public class IntervalNote extends AbstractNote{
 	private static final Color[] mNoteColors = { Color.BLACK, Color.WHITE, Color.YELLOW, Color.ORANGE, Color.RED, Color.PINK };
     
 	@JsonCreator
-	IntervalNote()
-	{
-		super();
-	}
+	IntervalNote(){ super(); }
 	
-	@JsonIgnore
-	public IntervalNote( int semitones )
-	{
-		super( semitones );
-	}
-	
-	@JsonIgnore
 	IntervalNote( IntervalNote note )
 	{
-		super( note );
+		super( (AbstractNote) note );
+	}
+		
+	@JsonIgnore
+	public IntervalNote( int semitones )
+	{	
+		super( semitones );
+		if (semitones < 0)
+		{
+			//Lousy ancient Greeks and their lousy
+			//lack of understanding of the concept of 0.
+			//They don't know nothing.
+
+			mOctave--;
+		}
 	}
 	
 	@JsonIgnore
@@ -54,18 +57,21 @@ public class IntervalNote extends AbstractNote{
 		}
 		
 		String numchars = "0123456789";
-		
-		int begin=0;
-		
+	
+		int begin = 0;
+		boolean negative = false;
+	
 		if ( note.charAt(0) == '-')
 		{
-			begin=1;
+			begin = 1;
+			mOctave--;
+			negative = true;
 		}
 				
 		int end = begin;
 		
 		//0 is not a valid interval but 10 could be.
-		if ( note.charAt(end) == '0' )
+		if ( note.charAt(begin) == '0' )
 		{
 			throw bad_name;
 		}
@@ -81,62 +87,44 @@ public class IntervalNote extends AbstractNote{
 			throw bad_name;   //Character wasn't a number.
 		}
 		
-		mID = Integer.valueOf( note.substring(0, end) );
+		if (negative) begin--;
 		
-		begin = end;
-		for (end = begin; end < note.length(); ++end)
+		int new_id = Integer.valueOf( note.substring(begin, end) ) - 1;
+		
+		if (negative) new_id++;
+		
+		setSafeID( new_id );
+		
+		//System.out.println("mID " + mID + " remaining " + note);
+		if ( note.length() > 1 && !setValidSharp( note.substring(end) ) )
 		{
-			if (mFlatChars.indexOf( note.charAt(end)) != -1)
-			{
-				mSharp--;
-			}
-			else if (mSharpChars.indexOf( note.charAt(end)) != -1)
-			{
-	
-				mSharp++;
-			}
-			else
-			{
-				//Some other character.
-				throw bad_name;
-			}
+			throw bad_name;
 		}
+	}
+
+	@JsonIgnore
+	public int getOctaveSemitone()
+	{
+		return mNoteMap[ mID ] + mSharp;
 	}
 	
 	@JsonIgnore
-	public final int getOctaveSemitone()
+	public int getSemitone()
 	{
-		//Lousy ancient Greeks and their lousy
-		//lack of understanding of the concept of 0.
-		//They don't know nothing.
-		if (mID > 0)
-		{
-			return mOffsetMap[ (mID-1) % 7 ] + mSharp;
-		}
-		
-		//Handle negative intervals.
-		return mOffsetMap[ (7 - (mID+1)) % 7] + mSharp;
+		return  getOctaveSemitone() + mOctave*12;
 	}
 	
 	@JsonIgnore
-	public final int getSemitone()
+	public String getNoteName()
 	{
-		//TODO verify negative interval logic.
-		int semitone = getOctaveSemitone();
-		
-		int id = Math.abs(mID + 1) / 7;
-		
-		if (mID > 0)
-		{
-			return semitone + ( (id - 1) * 12);
-		}
-		
-		return (id * -12) + semitone;
+		//Bite me Pythagoras
+		return new String( String.valueOf( mID + 1) );
 	}
-	
-	public final String getNoteName()
+
+	@JsonIgnore
+	protected int[] getNoteMap()
 	{
-		return new String( String.valueOf( mID ) );
+		return mNoteMap;
 	}
 	
 	public void reduceSharps()
@@ -157,14 +145,25 @@ public class IntervalNote extends AbstractNote{
 		mSharp = note.getSharp();
 	}
 	
-	public boolean equals(AbstractNote note)
+	public boolean equivalent(AbstractNote note)
 	{
+		//TODO refactor to get rid of this constructor abuse.
+		IntervalNote a = new IntervalNote( (IntervalNote)note );
+		a = new IntervalNote( a.getSemitone() );
+		IntervalNote b = new IntervalNote( getSemitone() );
+		
+		//NOTE, ignores octave.   && b.getOctave() == a.getOctave()
+		if ( b.getID() == a.getID()
+				&& b.getSharp()  == a.getSharp() )
+		{
+			return true;
+		}
 		return false;
 	}
 	
 	@JsonIgnore
 	public static Color getColor( int cid )
 	{
-		return mNoteColors[ cid % mNoteColors.length ];
+		return mNoteColors[ mod ( cid, mNoteColors.length ) ];
 	}
 }

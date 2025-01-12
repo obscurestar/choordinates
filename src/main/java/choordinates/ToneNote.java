@@ -10,63 +10,37 @@ import com.fasterxml.jackson.annotation.JsonCreator;
  * with one or more flat or sharp modifiers.
  */
 public class ToneNote extends AbstractNote{
-	@JsonIgnore
-	private static final int[] mOffsetMap = { 0, 2, 3, 5, 7, 8, 10 };  //ABCDEFG  0 is A-flat.
-	@JsonProperty("octave")
-	private int mOctave = 0; //A positive or negative number representing distance from middle octave.
+	@JsonIgnore public static final int[] mNoteMap = { 0, 2, 3, 5, 7, 8, 10 };  //ABCDEFG  0 is A-flat.
 
 	@JsonCreator
-	ToneNote()
-	{
-		super();
-	}
+	ToneNote(){ super(); }
 	
 	@JsonIgnore
 	public ToneNote( int semitones )
 	{
-		super( semitones );
+		mOctave = semitones/12;
+		
+		semitones = mod( semitones, 12 );
+		
+		mID = findInMap( semitones );
+		
+		//if (this instanceof IntervalNote)
+		//{
+			//System.out.println("Yay I did the thing!");
+			//Bite me Pythagoras! 
+			if (mID == -1)
+			{
+				mID = findInMap( semitones+1 );
+				mSharp = -1;
+			}
+		//}
+		setID( mod( mID, 7) );
 	}
 	
 	@JsonIgnore
-	ToneNote( ToneNote note )
-	{
-		//Copy constructor
-		super( note );
-		mOctave = note.getOctave();
-	}
-	
-	@JsonIgnore
-	public ToneNote(ToneNote root, int in_semitones)
-	{
-		
-		/*Given a tone note and semitones create a relative note.*/
-		
-		int semitones = (root.getOctaveSemitone() + in_semitones) % 12;
-		
-		mID = -1;
-		
-		for (int i=0;i<mOffsetMap.length;++i)
-		{
-			if (semitones == mOffsetMap[i])
-			{
-				mID = i;
-				break;
-			}
-		}
-		
-		if (mID == -1)
-		{
-			semitones --;
-			for (int i=0;i<mOffsetMap.length;++i)
-			{
-				if (semitones == mOffsetMap[i])
-				{
-					mID = (i+1)%7;
-					mSharp = -1;
-					break;
-				}
-			}
-		}
+	public ToneNote(ToneNote root, int semitones)
+	{	
+		super ( root.getSemitone() + semitones );
 	}
 	
 	public ToneNote(String note)
@@ -89,40 +63,29 @@ public class ToneNote extends AbstractNote{
 		String note_up = note.toUpperCase();
 		int note_index = note_up.charAt(0) - 'A';
 		
-		if (note_index < 0 || note_index > 6)
+		try 
 		{
-			//Not a valid note name.
+			setID( note_index );
+		}
+		catch (IllegalArgumentException e)
+		{
 			throw bad_name;
 		}
-				
-		mID = note_index;
-		
+						
 		if (note_up.charAt(0) != note.charAt(0))
 		{
 			mOctave++;
 		}
 		
-		for (int i=1;i<note.length();++i)
+		if ( note.length() > 1 && !setValidSharp( note.substring(1) ) )
 		{
-			if (mFlatChars.indexOf( note.charAt(i)) != -1)
-			{
-				mSharp--;
-			}
-			else if (mSharpChars.indexOf( note.charAt(i)) != -1)
-			{
-				mSharp++;
-			}
-			else
-			{
-				//Some other character.
-				throw bad_name;
-			}
+			throw bad_name;
 		}
 	}
 
 	@JsonIgnore
 	@Override
-	public final String getNoteName()
+	public String getNoteName()
 	{
 		/*
 		 * Generate the name of this note from the data.
@@ -134,73 +97,27 @@ public class ToneNote extends AbstractNote{
 		{
 			name = name.toLowerCase();
 		}
-
+	
 		return name;
 	}
 	
 	@JsonIgnore
-	public final void setOctave(int octave)
+	protected int[] getNoteMap()
 	{
-		mOctave = octave;
+		return mNoteMap;
 	}
 	
-	@JsonIgnore
-	public final int getOctave()
+	@Override
+	public boolean equivalent(AbstractNote note)
 	{
-		return mOctave;
-	}
-
-	@JsonIgnore
-	public final int getOctaveSemitone()
-	{
-		//Semitones from nearest A.
-		return mOffsetMap[mID] + mSharp;
-	}
-	
-	@JsonIgnore
-	public final int getSemitone()
-	{
-		//Semitones from middle A.
-		return mOctave * 12 + getOctaveSemitone();
-	}
-
-	public boolean equals(AbstractNote abs_note)
-	{
-		//Notes must be of same subclass to be identical.
-		ToneNote note;
-		if (abs_note instanceof ToneNote) {
-            note = (ToneNote) abs_note;
-		}
-		else
-		{
-			return false;
-		}
-            
-		//Returns true only when passed note is exact match.
-		if (mID == note.getID()
-				&& mSharp == note.getSharp()
-				&& mOctave == note.getOctave())
+		ToneNote a = new ToneNote( note.getSemitone() );
+		ToneNote b = new ToneNote( getSemitone() );
+		
+		if ( b.getID() == a.getID()
+				&& b.getSharp()  == a.getSharp() )
 		{
 			return true;
 		}
 		return false;
-	}
-	
-	public void reduceSharps()
-	{
-		/*While Ebb and E# are valid notes in some contexts, it can be annoying in others.*/
-		
-		int semitones = getOctaveSemitone();
-		
-		if (mSharp == 0)
-		{
-			//Already good.
-			return;
-		}
-		
-		//How much does a ctor cost, really?
-		ToneNote note = new ToneNote( semitones );
-		mID = note.getID();
-		mSharp = note.getSharp();
 	}
 }

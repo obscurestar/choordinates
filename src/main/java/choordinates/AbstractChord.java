@@ -50,7 +50,7 @@ public abstract class AbstractChord
 	}
 	
 	@JsonProperty("UUID")
-	public final UUID getUUID()
+	public UUID getUUID()
 	{
 		if (mUUID == null)
 		mUUID = UUID.randomUUID();
@@ -82,7 +82,7 @@ public abstract class AbstractChord
 	}
 	
 	@JsonIgnore
-	public final ArrayList<Integer> getIntervals( )
+	public ArrayList<Integer> getIntervals( )
 	{
 		ArrayList<Integer> result = new ArrayList<Integer>();
 				
@@ -95,7 +95,7 @@ public abstract class AbstractChord
 	}
 	
 	@JsonIgnore
-	public final ArrayList<Integer> getAbsoluteIntervals( )
+	public ArrayList<Integer> getAbsoluteIntervals( )
 	{
 		//Return intervals in positive single-octave space.
 		ArrayList<Integer> result = new ArrayList<Integer>();
@@ -115,12 +115,12 @@ public abstract class AbstractChord
 	}
 
 	@JsonIgnore
-	public final String getName() {
+	public String getName() {
 		return mName;
 	}
 
 	@JsonIgnore
-	public final ArrayList<String> getAllNoteNames()
+	public ArrayList<String> getAllNoteNames()
 	{
 		//Return names of all notes in the chord.
 		
@@ -140,7 +140,7 @@ public abstract class AbstractChord
 	public void addNoteIfNew(AbstractNote note) {
 		// Add note only if unique
 		for (AbstractNote c : mNotes) {
-			if (c.equals(note)) {
+			if (c.equivalent(note)) {
 				return; // Don't add note already in chord.
 			}
 		}
@@ -153,7 +153,7 @@ public abstract class AbstractChord
 
 		while (iter.hasNext()) {
 			AbstractNote item = iter.next();
-			if (note.equals(item)) {
+			if (note.equivalent(item)) {
 				iter.remove();
 			}
 		}
@@ -173,20 +173,38 @@ public abstract class AbstractChord
 	}
 
 	@JsonIgnore
-	public final int getNumNotes() {
+	public int getNumNotes() {
 		return mNotes.size();
-	}
-	
-	public void reduceSharps()
-	{
-		for(int i=0;i<getNumNotes();++i)
-		{
-			getNote(i).reduceSharps();
-		}
 	}
 	
 	public AbstractNote getNote(int id)
 	{
 		return (AbstractNote) mNotes.get(id);
+	}
+	
+	public boolean similar(AbstractChord chord)
+	{
+		if ( chord.getNumNotes() != getNumNotes()  || getNumNotes() < 0 )
+		{
+			return false;
+		}
+		
+		ArrayList<Integer> semitones = new ArrayList<Integer>();
+		
+		for (int i=0; i<getNumNotes(); ++i )
+		{
+			semitones.add( getNote(i).getOctaveSemitone() );
+		}
+		
+		//Accept notes in any order with any number of repeats.
+		for (int i=0; i<getNumNotes(); ++i )
+		{
+			if ( semitones.indexOf( chord.getNote(i).getOctaveSemitone() ) == -1 )
+			{
+				return false;
+			}
+		}
+		
+		return true;
 	}
 }

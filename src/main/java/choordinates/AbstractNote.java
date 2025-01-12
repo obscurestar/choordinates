@@ -15,75 +15,52 @@ import com.fasterxml.jackson.annotation.JsonCreator;
         @JsonSubTypes.Type(value = IntervalNote.class, name = "interval_note")
 })
 public abstract class AbstractNote {
-	@JsonIgnore
-	private static int[] mOffsetMap = { 0, 2, 4, 5, 7, 9, 11 };
+	@JsonIgnore private int[] mNoteMap = { 1, 2 ,3 };
+	@JsonIgnore public static final String mFlatChars = "♭b-";
+	@JsonIgnore public static final String mSharpChars = "♯#+";
 	@JsonProperty("id")
 	protected int mID = -1;   //A number from 0-6 representing A B C D E F G
 	@JsonProperty("sharps")
 	protected int mSharp = 0; //A positive or negative number representing how many semitones to move the named note.
-	
-	@JsonIgnore
-	public static final String mFlatChars = "♭b-";
-	@JsonIgnore
-	public static final String mSharpChars = "♯#+";
-	
-	@JsonIgnore
-	public abstract String getNoteName();
-	@JsonIgnore
-	public abstract int getOctaveSemitone();
-	@JsonIgnore
-	public abstract int getSemitone();
-	public abstract boolean equals(AbstractNote note);
-	public abstract void reduceSharps();
- 
+	@JsonProperty("octave")
+	protected int mOctave = 0; //+- octaves from center
+
 	@JsonCreator
-	public AbstractNote() {};
-	
+	public AbstractNote() {}
+
 	@JsonIgnore
 	public AbstractNote( AbstractNote note )
 	{
 		//Copy constructor.
 		mID = note.getID();
 		mSharp = note.getSharp();
-	}
-	
-	@JsonIgnore
-	public AbstractNote( int semitones )
-	{
-		semitones = semitones % 12;
-		
-		if (semitones < 0)
-		{
-			semitones += 12;
-		}
-		
-		for (int i=0;i<mOffsetMap.length;++i)
-		{
-			if (semitones == mOffsetMap[i])
-			{
-				mID = i+1;
-				break;
-			}
-		}
-		
-		if (mID == -1)
-		{
-			semitones --;
-			for (int i=0;i<mOffsetMap.length;++i)
-			{
-				if (semitones == mOffsetMap[i])
-				{
-					mID = i+2;
-					mSharp = -1;
-					break;
-				}
-			}
-		}
-		mID = mID % 7;
+		mOctave = note.getOctave();
 	}
 
 	@JsonIgnore
-	public final String getName()
+	public AbstractNote( int semitones )
+	{	
+		mOctave = semitones/12;
+		
+		semitones = mod( semitones, 12 );
+		
+		mID = findInMap( semitones );
+	
+		if (mID == -1)
+		{
+			mID = findInMap( semitones+1 );
+			mSharp = -1;
+		}
+
+		setID( mod( mID, 7) );
+	}
+
+	@JsonIgnore public abstract String getNoteName();
+	@JsonIgnore protected abstract int[] getNoteMap();
+	public abstract boolean equivalent(AbstractNote note);
+	 
+	@JsonIgnore
+	public String getName()
 	{
 		String result = getNoteName();
 		for (int i=0;i<Math.abs(mSharp);++i )
@@ -99,6 +76,37 @@ public abstract class AbstractNote {
 		}
 		return result;
 	}
+	
+	@JsonIgnore
+	public int  getID()
+	{
+		return mID;
+	}
+
+	@JsonIgnore
+	public int getSharp()
+	{
+		return mSharp;
+	}
+
+	@JsonIgnore
+	public int getOctave()
+	{
+		return mOctave;
+	}
+
+	@JsonIgnore
+	public int getOctaveSemitone()
+	{
+		return getNoteMap()[ mID ] + mSharp;
+	}
+	
+	@JsonIgnore
+	public int getSemitone()
+	{
+		return  getOctaveSemitone() + mOctave*12;
+	}
+
 	
 	@JsonIgnore
 	public void setID(int id)
@@ -117,14 +125,69 @@ public abstract class AbstractNote {
 	}
 	
 	@JsonIgnore
-	public final int  getID()
+	public void setOctave( int octave)
 	{
-		return mID;
+		mOctave = octave;
 	}
 	
 	@JsonIgnore
-	public final int getSharp()
+	public void setSafeID( int id )
 	{
-		return mSharp;
+		//Just assumes you know what you're doing!
+		setID( mod (id, 7 ) );
 	}
+
+	public static int mod(int val, int mod)
+	{
+		//Handles negatives correctly for our context.
+		val = val % mod;
+		if (val < 0 )
+		{
+			val += mod;
+		}
+		return val;
+	}
+	
+	@JsonIgnore
+	protected boolean setValidSharp(String str)
+	{
+		/*Sets sharps and flats from string
+		 * returns offset
+		 */
+		for (int index=0;index<str.length(); ++index)
+		{
+			if (mFlatChars.indexOf( str.charAt(index)) != -1)
+			{
+				mSharp--;
+			}
+			else if (mSharpChars.indexOf( str.charAt(index)) != -1)
+			{
+				mSharp++;
+			}
+			else
+			{
+				return false;
+			}
+		}
+		return true;
+	}
+	
+	protected int findInMap( int num )
+	{
+		int result = -1;
+		
+		int note_map[] = getNoteMap();
+
+		for (int i=0;i<note_map.length;++i)
+		{
+			if (num == note_map[i])
+			{
+				result = i;
+				break;
+			}
+		}
+		return result;
+	}
+	
+
 }
