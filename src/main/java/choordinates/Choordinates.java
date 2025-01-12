@@ -340,7 +340,7 @@ public class Choordinates extends JFrame {
 		 */
 		ChoordData.read();   //Initialize data structures from JSON file.
 		
-		//SPATTERS debug
+		//SPATTERS debug TODO put in real test harness.
 		new Tests();
 		
 		//Set up the window.

@@ -1,8 +1,14 @@
 package choordinates;
 
 public class Tests {
+	private static final String mIntervalString = "-1 1 2♭ 2 3♭ 3 4 5♭ 5 6♭ 6 7♭ 7";
+	private static final String mToneString = "A♭ A B♭ B C D♭ D E♭ E F G♭ G a♭ a b♭ b c d♭ d e♭ e f g♭ g g♭";
+
 	Tests()
 	{
+		TestToneFromInterval();
+		//TestToneChordParse();
+		//TestIntervalChordParse();
 		//TestToneNoteEqual();
 		//TestToneNoteParse();
 		//TestToneNote();
@@ -10,6 +16,33 @@ public class Tests {
 		//TestIntervalNoteEqual();
 		//TestIntervalNoteReduceSharps();
 		//TestIntervalNoteParse();
+	}
+	
+	//TONE CHORD TESTS
+	void TestToneFromInterval()
+	{
+		IntervalChord interval_chord = new IntervalChord( "1 3 5" );
+//		IntervalChord interval_chord = new IntervalChord( mIntervalString );
+		String[] tones = mToneString.split(" ");
+		for (String tone:tones)
+		{
+			ToneNote note = new ToneNote(tone);
+			ToneChord tone_chord = new ToneChord(note, interval_chord);
+			System.out.println(tone + " chord created: " + tone_chord.getAllNoteNames());
+		}
+	}
+	
+	void TestToneChordParse()
+	{
+		ToneChord chord = new ToneChord( mToneString );
+		System.out.println(chord.getAllNoteNames());
+	}
+		
+	//INTERVAL CHORD TESTS
+	void TestIntervalChordParse()
+	{
+		IntervalChord chord = new IntervalChord( mIntervalString );
+		System.out.println(chord.getAllNoteNames());
 	}
 	
 	//TONENOTE TESTS
@@ -49,8 +82,7 @@ public class Tests {
 	
 	void TestToneNoteParse()
 	{
-		String tester = "A B♭ B C♭ C D E♭ E F♭ F G♭ G a b♭ b c♭ c d e♭ e f♭ f g♭ g";
-		String[] tests = tester.split(" ");
+		String[] tests = mToneString.split(" ");
     	
     	System.out.print("String ctor ");
     	for(String test:tests)
@@ -98,8 +130,7 @@ public class Tests {
 	}
 	void TestIntervalNoteParse()
 	{
-		String tester = "-1 1 2♭ 2 3♭ 3 4 5♭ 5 6♭ 6 7♭ 7";
-		String[] tests = tester.split(" ");
+		String[] tests = mIntervalString.split(" ");
     	
     	System.out.print("String ctor ");
     	for(String test:tests)

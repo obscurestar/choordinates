@@ -173,7 +173,8 @@ public abstract class AbstractNote {
 	}
 	
 	protected int findInMap( int num )
-	{
+	{		
+		num = mod(num,12);
 		int result = -1;
 		
 		int note_map[] = getNoteMap();

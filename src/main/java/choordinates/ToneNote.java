@@ -24,16 +24,12 @@ public class ToneNote extends AbstractNote{
 		
 		mID = findInMap( semitones );
 		
-		//if (this instanceof IntervalNote)
-		//{
-			//System.out.println("Yay I did the thing!");
-			//Bite me Pythagoras! 
-			if (mID == -1)
-			{
-				mID = findInMap( semitones+1 );
-				mSharp = -1;
-			}
-		//}
+		if (mID == -1)
+		{
+			mID = findInMap( semitones+1 );
+			mSharp = -1;
+		}
+
 		setID( mod( mID, 7) );
 	}
 	

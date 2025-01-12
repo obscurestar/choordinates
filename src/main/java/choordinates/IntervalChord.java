@@ -66,56 +66,30 @@ public class IntervalChord extends AbstractChord
 	}
 	
 	@JsonIgnore
-	public IntervalChord(String intervals)
+	public IntervalChord(String interval_string)
 	{
 		/*
 		 * Tries to turn a delimited list into intervalchords.
 		 */
 		
-		String delims =" ,\t\r\n\0";
-				
-		int begin = 0;
-		int end;
-		boolean whitespace = true;
+		interval_string = interval_string.trim();
+		String[] intervals = interval_string.split(" ");
 		
-		IntervalChord chord = new IntervalChord();
-		
-		//TODO: Sloppy lazy parser.  Could probably be more efficient and less ugly.
-		intervals += " ";  //This is just shameful.
-		
-		for (end = begin; end < intervals.length(); ++end)
+		for (String interval:intervals)
 		{
 			IntervalNote note;
-			
-			//Look for a delimiter character
-			if ( delims.indexOf( intervals.charAt(end) ) > -1 )
+			try
 			{
-				if (!whitespace)
-				{
-					String string_name = intervals.substring(begin, end);
-					begin = end;
-					try
-					{
-						note = new IntervalNote( string_name );
-					}
-			        catch (IllegalArgumentException exception)
-			        {
-			        	throw exception;
-					}
-				}
-				begin = end;
-				whitespace = true;
+				note = new IntervalNote( interval );
 			}
-			else
-			{
-				if (whitespace)
-				{
-					begin = end;
-				}
-				whitespace = false;
+			catch( IllegalArgumentException exception )
+	        {
+	        	throw exception;
 			}
+			mNotes.add( note );
 		}
-		if (chord.getNumNotes() ==0)
+
+		if (getNumNotes() ==0)
 		{
 			throw new IllegalArgumentException("Must contain at least one note.");
 		}
@@ -126,6 +100,58 @@ public class IntervalChord extends AbstractChord
 		return (IntervalNote) mNotes.get(id);
 	}
 	
+	@JsonIgnore
+	public String getSymbol()
+	{
+		return mSymbol;
+	}
+
+	@JsonIgnore
+	public ArrayList<String> getAliases() {
+		// Return the list of aliases.
+		return mAliases;
+	}
+
+	@JsonIgnore
+	public String getAliasesString()
+	{
+		return String.join(" ", mAliases);
+	}
+
+	@JsonIgnore
+	public ArrayList<String> getAllChordNames() {
+		// Return all names for this chord (preferred first)
+		ArrayList<String> notes = getAliases();
+		// It's a short list. Who cares about the cost?
+		notes.add(0, mName);
+		return notes;
+	}
+
+	@JsonIgnore
+	public void setAliasesFromString(String aliasString) {
+		// Flush whatever we had. Byeeee!
+		mAliases.clear();
+	
+		if (aliasString.length() == 0) {
+			// Do not allow both name and alias to be blank.
+			if (mName == "") {
+				return;
+			}
+		}
+	
+		String[] aliases = aliasString.split(",");
+	
+		for (String alias : aliases) {
+			mAliases.add(alias.trim());
+		}
+	}
+
+	@JsonIgnore
+	public void setSymbol(String symbol)
+	{
+		mSymbol = symbol;
+	}
+
 	public void addAlias(String name) {
 		// I don't care about duplicates. It's your computation time, user.
 		mAliases.add(name);
@@ -143,57 +169,5 @@ public class IntervalChord extends AbstractChord
 				iter.remove();
 			}
 		}
-	}
-
-	@JsonIgnore
-	public void setAliasesFromString(String aliasString) {
-		// Flush whatever we had. Byeeee!
-		mAliases.clear();
-
-		if (aliasString.length() == 0) {
-			// Do not allow both name and alias to be blank.
-			if (mName == "") {
-				return;
-			}
-		}
-
-		String[] aliases = aliasString.split(",");
-
-		for (String alias : aliases) {
-			mAliases.add(alias.trim());
-		}
-	}
-
-	@JsonIgnore
-	public void setSymbol(String symbol)
-	{
-		mSymbol = symbol;
-	}
-	
-	@JsonIgnore
-	public String getSymbol()
-	{
-		return mSymbol;
-	}
-	
-	@JsonIgnore
-	public ArrayList<String> getAliases() {
-		// Return the list of aliases.
-		return mAliases;
-	}
-
-	@JsonIgnore
-	public String getAliasesString()
-	{
-		return String.join(" ", mAliases);
-	}
-	
-	@JsonIgnore
-	public ArrayList<String> getAllChordNames() {
-		// Return all names for this chord (preferred first)
-		ArrayList<String> notes = getAliases();
-		// It's a short list. Who cares about the cost?
-		notes.add(0, mName);
-		return notes;
 	}
 }

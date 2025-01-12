@@ -43,44 +43,12 @@ public abstract class AbstractChord
 		}
 	}
 	
-	@JsonProperty("UUID")
-	public void setUUID(UUID uuid)
-	{
-		mUUID = uuid;
-	}
-	
-	@JsonProperty("UUID")
-	public UUID getUUID()
-	{
-		if (mUUID == null)
-		mUUID = UUID.randomUUID();
-		return mUUID;
-	}
-	
 	@JsonIgnore
 	public int getInterval( int note_id )
 	{
 		return mNotes.get(note_id).getID();
 	}
-	
-	public static int makeAbsoluteInterval( int num )
-	{
-		int interval = num % 7;
-		
-		if (interval < 0) //Negative modulo is weird ya'll
-		{
-			interval += 7;
-		}
-		
-		return interval;
-	}
-	
-	@JsonIgnore
-	public int getAbsoluteInterval( int note_id )
-	{
-		return makeAbsoluteInterval( getInterval( note_id ) );
-	}
-	
+
 	@JsonIgnore
 	public ArrayList<Integer> getIntervals( )
 	{
@@ -92,26 +60,6 @@ public abstract class AbstractChord
 		}
 		
 		return result;
-	}
-	
-	@JsonIgnore
-	public ArrayList<Integer> getAbsoluteIntervals( )
-	{
-		//Return intervals in positive single-octave space.
-		ArrayList<Integer> result = new ArrayList<Integer>();
-		
-		for (int i=0;i< mNotes.size(); ++i)
-		{
-			//Look carefully at ToneChord.getInterval() and behold the glory of polymorphism!
-			result.add( getAbsoluteInterval(i) );
-		}
-		
-		return result;
-	}
-	
-	@JsonIgnore
-	public void setName(String name) {
-		mName = name;
 	}
 
 	@JsonIgnore
@@ -130,6 +78,48 @@ public abstract class AbstractChord
 			names.add(note.getName());
 		}
 		return names;
+	}
+
+	public AbstractNote getNote(int id)
+	{
+		return (AbstractNote) mNotes.get(id);
+	}
+
+	@JsonIgnore
+	public ArrayList<AbstractNote> getNotes() {
+		return mNotes;
+	}
+
+	@JsonIgnore
+	public int getNumNotes() {
+		return mNotes.size();
+	}
+
+	@JsonProperty("UUID")
+	public void setUUID(UUID uuid)
+	{
+		mUUID = uuid;
+	}
+	
+	@JsonProperty("UUID")
+	public UUID getUUID()
+	{
+		if (mUUID == null)
+		mUUID = UUID.randomUUID();
+		return mUUID;
+	}
+	
+	@JsonIgnore
+	public void setName(String name) {
+		mName = name;
+	}
+
+	@JsonIgnore
+	public void setNotes(AbstractNote[] notes) {
+		mNotes.clear();
+		for (AbstractNote note : notes) {
+			mNotes.add(note);
+		}
 	}
 	
 	public void addNote(AbstractNote note) {
@@ -159,29 +149,6 @@ public abstract class AbstractChord
 		}
 	}
 
-	@JsonIgnore
-	public ArrayList<AbstractNote> getNotes() {
-		return mNotes;
-	}
-
-	@JsonIgnore
-	public void setNotes(AbstractNote[] notes) {
-		mNotes.clear();
-		for (AbstractNote note : notes) {
-			mNotes.add(note);
-		}
-	}
-
-	@JsonIgnore
-	public int getNumNotes() {
-		return mNotes.size();
-	}
-	
-	public AbstractNote getNote(int id)
-	{
-		return (AbstractNote) mNotes.get(id);
-	}
-	
 	public boolean similar(AbstractChord chord)
 	{
 		if ( chord.getNumNotes() != getNumNotes()  || getNumNotes() < 0 )
