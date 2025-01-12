@@ -12,6 +12,14 @@ import javax.swing.*;
 
 public class FretPanel extends JPanel implements MouseListener, MouseMotionListener {
 	private static final long serialVersionUID = 1L;
+	
+    public enum Select
+	{
+			NONE,
+			VALID,
+			ANY
+	}
+    
     //Member constants
     private final int mMaxStrings = 8;
     private final int mMaxFrets = 26;  //The nut is fret 0.
@@ -34,13 +42,13 @@ public class FretPanel extends JPanel implements MouseListener, MouseMotionListe
     private IntervalChord mSearchChord = new IntervalChord();
     private ChordShape mFavChord = new ChordShape();
         
-    private boolean mSelectAny = true;
+    private Select mSelectMode = Select.NONE;
     
-    public void selectAny(boolean any)
+    public void selectMode(Select mode)
     {
     	//Determines whether we can select any string/fret 
-    	//or only populated ones.
-    	mSelectAny = any;
+    	//only populated ones or none at all.
+    	mSelectMode = mode;
     }
     
     public void setOrientation(boolean orientation) {
@@ -124,7 +132,12 @@ public class FretPanel extends JPanel implements MouseListener, MouseMotionListe
     
     public void selectFret(int string_num, int fret_num)
     {
-    	if (!mSelectAny && (mFrets[string_num][fret_num] == -1))
+    	if (mSelectMode == Select.NONE)
+    	{
+    		return;
+    	}
+    	
+    	if (mSelectMode==Select.VALID && (mFrets[string_num][fret_num] == -1))
     	{
     		return;
     	}
@@ -452,7 +465,7 @@ public class FretPanel extends JPanel implements MouseListener, MouseMotionListe
     	
     	
     	//Draw the selections.  Note these will overwrite Favorites. (and that's OK!)
-    	if (mSelectAny)
+    	if (mSelectMode == Select.ANY)
     	{
     		g.setColor(Color.BLACK); 
     	}
@@ -460,36 +473,39 @@ public class FretPanel extends JPanel implements MouseListener, MouseMotionListe
     	{
     		g.setColor(Color.CYAN); 
     	}
-    	for (int i=0;i<mNumStrings;++i)
+    	if (mSelectMode != Select.NONE)
     	{
-    		if (mSelections[i] != -1)
-    		{
-    			Cell cell = new Cell(i, mSelections[i], cell_size, fret_area);
-    			
-    			if (mOrientX) 
-    			{
-    				if (mSelectAny)
-    				{
-    					g.fillOval( cell.X[0] + cell_size/4, cell.Y[0] - cell_size/3, cell34, cell34);
-    				}
-    				else
-    				{
-    					g.fillRect( cell.X[0], cell.Y[0] - cell_half, cell_size, cell_size);
-    				}
-    			}
-    			else
-    			{
-    				if (mSelectAny)
-    				{
-    					g.fillOval( cell.X[0] - cell_size/3, cell.Y[0] + cell_size/4, cell34, cell34);
-    				}
-    				else
-    				{
-    					g.fillRect( cell.X[0] - cell_half, cell.Y[0], cell_size, cell_size);
-    				}
-
-    			}
-    		}
+	    	for (int i=0;i<mNumStrings;++i)
+	    	{
+	    		if (mSelections[i] != -1)
+	    		{
+	    			Cell cell = new Cell(i, mSelections[i], cell_size, fret_area);
+	    			
+	    			if (mOrientX) 
+	    			{
+	    				if (mSelectMode == Select.ANY)
+	    				{
+	    					g.fillOval( cell.X[0] + cell_size/4, cell.Y[0] - cell_size/3, cell34, cell34);
+	    				}
+	    				else
+	    				{
+	    					g.fillRect( cell.X[0], cell.Y[0] - cell_half, cell_size, cell_size);
+	    				}
+	    			}
+	    			else
+	    			{
+	    				if (mSelectMode == Select.ANY)
+	    				{
+	    					g.fillOval( cell.X[0] - cell_size/3, cell.Y[0] + cell_size/4, cell34, cell34);
+	    				}
+	    				else
+	    				{
+	    					g.fillRect( cell.X[0] - cell_half, cell.Y[0], cell_size, cell_size);
+	    				}
+	
+	    			}
+	    		}
+	    	}
     	}
     	
     	//Done with mouse position for now.

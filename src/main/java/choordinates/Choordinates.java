@@ -6,6 +6,9 @@ import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+
+import choordinates.FretPanel.Select;
+
 import javax.swing.JMenuBar;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -576,6 +579,7 @@ public class Choordinates extends JFrame {
 		mTextFretsNum.setColumns(3);
 		
 		mPanelFretSelect = new FretPanel();
+		mPanelFretSelect.selectMode(Select.ANY);
 		mPanelFretSelect.setOrientation(false);
 		mPanelFretSelect.setNumFrets(7);
 		GridBagConstraints gbc_panelFretSelect = new GridBagConstraints();
@@ -645,7 +649,7 @@ public class Choordinates extends JFrame {
 		gbc_mPanelNeck.fill = GridBagConstraints.BOTH;
 		gbc_mPanelNeck.gridx = 0;
 		gbc_mPanelNeck.gridy = 6;
-		mPanelNeck.selectAny(false);
+		mPanelNeck.selectMode(Select.VALID);
 		
 		JButton btnAddFavorite = new JButton("Add Favorite");
 		btnAddFavorite.addActionListener(new ActionListener() {
