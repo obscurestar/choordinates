@@ -3,6 +3,8 @@ package choordinates;
 import java.util.ArrayList;
 import java.util.UUID;
 import java.util.Iterator;
+import java.util.HashSet;
+import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -149,6 +151,45 @@ public abstract class AbstractChord
 		}
 	}
 
+	public void reduceNotes()
+	{
+		//Remove duplicate notes.
+		
+		Set<String> unique = new HashSet<String>();
+		
+		for( AbstractNote note:mNotes )
+		{
+			unique.add(note.getName());
+		}
+		
+		//Doing it this way to preserve note order.
+		boolean[] already_found = new boolean[unique.size()]; //Defaults to false on create
+		
+		//No way to raw index into sets?  Good grief.
+		ArrayList<String> unique_list = new ArrayList<>(unique);
+		
+		for (int i=0;i<unique_list.size();++i)
+		{
+			String unique_name = unique_list.get(i);
+			Iterator<AbstractNote> iter = mNotes.iterator();
+			while (iter.hasNext())
+			{
+				AbstractNote note = iter.next();
+				if (unique_name.compareTo(note.getName()) == 0)
+				{
+					if ( already_found[i] )
+					{
+						iter.remove();
+					}
+					else
+					{
+						already_found[i] = true;
+					}
+				}
+			}
+		}
+	}
+	
 	public boolean similar(AbstractChord chord)
 	{
 		if ( chord.getNumNotes() != getNumNotes()  || getNumNotes() < 0 )

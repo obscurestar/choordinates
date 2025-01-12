@@ -100,48 +100,55 @@ public class Choordinates extends JFrame {
 		mPanelNeck.setRootAndChord(root_note, choord_data.getChord(chord_id));	
 	}
 	
-	private void addMatches( ToneNote in_root_note, IntervalChord in_chord )
+	private void addMatches( ToneNote root_note, IntervalChord chord )
 	{
 		ChoordData choord_data = ChoordData.getInstance();
-//SPATTERS WORKING HERE
-		System.out.println("Initial intervals: " + in_chord.getAllNoteNames());
 		boolean found_any=false;
 		
 		flushMatchList();
 		
-		IntervalChord chord = new IntervalChord( in_chord );
-		ToneNote root_note = new ToneNote( in_root_note );
+		ToneChord perm_tone = new ToneChord( root_note, chord );
+		perm_tone.reduceNotes();  //Get rid of duplicate notes.
+
+		ToneNote perm_note = new ToneNote(root_note);
+		IntervalChord perm_interval = new IntervalChord(perm_tone);
+			
+		ArrayList<String> perm_names = perm_tone.getAllNoteNames();
+		int perm_count = perm_names.size();
 		
 		//Big fat O(n^2) permutations loop to find chord names.
-		for (int perm=0;perm<chord.getNumNotes();++perm)
+		for ( int perm=0;perm < perm_count;++perm )
 		{
 			for (int dict_id=0; dict_id<choord_data.getNumChords(); ++dict_id )
 			{
-				if ( choord_data.getChord(dict_id).similar( chord ) )
+				if ( choord_data.getChord(dict_id).similar( perm_interval ) )
 				{
-					ToneChord tone_chord = new ToneChord( root_note, choord_data.getChord(dict_id) );
+					ToneChord tone_chord = new ToneChord( perm_note, choord_data.getChord(dict_id) );
 					
 					addMatch( tone_chord.getName() );
 					found_any = true;
 				}
-			}
-			
-			//Rotate the chord 
-			chord = new IntervalChord();
-			int offset = in_chord.getNote(perm).getOctaveSemitone() - in_chord.getNote(0).getOctaveSemitone();
-			
-			chord = new IntervalChord();
-			for ( int note_num=0; note_num< in_chord.getNumNotes(); ++note_num)
-			{
-				int semitones = in_chord.getNote(note_num).getOctaveSemitone() + offset;
-				chord.addNote( new IntervalNote(semitones) );
+				
+				//Rotate the letters in the chord name
+				String perm_str = perm_names.get(0);
+				perm_names.remove(0);
+				perm_names.add(perm_str);
+				
+				perm_str = "";
+				for (int i=0;i<perm_count;++i)
+				{
+					perm_str += perm_names.get(i) + " ";
+				}
+				perm_tone = new ToneChord( perm_str );
+				perm_note = perm_tone.getNote(0);
+				perm_interval = new IntervalChord( perm_tone );
 			}
 		}
-				
+		
 		if (!found_any)
 		{
-			ArrayList<String> string_names= in_chord.getAllNoteNames();
-			String name = in_root_note.getName() + String.join(" ", string_names) + " <UNMATCHED> ";
+			ArrayList<String> string_names= chord.getAllNoteNames();
+			String name = root_note.getName() + String.join(" ", string_names) + " <UNMATCHED> ";
 			addMatch( name );
 		}
 
@@ -163,6 +170,7 @@ public class Choordinates extends JFrame {
         }
 				
 		IntervalChord interval_chord = new IntervalChord( tone_chord );
+		interval_chord.reduceNotes();  //Get rid of duplicate notes.
 
 		addMatches( tone_chord.getNote(0), interval_chord );
 		
@@ -196,8 +204,10 @@ public class Choordinates extends JFrame {
 		mPanelFretSelect.setFirstFret(fret_num);
 		
 		ToneChord tone_chord = mPanelFretSelect.getSelections(true);
-		
+	
 		IntervalChord interval_chord = new IntervalChord( tone_chord );
+		interval_chord.reduceNotes();  //Get rid of duplicate notes.
+
 		mPanelNeck.setRootAndChord(tone_chord.getNote(0), interval_chord);		
 
 		addMatches( tone_chord.getNote(0), interval_chord );
@@ -359,7 +369,7 @@ public class Choordinates extends JFrame {
 		ChoordData.read();   //Initialize data structures from JSON file.
 		
 		//SPATTERS debug TODO put in real test harness.
-		new Tests();
+		//new Tests();
 		
 		//Set up the window.
 		setTitle("Choordinates");

@@ -95,7 +95,6 @@ public class IntervalNote extends AbstractNote{
 		
 		setSafeID( new_id );
 		
-		//System.out.println("mID " + mID + " remaining " + note);
 		if ( note.length() > 1 && !setValidSharp( note.substring(end) ) )
 		{
 			throw bad_name;
