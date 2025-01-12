@@ -6,18 +6,22 @@ public class Tests {
 
 	Tests()
 	{
-		TestToneFromInterval();
+		//TestIntervalFromTone();
+		//TestToneFromInterval();
 		//TestToneChordParse();
 		//TestIntervalChordParse();
 		//TestToneNoteEqual();
 		//TestToneNoteParse();
 		//TestToneNote();
-		//TestIntervalNote();
+		TestIntervalNote();
 		//TestIntervalNoteEqual();
 		//TestIntervalNoteReduceSharps();
 		//TestIntervalNoteParse();
 	}
 	
+	void TestIntervalFromTone()
+	{
+	}
 	//TONE CHORD TESTS
 	void TestToneFromInterval()
 	{
@@ -147,7 +151,8 @@ public class Tests {
 		{
 			IntervalNote note = new IntervalNote(i);
 			//System.out.println(i + " " + note.getName() + " semi " + note.getOctaveSemitone() + " full " + note.getSemitone() );
-			System.out.print( " " + note.getName() );
+			System.out.println(i + " " + note.getName() + " semi " + note.getOctaveSemitone() );
+			//System.out.print( " " + note.getName() );
 		}
 		System.out.println();
 	}

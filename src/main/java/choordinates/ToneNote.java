@@ -16,6 +16,12 @@ public class ToneNote extends AbstractNote{
 	ToneNote(){ super(); }
 	
 	@JsonIgnore
+	ToneNote( ToneNote note )
+	{
+		super( note );
+	}
+	
+	@JsonIgnore
 	public ToneNote( int semitones )
 	{
 		mOctave = semitones/12;

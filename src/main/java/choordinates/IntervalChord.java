@@ -41,7 +41,7 @@ public class IntervalChord extends AbstractChord
 	{
 		//Create an intervalchord from a tone chord
 		ToneNote root_note = tone_chord.getNote(0);
-
+		
 		mName = root_note.getName();
 		int root_semi = root_note.getOctaveSemitone();
 
@@ -50,16 +50,9 @@ public class IntervalChord extends AbstractChord
 			IntervalNote interval_note = new IntervalNote();
 			ToneNote tone_note = tone_chord.getNote(i);
 			
-			if (i==0)
-			{
-				interval_note.setID(1);
-			}
-			else
-			{
-				int semitones = tone_note.getOctaveSemitone() - root_semi;
+			int semitones = tone_note.getOctaveSemitone() - root_semi;
 
-				interval_note = new IntervalNote( semitones );
-			}
+			interval_note = new IntervalNote( semitones );
 
 			mNotes.add(interval_note);
 		}

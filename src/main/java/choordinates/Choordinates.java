@@ -100,30 +100,48 @@ public class Choordinates extends JFrame {
 		mPanelNeck.setRootAndChord(root_note, choord_data.getChord(chord_id));	
 	}
 	
-	private void addMatches( ToneNote root_note, IntervalChord chord )
+	private void addMatches( ToneNote in_root_note, IntervalChord in_chord )
 	{
 		ChoordData choord_data = ChoordData.getInstance();
-
+//SPATTERS WORKING HERE
+		System.out.println("Initial intervals: " + in_chord.getAllNoteNames());
 		boolean found_any=false;
 		
 		flushMatchList();
 		
-		for (int i=0;i<choord_data.getNumChords(); ++i)
+		IntervalChord chord = new IntervalChord( in_chord );
+		ToneNote root_note = new ToneNote( in_root_note );
+		
+		//Big fat O(n^2) permutations loop to find chord names.
+		for (int perm=0;perm<chord.getNumNotes();++perm)
 		{
-			if ( choord_data.getChord(i).similar( chord ) )
+			for (int dict_id=0; dict_id<choord_data.getNumChords(); ++dict_id )
 			{
-				//The CTOR generates a nice name for us.
-				ToneChord tone_chord = new ToneChord( root_note, choord_data.getChord(i) );
-
-				addMatch( tone_chord.getName() );
-				found_any = true;
+				if ( choord_data.getChord(dict_id).similar( chord ) )
+				{
+					ToneChord tone_chord = new ToneChord( root_note, choord_data.getChord(dict_id) );
+					
+					addMatch( tone_chord.getName() );
+					found_any = true;
+				}
+			}
+			
+			//Rotate the chord 
+			chord = new IntervalChord();
+			int offset = in_chord.getNote(perm).getOctaveSemitone() - in_chord.getNote(0).getOctaveSemitone();
+			
+			chord = new IntervalChord();
+			for ( int note_num=0; note_num< in_chord.getNumNotes(); ++note_num)
+			{
+				int semitones = in_chord.getNote(note_num).getOctaveSemitone() + offset;
+				chord.addNote( new IntervalNote(semitones) );
 			}
 		}
-		
+				
 		if (!found_any)
 		{
-			ArrayList<String> string_names= chord.getAllNoteNames();
-			String name = root_note.getName() + String.join(" ", string_names) + " <UNMATCHED> ";
+			ArrayList<String> string_names= in_chord.getAllNoteNames();
+			String name = in_root_note.getName() + String.join(" ", string_names) + " <UNMATCHED> ";
 			addMatch( name );
 		}
 
@@ -143,9 +161,9 @@ public class Choordinates extends JFrame {
         	alert(null, exception.getMessage());
         	return;
         }
-		
+				
 		IntervalChord interval_chord = new IntervalChord( tone_chord );
-		
+
 		addMatches( tone_chord.getNote(0), interval_chord );
 		
 		mPanelNeck.setRootAndChord(tone_chord.getNote(0), interval_chord);		

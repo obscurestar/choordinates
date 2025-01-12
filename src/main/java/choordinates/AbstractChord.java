@@ -164,6 +164,7 @@ public abstract class AbstractChord
 		}
 		
 		//Accept notes in any order with any number of repeats.
+		
 		for (int i=0; i<getNumNotes(); ++i )
 		{
 			if ( semitones.indexOf( chord.getNote(i).getOctaveSemitone() ) == -1 )
