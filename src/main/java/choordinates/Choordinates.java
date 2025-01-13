@@ -6,6 +6,8 @@ import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 
 import choordinates.FretPanel.Select;
 
@@ -32,6 +34,8 @@ import java.awt.EventQueue;
 import java.awt.Dimension; 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 
 import java.util.ArrayList;
 import javax.swing.BoxLayout;
@@ -53,6 +57,7 @@ public class Choordinates extends JFrame {
 	private JTextField mTextRootNote;
 	private JList<String> mListMatches;
 	private JTabbedPane mTabbedPane;
+	private FavPanel mPanelFav;
 	
 	private ArrayList<String> mMatchList = new ArrayList<String>();
 	private JTextField mTextFretsNum;
@@ -207,6 +212,11 @@ public class Choordinates extends JFrame {
 		mPanelFretSelect.setFirstFret(fret_num);
 		
 		ToneChord tone_chord = mPanelFretSelect.getSelections(true);
+		if (tone_chord == null)
+		{
+			refreshFretPanel( mPanelFretSelect );
+			return;
+		}
 	
 		IntervalChord interval_chord = new IntervalChord( tone_chord );
 		interval_chord.reduceNotes();  //Get rid of duplicate notes.
@@ -250,6 +260,11 @@ public class Choordinates extends JFrame {
 			alert("Add favorite", exception.getMessage());
 			return;
 		}
+		setPanelFavSize();
+		mPanelFav.addFavorite(mPanelNeck.getRootNote(),
+								mPanelNeck.getSearchChord(),
+								chord_shape);
+		//SPATTERS call favorite panel here.
 	}
 	
 	public void refreshFretPanel( FretPanel panel )
@@ -353,6 +368,15 @@ public class Choordinates extends JFrame {
 		mRefreshing = false;
 	}
 	
+	private void setPanelFavSize()
+	{
+		Dimension list_size = mListMatches.getSize();
+		
+		//Favs is just a tiny bit taller than matches.
+		list_size.height = (int) (list_size.getHeight() * 1.1);
+		mPanelFav.adjustLayout(list_size); 		
+	}
+	
 	private void alert(String title, String message)
 	{
 		JOptionPane.showMessageDialog(null,
@@ -373,6 +397,13 @@ public class Choordinates extends JFrame {
 		
 		//SPATTERS debug TODO put in real test harness.
 		//new Tests();
+		
+		addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+            	setPanelFavSize();
+            }
+		});
 		
 		//Set up the window.
 		setTitle("Choordinates");
@@ -575,6 +606,15 @@ public class Choordinates extends JFrame {
 				searchByFrets();
 			}
 		});
+		mTextFretsNum.addFocusListener(new FocusListener() {
+            @Override
+            public void focusGained(FocusEvent e) {}
+          
+            @Override
+            public void focusLost(FocusEvent e) {
+                searchByFrets();
+            }
+        });
 		panelFretsNum.add(mTextFretsNum, gbc_mTextFretsNum);
 		mTextFretsNum.setColumns(3);
 		
@@ -618,15 +658,15 @@ public class Choordinates extends JFrame {
 		gbc_lblFavorites.gridy = 3;
 		contentPane.add(lblFavorites, gbc_lblFavorites);
 				
-		JScrollPane scrollFavorites = new JScrollPane();
-		GridBagConstraints gbc_scrollFavorites = new GridBagConstraints();
-		gbc_scrollFavorites.gridwidth = 2;
-		gbc_scrollFavorites.insets = new Insets(0, 0, 5, 0);
-		gbc_scrollFavorites.gridheight = 2;
-		gbc_scrollFavorites.fill = GridBagConstraints.BOTH;
-		gbc_scrollFavorites.gridx = 2;
-		gbc_scrollFavorites.gridy = 4;
-		contentPane.add(scrollFavorites, gbc_scrollFavorites);
+		mPanelFav = new FavPanel();
+		GridBagConstraints gbc_mFavPanel = new GridBagConstraints();
+		gbc_mFavPanel.gridwidth = 2;
+		gbc_mFavPanel.insets = new Insets(0, 0, 5, 0);
+		gbc_mFavPanel.gridheight = 2;
+		gbc_mFavPanel.fill = GridBagConstraints.BOTH;
+		gbc_mFavPanel.gridx = 2;
+		gbc_mFavPanel.gridy = 4;
+		contentPane.add(mPanelFav, gbc_mFavPanel);
 
 //Search button		
 		JButton btnSearch = new JButton("Search");
@@ -663,6 +703,12 @@ public class Choordinates extends JFrame {
 		gbc_mBtnAddFavorite.gridy = 5;
 		contentPane.add(btnAddFavorite, gbc_mBtnAddFavorite);
 		contentPane.add(mPanelNeck, gbc_mPanelNeck);
+		
+		/*SPATTERS TODO get the size of the window and the size of the size of mFavPanel
+		 * create a ratio for X and Y and use that to appropriately resize the panel
+		 * when adding/subtracting favorites.
+		 */
+
 		refresh();
 	}
 }

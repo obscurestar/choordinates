@@ -66,7 +66,7 @@ public class ChordShape {
 			}
 		}
 		
-		if (mLowestString == Integer.MAX_VALUE)
+		if (mFirstNote == null)
 		{
 			throw new IllegalArgumentException("No notes selected.");
 		}
@@ -108,7 +108,7 @@ public class ChordShape {
 	
 	public boolean isValid()
 	{
-		if (mSpan < 1)
+		if (mFirstNote ==null)
 		{
 			return false;
 		}
