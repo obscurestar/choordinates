@@ -537,6 +537,9 @@ public class FretPanel extends JPanel implements MouseListener, MouseMotionListe
     
     private void drawCells( Graphics g, Cell fret_area, int cell_size, int rows, int cols )
     {
+        g.setColor(Color.BLACK);
+        
+        
     	if (!mOrientX)
     	{
         	int tmp=cols;
@@ -595,6 +598,24 @@ public class FretPanel extends JPanel implements MouseListener, MouseMotionListe
     	}
     }
     
+    private void drawStringNames(Graphics g, Cell fret_area, int cell_size)
+    {
+    	int cell_half = cell_size/2;
+	 	for (int y=0; y<mNumStrings; ++y)
+	 	{
+	 		Cell cell = new Cell(y, 0, cell_size, fret_area);
+	    	if (mOrientX)  //Horizontal strings, vertical frets
+	    	{	
+
+	    		g.drawString(mTuning.getNote(y).getName(), cell_half, cell.Y[0]);
+	    	}
+	    	else
+	    	{
+		 		g.drawString(mTuning.getNote(y).getName(), cell.X[0] - cell_size/4, cell_size);
+	    	}
+	 	}
+    }
+    
     @Override
     public void paintComponent(Graphics g)
     {
@@ -651,16 +672,14 @@ public class FretPanel extends JPanel implements MouseListener, MouseMotionListe
     		fret_area.X[1] =  cell_size * mNumStrings + cell_half;
     		fret_area.Y[1] =  cell_size * mNumDrawFrets + cell_half;
     	}
-
+    	
     	handleMouseClick( fret_area, cell_size );
     	drawFavorites(g, fret_area, cell_size);
-    	drawSelections(g, fret_area, cell_size);
-    	
-        g.setColor(Color.BLACK);
-        
+    	drawSelections(g, fret_area, cell_size);   	
         drawCells(g, fret_area, cell_size, mNumDrawFrets, mNumStrings );
-
         drawFretNumbers(g, fret_area, cell_size);
+        drawStringNames(g, fret_area, cell_size);
+        
         //TODO refactor this orientx orienty into a less duplicate-code function some day.
 
         if (mSelectMode == Select.NONE )
@@ -670,13 +689,6 @@ public class FretPanel extends JPanel implements MouseListener, MouseMotionListe
         
         if (mOrientX)  //Horizontal strings, vertical frets
         {	
-        	for (int y=0; y<mNumStrings; ++y)
-        	{
-        		Cell cell = new Cell(y, 0, cell_size, fret_area);
-        		
-        		g.drawString(mTuning.getNote(y).getName(), cell_half, cell.Y[0]);
-        	}
-        	
         	for (int i=0; i<mNumDrawFrets+1; ++i)
         	{
         		//Draw the chord frets;
@@ -700,13 +712,6 @@ public class FretPanel extends JPanel implements MouseListener, MouseMotionListe
         }
         else
         {				//Horizontal fret, vertical strings.        	
-        	for (int x=0; x < mNumStrings; ++x)
-        	{
-        		Cell cell = new Cell(x, 0, cell_size, fret_area);
-        		
-        		g.drawString(mTuning.getNote(x).getName(), cell.X[0] - cell14, cell_size);
-        	}
-        	
         	for (int i=0; i<mNumDrawFrets+1; ++i)
         	{
         		//Draw the chord frets;
