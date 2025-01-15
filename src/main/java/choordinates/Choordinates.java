@@ -19,12 +19,9 @@ import javax.swing.JTabbedPane;
 import javax.swing.JComboBox;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
-//import javax.swing.SwingConstants;
-import javax.swing.JScrollPane;
 import javax.swing.JList;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
-//import javax.swing.SwingUtilities;
 import javax.swing.JOptionPane;
 
 import java.awt.GridBagLayout;
@@ -262,19 +259,16 @@ public class Choordinates extends JFrame {
 			return;
 		}
 		
-		if ( !choord_data.addFavorite(chord_shape) )
-		{
-			alert("Add favorite", "Already a favorite!");
-		}
-		else
-		{
-			choord_data.write();
-		}
+		IntervalChord interval_chord = mPanelNeck.getSearchChord();
+		
+		choord_data.addFavorite( chord_shape, interval_chord );
 		
 		setPanelFavSize();
 		mPanelFav.addFavorite(mPanelNeck.getRootNote(),
 								mPanelNeck.getSearchChord(),
 								chord_shape);
+		
+		choord_data.write();
 		//SPATTERS call favorite panel here.
 	}
 	
@@ -336,7 +330,7 @@ public class Choordinates extends JFrame {
 	public void refresh()
 	{
 		ChoordData choord_data = ChoordData.getInstance();
-		int tuning_id=choord_data.getCurrentTuning();
+		int tuning_id=choord_data.getCurrentTuningID();
 
 		mRefreshing = true; //Combobox y u suk?
 		

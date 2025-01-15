@@ -251,7 +251,7 @@ public class FretPanel extends JPanel implements MouseListener, MouseMotionListe
     	}
     	
     	ChoordData choord_data = ChoordData.getInstance();
-    	ToneChord tuning = choord_data.getTuning( choord_data.getCurrentTuning() );
+    	ToneChord tuning = choord_data.getCurrentTuning();
 
     	int string_num = mFavChord.getLowestString();
     	
@@ -284,12 +284,12 @@ public class FretPanel extends JPanel implements MouseListener, MouseMotionListe
     {
     	ChoordData choord_data = ChoordData.getInstance();
     	
-    	if (choord_data.getCurrentTuning() == -1)
+    	if (choord_data.getCurrentTuningID() == -1)
     	{
     		return;
     	}
     	
-    	ToneChord tuning = choord_data.getTuning( choord_data.getCurrentTuning() );
+    	ToneChord tuning = choord_data.getCurrentTuning();
     	
     	int root_tone=0;
     	
@@ -348,7 +348,7 @@ public class FretPanel extends JPanel implements MouseListener, MouseMotionListe
     {
     	ChoordData choord_data = ChoordData.getInstance();
     	
-    	int tuning_id = choord_data.getCurrentTuning();
+    	int tuning_id = choord_data.getCurrentTuningID();
     	
     	if (tuning_id == -1)
     	{
@@ -469,10 +469,6 @@ public class FretPanel extends JPanel implements MouseListener, MouseMotionListe
     private void drawFavorites(Graphics g, Cell fret_area, int cell_size)
     {
     	int cell_half = cell_size/2;
-    	int cell34 = cell_size * 3 / 4;
-    	int cell14 = cell_size / 4;
-    	int cell23 = cell_size * 2 / 3;
-    	int cell16 = cell_size / 6;
     	
     	if (mSelectMode == Select.NONE)
     	{
@@ -709,7 +705,7 @@ public class FretPanel extends JPanel implements MouseListener, MouseMotionListe
     @Override
     public void paintComponent(Graphics g)
     {
-    	if (ChoordData.getInstance().getCurrentTuning() == -1)
+    	if (ChoordData.getInstance().getCurrentTuningID() == -1)
     	{
     		return;
     	}

@@ -1,8 +1,8 @@
 package choordinates;
 
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.HashMap;
+import java.util.UUID;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -27,8 +27,8 @@ public class ChoordData {
 	private ArrayList<IntervalChord> mChords = new ArrayList<IntervalChord>();
 	@JsonProperty("current_chord")
 	private int mCurrentChord;
-	@JsonProperty("favorites")
-	Set<ChordShape> mFavorites = new HashSet<ChordShape>();
+	@JsonProperty("favorites_groups")
+	private HashMap<UUID, FavGroup> mFavGroups = new HashMap<UUID, FavGroup>();
 	//@JsonProperty("preferences")
 	@JsonIgnore
 	private Preferences mPreferences = new Preferences();
@@ -47,18 +47,50 @@ public class ChoordData {
         return mInstance;
     }
 
-	public boolean addFavorite(ChordShape fav)
+	@JsonIgnore
+	public FavGroup getFavoriteGroup(UUID group_id)
 	{
-		//Returns false if already in set.
-		int num = mFavorites.size();
-		mFavorites.add(fav);
-		if (num == mFavorites.size())
+		//gets a favorite group.  Creates new group if doesn't exist, returns group
+		if( mFavGroups.containsKey(group_id) )
 		{
-			return false;
+			return mFavGroups.get(group_id);
 		}
-		return true;
+		FavGroup favs = new FavGroup(group_id);
+		mFavGroups.put(group_id, favs);
+		
+		return favs;
+	}
+	
+	@JsonIgnore
+	public FavGroup getFavoriteGroup(ToneChord tuning, IntervalChord interval)
+	{
+		//gets a favorite group.  Creates new group if doesn't exist, returns group		
+		UUID group_id = FavGroup.generateUUID(tuning, interval);
+		
+		return getFavoriteGroup( group_id );		
+	}
+	
+	@JsonIgnore
+	public UUID addFavorite(ChordShape fav, UUID group_id)
+	{
+		//Creates group if it does not exist, returns UUID of favorite.
+		FavGroup group = getFavoriteGroup(group_id);
+		return group.addFavorite(fav);
+	}
+	
+	@JsonIgnore
+	public UUID addFavorite(ChordShape fav, ToneChord tuning, IntervalChord interval)
+	{
+		return getFavoriteGroup(tuning, interval).addFavorite(fav);
 	}
 	  
+	@JsonIgnore
+	public UUID addFavorite(ChordShape fav, IntervalChord interval)
+	{
+		ToneChord tuning = getCurrentTuning();
+		return addFavorite( fav, tuning, interval );
+	}
+	
 	//Functions related to chords.
 	@JsonIgnore
 	public int getNumChords()
@@ -66,6 +98,7 @@ public class ChoordData {
 		return mChords.size();
 	}
 	
+	@JsonIgnore
 	public boolean validChord(int id)
 	{
 		if (id >= 0 && id < mChords.size())
@@ -153,7 +186,7 @@ public class ChoordData {
 		return false;
 	}
 	
-	@JsonProperty("current_tuning")
+	@JsonIgnore
 	public void setCurrentTuning(int id)
 	{
 		//Sets current tuning to the passed ID.
@@ -176,11 +209,12 @@ public class ChoordData {
 	}
 	
 	@JsonIgnore
-	public int getCurrentTuning()
+	public int getCurrentTuningID()
 	{
 		return mCurrentTuning;
 	}
 	
+	@JsonIgnore
 	public ToneChord getTuning(int id)
 	{
 		if (!validTuning(id))
@@ -188,6 +222,12 @@ public class ChoordData {
 			throw new ArrayIndexOutOfBoundsException(id + " out of bounds. Only " + getNumTunings() + " avaliable.");
 		}
 		return mTunings.get(id);
+	}
+	
+	@JsonIgnore
+	public ToneChord getCurrentTuning()
+	{
+		return getTuning( getCurrentTuningID() );
 	}
 	
 	public int addTuning(ToneChord tuning)

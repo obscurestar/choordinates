@@ -2,15 +2,13 @@ package choordinates;
 
 import java.util.ArrayList;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
-import javax.swing.JScrollPane;
 
 import choordinates.FretPanel.Select;
-import javax.swing.JButton;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 
 public class FavPanel extends JPanel {
+	private static final long serialVersionUID = 1L;
 	ArrayList<FretPanel> mFavList = new ArrayList<FretPanel>();
 	FavHandler mCallback;
 
@@ -38,7 +36,6 @@ public class FavPanel extends JPanel {
 	}
 	
 	public void adjustLayout(Dimension size) {
-		double chord_aspect_ratio = 1.0 / 2.0;
 		double panel_aspect_ratio = size.getWidth() / size.getHeight();
 
 		int cols = 1;
@@ -64,7 +61,7 @@ public class FavPanel extends JPanel {
 	public void addFavorite(ToneNote root_note, IntervalChord chord, ChordShape chord_shape) {
 		ChoordData choord_data = ChoordData.getInstance();
 
-		ToneChord tuning = choord_data.getTuning(choord_data.getCurrentTuning());
+		ToneChord tuning = choord_data.getCurrentTuning();
 
 		int lowest = chord_shape.getLowestString();
 		ToneNote lowest_note = new ToneNote(root_note, chord_shape.getFirstNote().getOctaveSemitone());

@@ -121,7 +121,7 @@ public class TuningDialog extends JDialog
             @Override
             public void actionPerformed(ActionEvent e)
             {
-            	int id = ChoordData.getInstance().getCurrentTuning();
+            	int id = ChoordData.getInstance().getCurrentTuningID();
             	
             	if (saveTuning(id))
             	{
@@ -141,7 +141,7 @@ public class TuningDialog extends JDialog
             {
         		ChoordData choord_data = ChoordData.getInstance();
 
-            	int id  = choord_data.getCurrentTuning();
+            	int id  = choord_data.getCurrentTuningID();
             	
             	if (id == -1)
             	{
@@ -217,7 +217,7 @@ public class TuningDialog extends JDialog
 		//Handle window closing from button or window.
 		ChoordData choord_data = ChoordData.getInstance();
 
-    	int id = choord_data.getCurrentTuning();
+    	int id = choord_data.getCurrentTuningID();
     	boolean confirm_write = false;
     	if ( changed(id) )
     	{
@@ -288,7 +288,7 @@ public class TuningDialog extends JDialog
 		}
 		
 		//Set tuning to current in data.
-		int id = choord_data.getCurrentTuning();
+		int id = choord_data.getCurrentTuningID();
 		if (id > -1)
 		{
 			mComboTunings.setSelectedIndex(id);
