@@ -44,9 +44,22 @@ public class FretPanel extends JPanel implements MouseListener, MouseMotionListe
     private ToneNote mRootNote;
     private IntervalChord mSearchChord = new IntervalChord();
     private ChordShape mFavChord = new ChordShape();
+    private FavHandler mFavHandler;
         
     private Select mSelectMode = Select.NONE;
     
+	private FavHandler mFavCallback;
+
+	public FavHandler getFavHandler()
+	{
+		return mFavHandler;
+	}
+	
+	public void setCallback(FavHandler callback)
+	{
+		mFavCallback = callback;
+	}
+
     public void selectMode(Select mode)
     {
     	//Determines whether we can select any string/fret 
@@ -109,6 +122,15 @@ public class FretPanel extends JPanel implements MouseListener, MouseMotionListe
     
     public ChordShape getSelectionShape()
     {
+    	if (mTuning == null
+    			|| mRootNote == null
+    			|| mSearchChord == null
+    			)
+    	{
+    		//One if to rule them all.
+    		throw new IllegalArgumentException("No notes selected.");
+    	}
+    	
     	mFavChord =  new ChordShape( mTuning, mRootNote, mSearchChord, mFirstFret, mNumStrings, mSelections );
     	markFavorite();
     	flushSelections();
@@ -335,6 +357,15 @@ public class FretPanel extends JPanel implements MouseListener, MouseMotionListe
     }
     
     public FretPanel() {
+    	mFavHandler = new FavHandler()
+    			{
+    				@Override
+    				public void favCallback( ChordShape chord )
+    				{
+    					setSelectionShape(chord);
+    				}
+    			};
+    			
     	ChoordData.getInstance();
     	flushFrets();
     	flushSelections();
@@ -370,6 +401,11 @@ public class FretPanel extends JPanel implements MouseListener, MouseMotionListe
     
     private void handleMouseClick(Cell fret_area, int cell_size)
     {
+    	if (mSelectMode == Select.NONE 
+    			&& mFavCallback != null )
+    	{
+    		mFavCallback.favCallback(mFavChord);
+    	}
     	//Handle mouse clicks.
     	int cell_half = cell_size/2;
 
@@ -447,7 +483,7 @@ public class FretPanel extends JPanel implements MouseListener, MouseMotionListe
     				{
     					Cell cell = new Cell(string_num, fret_num, cell_size, fret_area);
     					
-				    	g.setColor(Color.ORANGE);
+				    	g.setColor(Color.GREEN);
 
     					if (mOrientX) 
     	    			{
@@ -479,7 +515,7 @@ public class FretPanel extends JPanel implements MouseListener, MouseMotionListe
     	}
     	else
     	{
-    		g.setColor(Color.CYAN); 
+    		g.setColor(Color.ORANGE); 
     	}
 
     	for (int i=0;i<mNumStrings;++i)

@@ -12,7 +12,31 @@ import java.awt.GridLayout;
 
 public class FavPanel extends JPanel {
 	ArrayList<FretPanel> mFavList = new ArrayList<FretPanel>();
+	FavHandler mCallback;
 
+	public void setFavHandler(FavHandler callback)
+	{	
+		mCallback = callback;
+
+	}
+	
+	private void setFavCallback(FretPanel panel)
+	{
+		if (mCallback == null)
+		{
+			return;
+		}
+		panel.setCallback(mCallback);
+	}
+	
+	private void setFavCallbacks()
+	{
+		for( int i=0;i<mFavList.size();++i )
+		{
+			mFavList.get(i).setCallback(mCallback);
+		}
+	}
+	
 	public void adjustLayout(Dimension size) {
 		double chord_aspect_ratio = 1.0 / 2.0;
 		double panel_aspect_ratio = size.getWidth() / size.getHeight();
@@ -51,10 +75,6 @@ public class FavPanel extends JPanel {
 
 		int fav_semitones = AbstractNote.mod( fav_tone.getOctaveSemitone(), 12);
 
-		flush(); // SPATTERS DEBUG REMOVE ME!
-
-		// SPATTERS it good!
-
 		FretPanel fret_panel = new FretPanel();
 		fret_panel.setOrientation(false);
 		fret_panel.setRootAndChord(root_note, chord);
@@ -63,6 +83,7 @@ public class FavPanel extends JPanel {
 		fret_panel.setNumFrets(7);
 		fret_panel.setFirstFret(fav_semitones); //should happen after setNumFrets.
 		fret_panel.markFrets();
+		setFavCallback(fret_panel);
 
 		mFavList.add(fret_panel);
 		add(fret_panel);

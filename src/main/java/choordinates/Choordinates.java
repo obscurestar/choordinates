@@ -260,6 +260,7 @@ public class Choordinates extends JFrame {
 			alert("Add favorite", exception.getMessage());
 			return;
 		}
+		
 		setPanelFavSize();
 		mPanelFav.addFavorite(mPanelNeck.getRootNote(),
 								mPanelNeck.getSearchChord(),
@@ -703,11 +704,8 @@ public class Choordinates extends JFrame {
 		gbc_mBtnAddFavorite.gridy = 5;
 		contentPane.add(btnAddFavorite, gbc_mBtnAddFavorite);
 		contentPane.add(mPanelNeck, gbc_mPanelNeck);
-		
-		/*SPATTERS TODO get the size of the window and the size of the size of mFavPanel
-		 * create a ratio for X and Y and use that to appropriately resize the panel
-		 * when adding/subtracting favorites.
-		 */
+
+		mPanelFav.setFavHandler( mPanelNeck.getFavHandler() );
 
 		refresh();
 	}
