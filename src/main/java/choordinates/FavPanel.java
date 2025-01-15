@@ -49,23 +49,20 @@ public class FavPanel extends JPanel {
 
 		ToneNote fav_tone = new ToneNote(lowest_note.getOctaveSemitone() - tuning_semitones);
 
-		int fav_semitones = fav_tone.getOctaveSemitone();
+		int fav_semitones = AbstractNote.mod( fav_tone.getOctaveSemitone(), 12);
 
 		flush(); // SPATTERS DEBUG REMOVE ME!
 
 		// SPATTERS it good!
 
-		Dimension size = this.getSize();
 		FretPanel fret_panel = new FretPanel();
 		fret_panel.setOrientation(false);
-		fret_panel.setNumFrets(7);
 		fret_panel.setRootAndChord(root_note, chord);
 		fret_panel.selectMode(Select.NONE);
 		fret_panel.setSelectionShape(chord_shape);
+		fret_panel.setNumFrets(7);
+		fret_panel.setFirstFret(fav_semitones); //should happen after setNumFrets.
 		fret_panel.markFrets();
-		fret_panel.setFirstFret(fav_semitones);
-
-//		fret_panel.refresh();
 
 		mFavList.add(fret_panel);
 		add(fret_panel);

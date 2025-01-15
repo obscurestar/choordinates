@@ -80,7 +80,7 @@ public class FretPanel extends JPanel implements MouseListener, MouseMotionListe
     public void setFirstFret(int fretno)
     {
     	int upper_limit = ( mMaxFrets - mNumFrets );
-    	
+
     	mFirstFret = Math.min( Math.max( fretno, 0), upper_limit );
     	mFirstDrawFret = mFirstFret;
     	
@@ -287,7 +287,7 @@ public class FretPanel extends JPanel implements MouseListener, MouseMotionListe
     			if (mRootNote != null)
     			{
 	    			int chord_tone = ( root_tone + interval_tone ) % 12;
-	    			for (int fret=mFirstFret;fret<mNumFrets; ++fret)
+	    			for (int fret=0;fret<mMaxFrets; ++fret)
 	    			{
 	    				if ( ( ( string_tone + fret ) % 12 ) == chord_tone)
 	    				{
@@ -532,7 +532,7 @@ public class FretPanel extends JPanel implements MouseListener, MouseMotionListe
     		int xpos = fret_area.X[0] + x*cell_size;
     		g.drawLine( xpos, fret_area.Y[0], xpos, fret_area.Y[1]);
     		
-    		if (mOrientX && AbstractNote.mod(x+mFirstDrawFret, 12) == 0)
+    		if (mOrientX && (x+mFirstDrawFret) % 12 == 0)
     		{
         		g.drawLine( xpos - 2, fret_area.Y[0], xpos - 2, fret_area.Y[1]);
     		}
@@ -543,7 +543,7 @@ public class FretPanel extends JPanel implements MouseListener, MouseMotionListe
     		int ypos = fret_area.Y[0] + y*cell_size;
     		g.drawLine( fret_area.X[0], ypos, fret_area.X[1], ypos);
     		
-    		if (!mOrientX && AbstractNote.mod(y+mFirstDrawFret, 12) == 0)
+    		if (!mOrientX && (y+mFirstDrawFret) % 12 == 0)
     		{
         		g.drawLine( fret_area.X[0], ypos - 2, fret_area.X[1], ypos - 2 );
     		}
@@ -554,15 +554,11 @@ public class FretPanel extends JPanel implements MouseListener, MouseMotionListe
     {
         int[] labeled_frets = {0, 3, 5, 7, 9, 12, 15, 17, 19, 21, 24};      
         
-    	for (int x=0; x<mNumFrets; ++x)
+    	for (int x=0; x<mNumDrawFrets; ++x)
     	{	
        		//Draw the string labels
-    		int fret_no = mFirstDrawFret+x;
-    		if (mFirstDrawFret >= 0 )
-    		{
-    			fret_no--;
-    		}
-    		
+    		int fret_no = mFirstFret+x;
+
     		if (Arrays.binarySearch(labeled_frets, fret_no) >= 0)
     		{
     			String numeral = getRomanNumeral(fret_no);
@@ -602,7 +598,7 @@ public class FretPanel extends JPanel implements MouseListener, MouseMotionListe
        
     private void drawIntervalNotes(Graphics g, Cell fret_area, int cell_size)
     {
-    	int rows = mNumFrets;
+    	int rows = mNumDrawFrets-1;
     	int cols = mNumStrings;
     	
     	final int cell_half = cell_size/2;
@@ -614,8 +610,9 @@ public class FretPanel extends JPanel implements MouseListener, MouseMotionListe
     	
     	if (mOrientX)
     	{
-    		rows = mNumStrings;
-    		cols = mNumFrets;
+    		int tmp = rows;
+    		rows = cols;
+    		cols = tmp;
     	}
     	
     	for (int x=0;x<cols;++x)
@@ -688,13 +685,13 @@ public class FretPanel extends JPanel implements MouseListener, MouseMotionListe
         //Add one to frets to have space for drawing string names.
         if (mOrientX)
         {
-        	max_cell_x = getWidth() / (mNumDrawFrets+1);
+        	max_cell_x = getWidth() / mNumDrawFrets;
         	max_cell_y = getHeight() / (mNumStrings+1);
         }
         else
         {
         	max_cell_x = getWidth() / (mNumStrings+1);
-        	max_cell_y = getHeight() / (mNumDrawFrets);  
+        	max_cell_y = getHeight() / mNumDrawFrets;  
         }
         
         //Several convenience ints.
@@ -702,18 +699,16 @@ public class FretPanel extends JPanel implements MouseListener, MouseMotionListe
         final int cell_half = cell_size/2; 
         
     	Cell fret_area = new Cell(); //X and Y mins and maxes of fret box.
-    	
+    	    	
     	fret_area.X[0] = cell_size + cell_half;		//X min
-    	fret_area.Y[0] =  cell_size + cell_half;    //Y min
+    	fret_area.Y[0] = fret_area.X[0];    //Y min
+		fret_area.X[1] =  cell_size * mNumStrings + cell_half;
+		fret_area.Y[1] =  cell_size * mNumDrawFrets + cell_half;
     	if (mOrientX)
     	{
-    		fret_area.X[1] = cell_size * mNumDrawFrets + cell_half;	//X max
-    		fret_area.Y[1] =  cell_size * mNumStrings + cell_half;
-    	}
-    	else
-    	{
-    		fret_area.X[1] =  cell_size * mNumStrings + cell_half;
-    		fret_area.Y[1] =  cell_size * mNumDrawFrets + cell_half;
+    		int tmp = fret_area.X[1];
+    		fret_area.X[1] = fret_area.Y[1];
+    		fret_area.Y[1] =  tmp;
     	}
     	
     	handleMouseClick( fret_area, cell_size );
