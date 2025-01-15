@@ -250,6 +250,7 @@ public class Choordinates extends JFrame {
 	private void addFavorite()
 	{	
 		ChordShape chord_shape;
+		ChoordData choord_data = ChoordData.getInstance();
 		
 		try
 		{
@@ -259,6 +260,15 @@ public class Choordinates extends JFrame {
 		{
 			alert("Add favorite", exception.getMessage());
 			return;
+		}
+		
+		if ( !choord_data.addFavorite(chord_shape) )
+		{
+			alert("Add favorite", "Already a favorite!");
+		}
+		else
+		{
+			choord_data.write();
 		}
 		
 		setPanelFavSize();

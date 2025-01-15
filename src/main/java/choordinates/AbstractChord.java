@@ -1,7 +1,6 @@
 package choordinates;
 
 import java.util.ArrayList;
-import java.util.UUID;
 import java.util.Iterator;
 import java.util.HashSet;
 import java.util.Set;
@@ -24,7 +23,6 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 })
 public abstract class AbstractChord
 {
-	private UUID mUUID;  //Generate a UUID.
 	@JsonProperty("notes")
 	protected ArrayList<AbstractNote> mNotes = new ArrayList<AbstractNote>(); // List of notes comprising the chord.
 	@JsonProperty("name")
@@ -36,7 +34,6 @@ public abstract class AbstractChord
 	@JsonIgnore
 	public AbstractChord( AbstractChord chord )
 	{
-		mUUID = chord.getUUID();
 		mName = chord.getName();
 		mNotes = new ArrayList<AbstractNote>();
 		for (int i=0;i<chord.getNumNotes();++i)
@@ -95,20 +92,6 @@ public abstract class AbstractChord
 	@JsonIgnore
 	public int getNumNotes() {
 		return mNotes.size();
-	}
-
-	@JsonProperty("UUID")
-	public void setUUID(UUID uuid)
-	{
-		mUUID = uuid;
-	}
-	
-	@JsonProperty("UUID")
-	public UUID getUUID()
-	{
-		if (mUUID == null)
-		mUUID = UUID.randomUUID();
-		return mUUID;
 	}
 	
 	@JsonIgnore

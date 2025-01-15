@@ -283,6 +283,12 @@ public class FretPanel extends JPanel implements MouseListener, MouseMotionListe
     public void markFrets()
     {
     	ChoordData choord_data = ChoordData.getInstance();
+    	
+    	if (choord_data.getCurrentTuning() == -1)
+    	{
+    		return;
+    	}
+    	
     	ToneChord tuning = choord_data.getTuning( choord_data.getCurrentTuning() );
     	
     	int root_tone=0;
@@ -703,8 +709,11 @@ public class FretPanel extends JPanel implements MouseListener, MouseMotionListe
     @Override
     public void paintComponent(Graphics g)
     {
-    	//Hideous boutique graphic panel with trial and error layout.
-    	//TODO Refactor into function blocks some day.
+    	if (ChoordData.getInstance().getCurrentTuning() == -1)
+    	{
+    		return;
+    	}
+    	
         super.paintComponent(g);
         
         mNumDrawFrets = mNumFrets + 1;

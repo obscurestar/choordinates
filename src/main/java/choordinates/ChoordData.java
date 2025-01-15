@@ -1,6 +1,8 @@
 package choordinates;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -18,13 +20,15 @@ public class ChoordData {
 	private static ChoordData mInstance;
 	
 	@JsonProperty("tunings")
-	private ArrayList<ToneChord> mTunings = new ArrayList<>();
+	private ArrayList<ToneChord> mTunings = new ArrayList<ToneChord>();
 	@JsonProperty("current_tuning")
 	private int mCurrentTuning;
 	@JsonProperty("chords")
-	private ArrayList<IntervalChord> mChords = new ArrayList<>();
+	private ArrayList<IntervalChord> mChords = new ArrayList<IntervalChord>();
 	@JsonProperty("current_chord")
 	private int mCurrentChord;
+	@JsonProperty("favorites")
+	Set<ChordShape> mFavorites = new HashSet<ChordShape>();
 	//@JsonProperty("preferences")
 	@JsonIgnore
 	private Preferences mPreferences = new Preferences();
@@ -42,12 +46,18 @@ public class ChoordData {
         }
         return mInstance;
     }
-	
-	/*
-	 * TODO There's a LOT of commonality between Chord and Tone
-	 * If we add complexity here, refactor these to cast to the 
-	 * AbstractChord and convert to wrappers.
-	 */
+
+	public boolean addFavorite(ChordShape fav)
+	{
+		//Returns false if already in set.
+		int num = mFavorites.size();
+		mFavorites.add(fav);
+		if (num == mFavorites.size())
+		{
+			return false;
+		}
+		return true;
+	}
 	  
 	//Functions related to chords.
 	@JsonIgnore
@@ -289,5 +299,4 @@ public class ChoordData {
 		
 		return mInstance;
 	}
-	
 }

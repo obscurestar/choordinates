@@ -2,10 +2,12 @@ package choordinates;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 
 import java.util.ArrayList; 
+import java.util.UUID;
 
 /* A class describing the shape of a chord for favorite chord selection*/
 
@@ -18,9 +20,71 @@ public class ChordShape {
 	private int mLowestString=Integer.MAX_VALUE; //First string where a note is set.
 	@JsonProperty("first_note")
 	private IntervalNote mFirstNote; //The interval note at the first string.
+	@JsonProperty("uuid")
+	private UUID mUUID;
 	
+	@JsonCreator
 	public ChordShape(){}
 	
+	private static byte[] convertIntArrayToByteArrayUsingByteBuffer(int[] intArray) {
+        byte[] byteArray = new byte[intArray.length];
+        for (int i = 0; i < intArray.length; i++) {
+            byteArray[i] = (byte) intArray[i];
+        }
+        return byteArray;
+    }
+	
+	@JsonIgnore
+	private void generateUUID()
+	{
+		ChoordData choord_data = ChoordData.getInstance();
+		
+		//This is pretty sketch.  Making a byte array from a couple keywords
+		//And the values to make a consistent UUID.
+
+		//SMASH bits!  (They're all < 255, it's okay!
+		
+		ToneChord tuning = choord_data.getTuning( choord_data.getCurrentTuning() );
+		
+		String idstr_1 = "intervals";
+		String idstr_2 = "tuning";
+		byte[] id1 = idstr_1.getBytes(); 
+		byte[] id2 = idstr_2.getBytes();
+		
+		int buffer_len = id1.length + id2.length + tuning.getNumNotes() + mStrings.length;
+
+		byte[] uuid_bytes = new byte[buffer_len];
+		int index = 0;
+		
+		//First string identifier
+		for( int i=0;i<id1.length;++i, ++index )
+		{
+			uuid_bytes[index] = id1[i];
+		}
+		
+		//The tuning semitones
+		for ( int i=0;i<tuning.getNumNotes();++i, ++index )
+		{
+			//Double casting. Now that's dumb!
+			uuid_bytes[index] = (byte)tuning.getNote(i).getOctaveSemitone();
+		}
+		
+		//Second string identifier
+		for( int i=0;i<id2.length;++i, ++index )
+		{
+			uuid_bytes[index] = id2[i];
+		}
+
+		//Get the strings that constitute this favorite.
+		for( int i=0;i<mStrings.length;++i, ++index )
+		{
+			uuid_bytes[index] = (byte)mStrings[i];
+		}
+		
+		mUUID = UUID.nameUUIDFromBytes( uuid_bytes );
+	}
+	
+	@JsonIgnore
 	public ChordShape(ToneChord tuning, ToneNote root_note, IntervalChord intervals, int first_fret, int num_strings, int[] strings)
 	{
 		ToneChord selected = new ToneChord(root_note, intervals);
@@ -80,6 +144,44 @@ public class ChordShape {
 				mStrings[i] -= lowest;
 			}
 		}
+		generateUUID();
+	}
+	
+	@JsonIgnore
+	public boolean equals(ChordShape chord)
+	{
+		return equals(chord.getUUID());
+	}
+	
+	@JsonIgnore
+    @Override
+    public boolean equals(Object obj) 
+    {
+        if ( mUUID == null
+        	|| obj == null 
+        	|| obj.getClass() != this.getClass())
+        {
+            return false;
+        }
+        ChordShape chord = (ChordShape) obj;
+        
+        if ( mUUID.compareTo( chord.getUUID() )  == 0)
+        {
+        	return true;
+        }
+        return false;
+    }
+    
+	@JsonIgnore
+    @Override
+    public int hashCode() {
+        return mUUID.hashCode();
+    }
+ 
+	@JsonIgnore
+	public UUID getUUID()
+	{
+		return mUUID;
 	}
 	
 	@JsonIgnore
@@ -106,6 +208,7 @@ public class ChordShape {
 		return mSpan;
 	}
 	
+	@JsonIgnore
 	public boolean isValid()
 	{
 		if (mFirstNote ==null)
