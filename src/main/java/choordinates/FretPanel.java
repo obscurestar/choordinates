@@ -109,7 +109,7 @@ public class FretPanel extends JPanel implements MouseListener, MouseMotionListe
     
     public ChordShape getSelectionShape()
     {
-    	mFavChord =  new ChordShape( mTuning, mRootNote, mSearchChord, mFirstDrawFret, mNumStrings, mSelections );
+    	mFavChord =  new ChordShape( mTuning, mRootNote, mSearchChord, mFirstFret, mNumStrings, mSelections );
     	markFavorite();
     	flushSelections();
     	refresh();
@@ -432,6 +432,11 @@ public class FretPanel extends JPanel implements MouseListener, MouseMotionListe
     	int cell23 = cell_size * 2 / 3;
     	int cell16 = cell_size / 6;
     	
+    	if (mSelectMode == Select.NONE)
+    	{
+    		return;
+    	}
+    	
     	if (mFavChord.isValid())
     	{
     		for (int string_num=0;string_num<mNumStrings;++string_num)
@@ -442,39 +447,16 @@ public class FretPanel extends JPanel implements MouseListener, MouseMotionListe
     				{
     					Cell cell = new Cell(string_num, fret_num, cell_size, fret_area);
     					
-    					if (mSelectMode == Select.NONE)
-    					{
-    						int offset = 0;  //HACK!  subtracting cell_size display the fret is wrong!
+				    	g.setColor(Color.ORANGE);
 
-							if (mFirstFret > 0)
-							{
-								offset -= cell_size;
-							}
-							
-    				    	g.setColor(Color.BLACK);
-    						if (mOrientX)
-    						{
-    							
-    							g.fillOval( cell.X[0] + cell23 + offset, cell.Y[0] + cell16, cell34, cell34 );
-    						}
-    						else
-    						{
-    							g.fillOval( cell.X[0] - cell_half + cell16, cell.Y[0] + cell16 + offset, cell34, cell34 );
-    						}
-    					}
-    					else
-    					{
-    				    	g.setColor(Color.ORANGE);
-
-	    					if (mOrientX) 
-	    	    			{
-	    	    				g.fillRect( cell.X[0], cell.Y[0] - cell_half, cell_size, cell_size);
-	    	    			}
-	    	    			else
-	    	    			{
-	    	    				g.fillRect( cell.X[0] - cell_half, cell.Y[0], cell_size, cell_size);
-	    	    			}
-    					}
+    					if (mOrientX) 
+    	    			{
+    	    				g.fillRect( cell.X[0], cell.Y[0] - cell_half, cell_size, cell_size);
+    	    			}
+    	    			else
+    	    			{
+    	    				g.fillRect( cell.X[0] - cell_half, cell.Y[0], cell_size, cell_size);
+    	    			}
     				}
     			}
     		}
@@ -499,39 +481,37 @@ public class FretPanel extends JPanel implements MouseListener, MouseMotionListe
     	{
     		g.setColor(Color.CYAN); 
     	}
-    	if (mSelectMode != Select.NONE)
+
+    	for (int i=0;i<mNumStrings;++i)
     	{
-	    	for (int i=0;i<mNumStrings;++i)
-	    	{
-	    		if (mSelections[i] != -1)
-	    		{
-	    			Cell cell = new Cell(i, mSelections[i], cell_size, fret_area);
-	    			
-	    			if (mOrientX) 
-	    			{
-	    				if (mSelectMode == Select.ANY)
-	    				{
-	    					g.fillOval( cell.X[0] + cell_size/4, cell.Y[0] - cell_size/3, cell34, cell34);
-	    				}
-	    				else
-	    				{
-	    					g.fillRect( cell.X[0], cell.Y[0] - cell_half, cell_size, cell_size);
-	    				}
-	    			}
-	    			else
-	    			{
-	    				if (mSelectMode == Select.ANY)
-	    				{
-	    					g.fillOval( cell.X[0] - cell_size/3, cell.Y[0] + cell_size/4, cell34, cell34);
-	    				}
-	    				else
-	    				{
-	    					g.fillRect( cell.X[0] - cell_half, cell.Y[0], cell_size, cell_size);
-	    				}
-	
-	    			}
-	    		}
-	    	}
+    		if (mSelections[i] != -1)
+    		{
+    			Cell cell = new Cell(i, mSelections[i], cell_size, fret_area);
+    			
+    			if (mOrientX) 
+    			{
+    				if (mSelectMode == Select.ANY)
+    				{
+    					g.fillOval( cell.X[0] + cell_size/4, cell.Y[0] - cell_size/3, cell34, cell34);
+    				}
+    				else
+    				{
+    					g.fillRect( cell.X[0], cell.Y[0] - cell_half, cell_size, cell_size);
+    				}
+    			}
+    			else
+    			{
+    				if (mSelectMode == Select.ANY)
+    				{
+    					g.fillOval( cell.X[0] - cell_size/3, cell.Y[0] + cell_size/4, cell34, cell34);
+    				}
+    				else
+    				{
+    					g.fillRect( cell.X[0] - cell_half, cell.Y[0], cell_size, cell_size);
+    				}
+
+    			}
+    		}
     	}
     }
     
@@ -578,6 +558,10 @@ public class FretPanel extends JPanel implements MouseListener, MouseMotionListe
     	{	
        		//Draw the string labels
     		int fret_no = mFirstDrawFret+x;
+    		if (mFirstDrawFret >= 0 )
+    		{
+    			fret_no--;
+    		}
     		
     		if (Arrays.binarySearch(labeled_frets, fret_no) >= 0)
     		{
@@ -615,6 +599,73 @@ public class FretPanel extends JPanel implements MouseListener, MouseMotionListe
 	    	}
 	 	}
     }
+       
+    private void drawIntervalNotes(Graphics g, Cell fret_area, int cell_size)
+    {
+    	int rows = mNumFrets;
+    	int cols = mNumStrings;
+    	
+    	final int cell_half = cell_size/2;
+    	
+    	//The bible says PI=3.  Who am I to question mindless dogma?
+        final int cell34 = cell_size * 3 / 4;
+        final int cell23 = cell_size * 2 / 3;
+        final int cell16 = cell_size / 6;
+    	
+    	if (mOrientX)
+    	{
+    		rows = mNumStrings;
+    		cols = mNumFrets;
+    	}
+    	
+    	for (int x=0;x<cols;++x)
+    	{
+    		for (int y=0;y<rows;++y)
+    		{
+    			Cell cell = new Cell( y, x, cell_size, fret_area );
+    			
+    			boolean fav=false;
+    			int fret_no = x + mFirstFret;
+    			
+    			if (mOrientX)
+    			{
+        			if (mFrets[y][fret_no] == -1)
+        			{
+        				continue;
+        			}
+    				g.setColor(IntervalNote.getColor(mFrets[y][fret_no]));
+    				fav = mFavFrets[y][fret_no];
+    				cell.X[0] += cell23;
+    			}
+    			else
+    			{
+    				fret_no = y + mFirstFret;
+    				cell = new Cell( x, y, cell_size, fret_area );
+    				if (mFrets[x][fret_no] == -1)
+    				{
+    					continue;
+    				}
+    				g.setColor(IntervalNote.getColor(mFrets[x][fret_no]));
+    				
+    				fav = mFavFrets[x][fret_no];
+    				cell.X[0] += cell16;
+    				cell.Y[0] += cell_half;
+    			}
+    			
+    			if (mSelectMode == Select.NONE && !fav)
+    			{
+    				continue;
+    			}
+
+    			cell.X[0] -= cell_half;
+    			cell.Y[0] -= cell_size/3;
+
+    			g.fillOval( cell.X[0],  cell.Y[0],  cell34,  cell34);
+    			g.setColor(Color.BLACK);
+    			g.drawOval( cell.X[0],  cell.Y[0],  cell34,  cell34);
+    		}
+    	}
+    }
     
     @Override
     public void paintComponent(Graphics g)
@@ -628,10 +679,6 @@ public class FretPanel extends JPanel implements MouseListener, MouseMotionListe
         {
         	mNumDrawFrets++;
         }
-
-        //Get the height and width of the panel. 
-        int pany = getHeight();
-        int panx = getWidth();
         
         //Max size of cells in the space of the pane.
         int max_cell_x, max_cell_y;
@@ -641,22 +688,18 @@ public class FretPanel extends JPanel implements MouseListener, MouseMotionListe
         //Add one to frets to have space for drawing string names.
         if (mOrientX)
         {
-        	max_cell_x = panx / (mNumDrawFrets+1);
-        	max_cell_y = pany / (mNumStrings+1);
+        	max_cell_x = getWidth() / (mNumDrawFrets+1);
+        	max_cell_y = getHeight() / (mNumStrings+1);
         }
         else
         {
-        	max_cell_x = panx / (mNumStrings+1);
-        	max_cell_y = pany / (mNumDrawFrets);  
+        	max_cell_x = getWidth() / (mNumStrings+1);
+        	max_cell_y = getHeight() / (mNumDrawFrets);  
         }
         
         //Several convenience ints.
         final int cell_size = Math.min(max_cell_x, max_cell_y);
         final int cell_half = cell_size/2; 
-        final int cell34 = cell_size * 3 / 4;
-        final int cell23 = cell_size * 2 / 3;
-        final int cell16 = cell_size / 6;
-        final int cell14 = cell_size / 4;
         
     	Cell fret_area = new Cell(); //X and Y mins and maxes of fret box.
     	
@@ -679,58 +722,7 @@ public class FretPanel extends JPanel implements MouseListener, MouseMotionListe
         drawCells(g, fret_area, cell_size, mNumDrawFrets, mNumStrings );
         drawFretNumbers(g, fret_area, cell_size);
         drawStringNames(g, fret_area, cell_size);
-        
-        //TODO refactor this orientx orienty into a less duplicate-code function some day.
-
-        if (mSelectMode == Select.NONE )
-        {
-        	return;
-        }
-        
-        if (mOrientX)  //Horizontal strings, vertical frets
-        {	
-        	for (int i=0; i<mNumDrawFrets+1; ++i)
-        	{
-        		//Draw the chord frets;
-        		if (i < (mNumFrets))
-        		{
-	        		for (int j=0; j<mNumStrings; ++j)
-	        		{
-	        			Cell cell = new Cell(j, i, cell_size, fret_area);
-	        			cell.Y[0] -= cell_half;
-	        			cell.X[0] -= cell_half;
-	        			if (mFrets[j][i] != -1)
-	        			{
-        					g.setColor(IntervalNote.getColor(mFrets[j][i]));
-        					g.fillOval( cell.X[0] + cell23, cell.Y[0] + cell16, cell34, cell34);
-        					g.setColor(Color.BLACK);
-        					g.drawOval( cell.X[0] + cell23, cell.Y[0]+ cell16, cell34, cell34);
-	        			}
-	        		}
-        		}
-        	}
-        }
-        else
-        {				//Horizontal fret, vertical strings.        	
-        	for (int i=0; i<mNumDrawFrets+1; ++i)
-        	{
-        		//Draw the chord frets;
-        		for (int j=0; j<mNumStrings; ++j)
-        		{
-        			Cell cell = new Cell(j, i, cell_size, fret_area);
-        			if (i < (mNumFrets))
-        			{
-	        			if (mFrets[j][i] != -1)
-	        			{
-        					g.setColor(IntervalNote.getColor(mFrets[j][i]));
-        					g.fillOval( cell.X[0] - cell_half + cell16, cell.Y[0]+ cell16, cell34, cell34);
-        					g.setColor(Color.BLACK);
-        					g.fillOval( cell.X[0] - cell_half + cell16, cell.Y[0]+ cell16, cell34, cell34);
-	        			}
-        			}
-        		}
-        	}
-        }
+        drawIntervalNotes(g, fret_area, cell_size); 
     }
     
     @Override

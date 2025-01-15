@@ -49,7 +49,7 @@ public class ChordShape {
 					mLowestString = i;
 					
 					//Get the note name from the tuning. 
-					ToneNote string_note = new ToneNote(  tuning.getNote(i), strings[i] + first_fret + 1);
+					ToneNote string_note = new ToneNote(  tuning.getNote(i), strings[i] + first_fret );
 					
 					for (int j=0;j<selected.getNumNotes();++j)
 					{
