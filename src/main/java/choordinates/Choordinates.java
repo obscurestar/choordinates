@@ -35,6 +35,7 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 
 import java.util.ArrayList;
+import java.util.UUID;
 import javax.swing.BoxLayout;
 
 public class Choordinates extends JFrame {
@@ -58,7 +59,9 @@ public class Choordinates extends JFrame {
 	
 	private ArrayList<String> mMatchList = new ArrayList<String>();
 	private JTextField mTextFretsNum;
-	
+	private UUID mCurrentFavorites = UUID.randomUUID(); //Odds are good this won't bite me.
+    private FavHandler mFavHandler;
+
 	/**
 	 * Launch the application.
 	 */
@@ -158,6 +161,7 @@ public class Choordinates extends JFrame {
 		}
 
 		refreshMatches();
+		updateFavorites();
 	}
 	
 	private void searchByNotes()
@@ -179,7 +183,8 @@ public class Choordinates extends JFrame {
 
 		addMatches( tone_chord.getNote(0), interval_chord );
 		
-		mPanelNeck.setRootAndChord(tone_chord.getNote(0), interval_chord);		
+		mPanelNeck.setRootAndChord(tone_chord.getNote(0), interval_chord);
+		updateFavorites();
 	}
 	
 	private void searchByFrets()
@@ -223,6 +228,7 @@ public class Choordinates extends JFrame {
 		addMatches( tone_chord.getNote(0), interval_chord );
 
 		//refreshFretPanel(mPanelFretSelect);
+		updateFavorites();
 	}
 	
 	private void search()
@@ -242,6 +248,32 @@ public class Choordinates extends JFrame {
 		{
 			searchByFrets();
 		}
+	}
+	
+	private void updateFavorites()
+	{
+		ChoordData choord_data = ChoordData.getInstance();
+		ToneChord tuning = choord_data.getCurrentTuning();
+		IntervalChord intervals = mPanelNeck.getSearchChord();
+		
+		if ( ! intervals.hasNotes() )
+		{
+			return; //Shouldn't ever get here.
+		}
+		
+		ToneNote root_note = mPanelNeck.getRootNote();
+		
+		UUID current_id = FavGroup.generateUUID( tuning, intervals);
+		
+		if ( current_id.compareTo( mCurrentFavorites ) == 0)
+		{
+			return; //No update required.
+		}
+		
+		mCurrentFavorites = current_id;
+		/*  SPATTERS wonky here.  Fix!
+		mPanelFav.loadFavorites(mCurrentFavorites, root_note, intervals);
+		*/
 	}
 	
 	private void addFavorite()
@@ -269,7 +301,6 @@ public class Choordinates extends JFrame {
 								chord_shape);
 		
 		choord_data.write();
-		//SPATTERS call favorite panel here.
 	}
 	
 	public void refreshFretPanel( FretPanel panel )
@@ -327,6 +358,11 @@ public class Choordinates extends JFrame {
 		mMatchList.add(match_name);
 	}
 	
+	public void handleDelete( ChordShape chord )
+	{
+	 	mPanelFav.deleteFavorite(chord);
+	}
+	
 	public void refresh()
 	{
 		ChoordData choord_data = ChoordData.getInstance();
@@ -382,13 +418,31 @@ public class Choordinates extends JFrame {
 		mPanelFav.adjustLayout(list_size); 		
 	}
 	
-	private void alert(String title, String message)
+	public static void alert(String title, String message)
 	{
 		JOptionPane.showMessageDialog(null,
 				message, 
 				title, 
 				JOptionPane.INFORMATION_MESSAGE,
 				ChoordData.getInstance().getPreferences().getIcon());
+	}
+	
+	
+	public static boolean confirm(String title, String message)
+	{
+        int result = JOptionPane.showConfirmDialog(null, 
+                                                  message, 
+                                                  title, 
+                                                  JOptionPane.OK_CANCEL_OPTION,
+                                                  JOptionPane.QUESTION_MESSAGE,
+                                                  ChoordData.getInstance().getPreferences().getIcon());
+        
+        if (result == JOptionPane.OK_OPTION)
+        {
+           return true;
+        }
+
+        return false;
 	}
 	
 	/**
@@ -402,6 +456,22 @@ public class Choordinates extends JFrame {
 		
 		//SPATTERS debug TODO put in real test harness.
 		//new Tests();
+		
+    	mFavHandler = new FavHandler()
+		{
+			@Override
+			public void favCallback( ChordShape chord, boolean right_click )
+			{
+				if (right_click)
+				{
+					handleDelete( chord );
+				}
+				else
+				{
+					mPanelNeck.setSelectionShape(chord);
+				}
+			}
+		};
 		
 		addComponentListener(new ComponentAdapter() {
             @Override
@@ -496,6 +566,7 @@ public class Choordinates extends JFrame {
         		ChoordData.getInstance().setCurrentTuning(id);
         		ChoordData.getInstance().write();
 
+        		updateFavorites();
         		refreshFretPanels();
         		refresh();
         	}
@@ -537,6 +608,20 @@ public class Choordinates extends JFrame {
 		gbc_mTextRootNote.fill = GridBagConstraints.HORIZONTAL;
 		gbc_mTextRootNote.gridx = 1;
 		gbc_mTextRootNote.gridy = 0;
+		mTextRootNote.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				searchByChord();
+			}
+		});
+		mTextRootNote.addFocusListener(new FocusListener() {
+            @Override
+            public void focusGained(FocusEvent e) {}
+          
+            @Override
+            public void focusLost(FocusEvent e) {
+                searchByChord();
+            }
+        });
 		panelChordSelect.add(mTextRootNote, gbc_mTextRootNote);
 		
 		JLabel lblChordChord = new JLabel("Chord");
@@ -563,6 +648,7 @@ public class Choordinates extends JFrame {
                     if (!e.getValueIsAdjusting()) { // Check if selection is finalized
                     	choord_data.setCurrentChord( mListChordChord.getSelectedIndex());
                 		ChoordData.getInstance().write();
+                		updateFavorites();
                     	refresh();
                     }
             	}
@@ -709,7 +795,7 @@ public class Choordinates extends JFrame {
 		contentPane.add(btnAddFavorite, gbc_mBtnAddFavorite);
 		contentPane.add(mPanelNeck, gbc_mPanelNeck);
 
-		mPanelFav.setFavHandler( mPanelNeck.getFavHandler() );
+		mPanelFav.setFavHandler( mFavHandler );
 
 		refresh();
 	}

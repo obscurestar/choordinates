@@ -199,4 +199,14 @@ public abstract class AbstractChord
 		
 		return true;
 	}
+	
+	@JsonIgnore
+	public boolean hasNotes()
+	{
+		if (getNumNotes() > 0)
+		{
+			return true;
+		}
+		return false;
+	}
 }

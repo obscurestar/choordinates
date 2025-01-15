@@ -1,7 +1,11 @@
 package choordinates;
 
-import java.util.ArrayList;
+//import java.util.ArrayList;
+//import java.util.HashMap;
+import java.util.UUID;
 import javax.swing.JPanel;
+import java.util.HashMap;
+import java.util.UUID;
 
 import choordinates.FretPanel.Select;
 import java.awt.Dimension;
@@ -9,7 +13,8 @@ import java.awt.GridLayout;
 
 public class FavPanel extends JPanel {
 	private static final long serialVersionUID = 1L;
-	ArrayList<FretPanel> mFavList = new ArrayList<FretPanel>();
+	//ArrayList<FretPanel> mFavList = new ArrayList<FretPanel>();
+	HashMap<UUID, FretPanel> mFavList = new HashMap<UUID, FretPanel>();
 	FavHandler mCallback;
 
 	public void setFavHandler(FavHandler callback)
@@ -51,13 +56,23 @@ public class FavPanel extends JPanel {
 
 	public void flush() {
 		if (mFavList.size() > 0) {
-			for (FretPanel fav : mFavList) {
+			for (FretPanel fav : mFavList.values()) {
 				remove(fav);
 			}
 		}
 		mFavList.clear();
 	}
 
+	public void loadFavorites( UUID group_id, ToneNote roote_note, IntervalChord chord )
+	{
+		flush();
+		HashMap<UUID, ChordShape>  favs = ChoordData.getInstance().getFavoriteGroup( group_id ).getFavorites();
+		for (ChordShape chord_shape : favs.values()) 
+		{
+			addFavorite( roote_note, chord, chord_shape );
+		}
+	}
+	
 	public void addFavorite(ToneNote root_note, IntervalChord chord, ChordShape chord_shape) {
 		ChoordData choord_data = ChoordData.getInstance();
 
@@ -82,10 +97,30 @@ public class FavPanel extends JPanel {
 		fret_panel.markFrets();
 		setFavCallback(fret_panel);
 
-		mFavList.add(fret_panel);
+		mFavList.put(chord_shape.getUUID(),fret_panel);
 		add(fret_panel);
 
 		adjustLayout(this.getSize());
+	}
+	
+	public void deleteFavorite( UUID fav_id )
+	{
+		//Handling dialog and save here because why do either if it's a bad selection.
+		if (mFavList.containsKey( fav_id ) )
+		{
+			if( Choordinates.confirm( "Delete Favorite", "This operation cannot be undone.") )
+			{
+				remove ( mFavList.get(fav_id) );
+				mFavList.remove( fav_id );
+				adjustLayout(this.getSize());
+				//SPATTERS delete from ChordData and write.
+			}
+		}
+	}
+	
+	public void deleteFavorite( ChordShape chord )
+	{
+		deleteFavorite( chord.getUUID() );
 	}
 
 	FavPanel() {

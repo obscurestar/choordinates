@@ -44,19 +44,15 @@ public class FretPanel extends JPanel implements MouseListener, MouseMotionListe
     private ToneNote mRootNote;
     private IntervalChord mSearchChord = new IntervalChord();
     private ChordShape mFavChord = new ChordShape();
-    private FavHandler mFavHandler;
         
     private Select mSelectMode = Select.NONE;
     
 	private FavHandler mFavCallback;
 
-	public FavHandler getFavHandler()
-	{
-		return mFavHandler;
-	}
-	
 	public void setCallback(FavHandler callback)
 	{
+		System.out.println("Setting");
+
 		mFavCallback = callback;
 	}
 
@@ -362,16 +358,7 @@ public class FretPanel extends JPanel implements MouseListener, MouseMotionListe
     	markFrets();
     }
     
-    public FretPanel() {
-    	mFavHandler = new FavHandler()
-    			{
-    				@Override
-    				public void favCallback( ChordShape chord )
-    				{
-    					setSelectionShape(chord);
-    				}
-    			};
-    			
+    public FretPanel() {    			
     	ChoordData.getInstance();
     	flushFrets();
     	flushSelections();
@@ -407,11 +394,6 @@ public class FretPanel extends JPanel implements MouseListener, MouseMotionListe
     
     private void handleMouseClick(Cell fret_area, int cell_size)
     {
-    	if (mSelectMode == Select.NONE 
-    			&& mFavCallback != null )
-    	{
-    		mFavCallback.favCallback(mFavChord);
-    	}
     	//Handle mouse clicks.
     	int cell_half = cell_size/2;
 
@@ -763,6 +745,19 @@ public class FretPanel extends JPanel implements MouseListener, MouseMotionListe
     
     @Override
     public void mousePressed(MouseEvent e) {
+    	if (mSelectMode == Select.NONE 
+    			&& mFavCallback != null )
+    	{
+    		boolean right_click = false;
+    		if (e.getButton() == MouseEvent.BUTTON3 )
+    		{
+    			System.out.println("Delete me senpai!");
+    			right_click = true;
+    		}
+    		mFavCallback.favCallback(mFavChord, right_click);
+    		return;
+    	}
+
         mClickX = e.getX();
         mClickY = e.getY();
         repaint();   

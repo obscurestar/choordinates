@@ -48,10 +48,25 @@ public class ChoordData {
     }
 
 	@JsonIgnore
+	public boolean hasFavoriteGroup(UUID group_id)
+	{
+		return mFavGroups.containsKey(group_id);
+	}
+	
+	@JsonIgnore
+	public boolean hasFavoriteGroup( IntervalChord interval )
+	{
+		//Uses the current tuning to see if group exists.
+		UUID group_id = FavGroup.generateUUID(getCurrentTuning(), interval);
+		
+		return hasFavoriteGroup( group_id );
+	}
+	
+	@JsonIgnore
 	public FavGroup getFavoriteGroup(UUID group_id)
 	{
 		//gets a favorite group.  Creates new group if doesn't exist, returns group
-		if( mFavGroups.containsKey(group_id) )
+		if( hasFavoriteGroup(group_id) )
 		{
 			return mFavGroups.get(group_id);
 		}

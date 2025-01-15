@@ -42,6 +42,12 @@ public class FavGroup
 	}
 	
 	@JsonIgnore
+	public HashMap<UUID, ChordShape> getFavorites()
+	{
+		return mFavorites;
+	}
+	
+	@JsonIgnore
 	public ChordShape getFavorite( UUID fav_id )
 	{
 		if ( hasFavorite (fav_id) )

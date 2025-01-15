@@ -150,7 +150,7 @@ public class TuningDialog extends JDialog
             	
             	String name = choord_data.getTuning(id).getName();
             	
-            	if (confirm("Delete Tuning", name))
+            	if (Choordinates.confirm("Delete Tuning", name))
             	{
             		choord_data.deleteTuning(id);
             		choord_data.setCurrentTuning(-1); 
@@ -223,11 +223,11 @@ public class TuningDialog extends JDialog
     	{
     		if (from_button)
     		{
-    			confirm_write = confirm("Unsaved Changes", "Confirm Close");
+    			confirm_write = Choordinates.confirm("Unsaved Changes", "Confirm Close");
     		}
     		else
     		{
-    			confirm_write = confirm("Window closing", "Save changes?");
+    			confirm_write = Choordinates.confirm("Window closing", "Save changes?");
     		}
     	}
     	else if (from_button)
@@ -241,26 +241,6 @@ public class TuningDialog extends JDialog
     		refreshMain();
     		this.setVisible(false);
     	}
-	}
-	
-	private boolean confirm(String title, String message)
-	{
-        int result = JOptionPane.showConfirmDialog(null, 
-                                                  message, 
-                                                  title, 
-                                                  JOptionPane.OK_CANCEL_OPTION, 
-                                                  JOptionPane.QUESTION_MESSAGE,
-                                                  ChoordData.getInstance().getPreferences().getIcon());
-
-        if (result == JOptionPane.OK_OPTION)
-        {
-           return true;
-        }
-        /*else if (result == JOptionPane.CANCEL_OPTION)
-        {
-        	return false;
-	    }*/
-        return false;
 	}
 		
 	private String makeStringsText(int id)
@@ -342,7 +322,7 @@ public class TuningDialog extends JDialog
     		if (tuning_name.compareTo( choord_data.getTuning(tuning_id).getName() ) != 0 
     				|| string_names.compareTo(makeStringsText(tuning_id)) != 0)
     		{
-    			if(confirm("Confirm", "Update " +  choord_data.getTuning(tuning_id).getName() + "?"))
+    			if(Choordinates.confirm("Confirm", "Update " +  choord_data.getTuning(tuning_id).getName() + "?"))
     			{
     				choord_data.updateTuning(tuning_id,  chord);
     			}
