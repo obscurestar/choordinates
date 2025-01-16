@@ -66,7 +66,6 @@ public class FavPanel extends JPanel {
 	public void loadFavorites( UUID group_id, ToneNote roote_note, IntervalChord interval_chord )
 	{
 		ToneChord tuning = ChoordData.getInstance().getCurrentTuning();
-		System.out.println("Loading favorites from group: " + tuning.getAllNoteNames() + " interval " + interval_chord.getAllNoteNames() + " groupd_id " + group_id.toString());
 
 		flush();
 		HashMap<UUID, ChordShape>  favs = ChoordData.getInstance().getFavoriteGroup( group_id ).getFavorites();
@@ -106,24 +105,27 @@ public class FavPanel extends JPanel {
 		adjustLayout(this.getSize());
 	}
 	
-	public void deleteFavorite( UUID fav_id )
+	public void deleteFavorite( UUID fav_id, IntervalChord key )
 	{
 		//Handling dialog and save here because why do either if it's a bad selection.
 		if (mFavList.containsKey( fav_id ) )
 		{
 			if( Choordinates.confirm( "Delete Favorite", "This operation cannot be undone.") )
 			{
+				ChoordData choord_data = ChoordData.getInstance();
+				
 				remove ( mFavList.get(fav_id) );
 				mFavList.remove( fav_id );
 				adjustLayout(this.getSize());
-				//SPATTERS delete from ChordData and write.
+				choord_data.getFavoriteGroup( key ).deleteFavorite(fav_id);
+				choord_data.write();
 			}
 		}
 	}
 	
-	public void deleteFavorite( ChordShape chord )
+	public void deleteFavorite( ChordShape chord, IntervalChord key )
 	{
-		deleteFavorite( chord.getUUID() );
+		deleteFavorite( chord.getUUID(), key );
 	}
 
 	FavPanel() {

@@ -58,6 +58,15 @@ public class FavGroup
 	}
 	
 	@JsonIgnore
+	public void deleteFavorite( UUID fav_id )
+	{
+		if ( hasFavorite (fav_id) )
+		{
+			mFavorites.remove( fav_id );
+		}
+	}
+	
+	@JsonIgnore
 	public UUID addFavorite(ChordShape fav)
 	{
 		

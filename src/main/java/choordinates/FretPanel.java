@@ -51,8 +51,6 @@ public class FretPanel extends JPanel implements MouseListener, MouseMotionListe
 
 	public void setCallback(FavHandler callback)
 	{
-		System.out.println("Setting");
-
 		mFavCallback = callback;
 	}
 
@@ -751,7 +749,6 @@ public class FretPanel extends JPanel implements MouseListener, MouseMotionListe
     		boolean right_click = false;
     		if (e.getButton() == MouseEvent.BUTTON3 )
     		{
-    			System.out.println("Delete me senpai!");
     			right_click = true;
     		}
     		mFavCallback.favCallback(mFavChord, right_click);

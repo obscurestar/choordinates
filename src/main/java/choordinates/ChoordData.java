@@ -86,11 +86,16 @@ public class ChoordData {
 	}
 	
 	@JsonIgnore
+	public FavGroup getFavoriteGroup( IntervalChord interval )
+	{
+		return getFavoriteGroup( getCurrentTuning() , interval );
+	}
+	
+	@JsonIgnore
 	public UUID addFavorite(ChordShape fav, UUID group_id)
 	{
 		//Creates group if it does not exist, returns UUID of favorite.
 		FavGroup group = getFavoriteGroup(group_id);
-		System.out.println("AddFavorite");
 		return group.addFavorite(fav);
 	}
 	
