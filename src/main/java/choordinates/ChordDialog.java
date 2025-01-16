@@ -351,6 +351,8 @@ public class ChordDialog extends JDialog
     		this.setVisible(false);
     	}
     	
+    	choord_data.getPreferences().setChordRect( getBounds() );
+    	
     	if (confirm_write)
     	{
     		choord_data.write();

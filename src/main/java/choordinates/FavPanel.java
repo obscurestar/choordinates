@@ -94,7 +94,7 @@ public class FavPanel extends JPanel {
 		fret_panel.setRootAndChord(root_note, chord);
 		fret_panel.selectMode(Select.NONE);
 		fret_panel.setSelectionShape(chord_shape);
-		fret_panel.setNumFrets(7);
+		fret_panel.setNumFrets(   ChoordData.getInstance().getPreferences().getPanelLength() );
 		fret_panel.setFirstFret(fav_semitones); //should happen after setNumFrets.
 		fret_panel.markFrets();
 		setFavCallback(fret_panel);

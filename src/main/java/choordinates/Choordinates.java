@@ -8,6 +8,9 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.awt.Taskbar;
 
 import choordinates.FretPanel.Select;
 
@@ -45,6 +48,7 @@ public class Choordinates extends JFrame {
 	
 	private TuningDialog mTuningDialog;
 	private ChordDialog mChordDialog;
+	private PreferencesDialog mPreferencesDialog;
 	
 	private JPanel contentPane;
 	private JComboBox<String> mComboTuning;
@@ -463,6 +467,17 @@ public class Choordinates extends JFrame {
 		 */
 		ChoordData.read();   //Initialize data structures from JSON file.
 		
+        //this is new since JDK 9
+        final Taskbar taskbar = Taskbar.getTaskbar();
+
+        try {
+            taskbar.setIconImage(ChoordData.getInstance().getPreferences().getIcon().getImage());
+        } catch (final UnsupportedOperationException e) {
+        } catch (final SecurityException e) {
+        }
+
+		setIconImage(ChoordData.getInstance().getPreferences().getIcon().getImage());
+
 		//SPATTERS debug TODO put in real test harness.
 		//new Tests();
 		
@@ -482,6 +497,13 @@ public class Choordinates extends JFrame {
 			}
 		};
 		
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+            	ChoordData.getInstance().getPreferences().setMainRect( getBounds() );
+            }
+        });
+        
 		addComponentListener(new ComponentAdapter() {
             @Override
             public void componentResized(ComponentEvent e) {
@@ -533,12 +555,43 @@ public class Choordinates extends JFrame {
 			}
         });	
 		
+		JMenuItem mntmPreferences = new JMenuItem("Preferences");
+		mnWindow.add(mntmPreferences);
+		
+		mntmPreferences.addActionListener(e -> {
+			if (mPreferencesDialog == null)
+			{
+				mPreferencesDialog = new PreferencesDialog();
+			}
+			else
+			{
+				mPreferencesDialog.toFront();
+				mPreferencesDialog.setVisible(true);
+			}
+        });	
+		
 		JMenu mnHelp = new JMenu("Help");
 		menuBar.add(mnHelp);
 		
 	//HELP menu
 		JMenuItem mntmAbout = new JMenuItem("About");
+		mntmAbout.addActionListener(e -> {
+			Choordinates.alert("Choordinates", "1.0");
+		});
 		mnHelp.add(mntmAbout);
+		
+		JMenuItem mntmReport = new JMenuItem("Report issue");
+		mntmReport.addActionListener(e -> {
+			new BrowserWindow("https://github.com/obscurestar/choordinates/issues");
+		});
+		mnHelp.add(mntmReport);
+
+		JMenuItem mntmHelpfile = new JMenuItem("Choordinates Help");
+		mntmHelpfile.addActionListener(e -> {
+			new BrowserWindow("https://raw.githubusercontent.com/obscurestar/choordinates/refs/heads/main/", 
+					 System.getProperty("user.dir") + "choordinates.html");
+		});
+		mnHelp.add(mntmHelpfile);
 
 //Create the content pane
 		setBounds(100, 100, 499, 449);
@@ -735,7 +788,7 @@ public class Choordinates extends JFrame {
 		mPanelFretSelect = new FretPanel();
 		mPanelFretSelect.selectMode(Select.ANY);
 		mPanelFretSelect.setOrientation(false);
-		mPanelFretSelect.setNumFrets(7);
+		mPanelFretSelect.setNumFrets(  ChoordData.getInstance().getPreferences().getPanelLength() );
 		GridBagConstraints gbc_panelFretSelect = new GridBagConstraints();
 		gbc_panelFretSelect.gridheight = 3;
 		gbc_panelFretSelect.fill = GridBagConstraints.BOTH;

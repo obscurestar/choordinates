@@ -29,8 +29,7 @@ public class ChoordData {
 	private int mCurrentChord;
 	@JsonProperty("favorites_groups")
 	private HashMap<UUID, FavGroup> mFavGroups = new HashMap<UUID, FavGroup>();
-	//@JsonProperty("preferences")
-	@JsonIgnore
+	@JsonProperty("preferences")
 	private Preferences mPreferences = new Preferences();
 
 	private ChoordData()
@@ -38,7 +37,7 @@ public class ChoordData {
 		mCurrentTuning = -1;
 		mCurrentChord = -1;
 	}
-		
+	
 	@JsonIgnore
 	public static ChoordData getInstance() {
         if (mInstance == null) {

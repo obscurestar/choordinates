@@ -235,6 +235,8 @@ public class TuningDialog extends JDialog
     		this.setVisible(false);
     	}
     	
+        choord_data.getPreferences().setTuningRect( getBounds() );
+       
     	if (confirm_write)
     	{
     		choord_data.write();

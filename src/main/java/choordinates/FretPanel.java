@@ -32,7 +32,6 @@ public class FretPanel extends JPanel implements MouseListener, MouseMotionListe
     private int mFirstDrawFret = -1;
     private int mFirstFret = 0;
     private int mSelectionFirstFret = -1;
-    private boolean mLefty = false;		//Set to true for left-handed chord shapes.
     private ToneChord mTuning = new ToneChord();
     private int[] mSelections = new int[mMaxStrings];
 
@@ -415,7 +414,7 @@ public class FretPanel extends JPanel implements MouseListener, MouseMotionListe
     			cell_y = (mouse_y - fret_area.Y[0] + cell_half) / cell_size;
 
     			fret_num = cell_x;
-    			if (mLefty)
+    			if ( ChoordData.getInstance().getPreferences().getLefty() )
     			{
     				string_num = cell_y;
     			}
@@ -428,7 +427,7 @@ public class FretPanel extends JPanel implements MouseListener, MouseMotionListe
     		{
     			cell_x = (mouse_x - fret_area.X[0] + cell_half) / cell_size;
     			fret_num = cell_y;
-    			if (mLefty)
+    			if ( ChoordData.getInstance().getPreferences().getLefty() )
     			{
     				string_num = mNumStrings - (cell_x + 1);
     			}
@@ -790,7 +789,7 @@ public class FretPanel extends JPanel implements MouseListener, MouseMotionListe
 			if (mOrientX)
 			{
 				y = string_num;
-				if (!mLefty)
+				if ( !ChoordData.getInstance().getPreferences().getLefty() )
 				{
 					y = mNumStrings - ( string_num + 1 );
 				}
@@ -799,7 +798,7 @@ public class FretPanel extends JPanel implements MouseListener, MouseMotionListe
 			else
 			{
 				x = string_num;
-				if (mLefty)
+				if ( ChoordData.getInstance().getPreferences().getLefty() )
 				{
 					x = mNumStrings - ( string_num + 1);
 				}
