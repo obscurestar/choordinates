@@ -106,12 +106,15 @@ public class Choordinates extends JFrame {
 		refreshMatches();
 		
 		mPanelNeck.setRootAndChord(root_note, choord_data.getChord(chord_id));	
+		updateFavorites();
+		refreshFretPanels();
 	}
 	
-	private void addMatches( ToneNote root_note, IntervalChord chord )
+	private IntervalChord addMatches( ToneNote root_note, IntervalChord chord )
 	{
 		ChoordData choord_data = ChoordData.getInstance();
 		boolean found_any=false;
+		IntervalChord first_match=chord;
 		
 		flushMatchList();
 		
@@ -134,6 +137,11 @@ public class Choordinates extends JFrame {
 					ToneChord tone_chord = new ToneChord( perm_note, choord_data.getChord(dict_id) );
 					
 					addMatch( tone_chord.getName() );
+					
+					if (!found_any)
+					{
+						first_match = new IntervalChord(tone_chord);
+					}
 					found_any = true;
 				}
 				
@@ -161,7 +169,7 @@ public class Choordinates extends JFrame {
 		}
 
 		refreshMatches();
-		updateFavorites();
+		return first_match;
 	}
 	
 	private void searchByNotes()
@@ -181,7 +189,7 @@ public class Choordinates extends JFrame {
 		IntervalChord interval_chord = new IntervalChord( tone_chord );
 		interval_chord.reduceNotes();  //Get rid of duplicate notes.
 
-		addMatches( tone_chord.getNote(0), interval_chord );
+		interval_chord = addMatches( tone_chord.getNote(0), interval_chord );
 		
 		mPanelNeck.setRootAndChord(tone_chord.getNote(0), interval_chord);
 		updateFavorites();
@@ -222,10 +230,11 @@ public class Choordinates extends JFrame {
 	
 		IntervalChord interval_chord = new IntervalChord( tone_chord );
 		interval_chord.reduceNotes();  //Get rid of duplicate notes.
+		interval_chord = addMatches( tone_chord.getNote(0), interval_chord );
 
 		mPanelNeck.setRootAndChord(tone_chord.getNote(0), interval_chord);		
 
-		addMatches( tone_chord.getNote(0), interval_chord );
+		//refreshFretPanel(mPanelNeck);
 
 		//refreshFretPanel(mPanelFretSelect);
 		updateFavorites();
@@ -256,6 +265,7 @@ public class Choordinates extends JFrame {
 		ToneChord tuning = choord_data.getCurrentTuning();
 		IntervalChord intervals = mPanelNeck.getSearchChord();
 		
+		System.out.println("In choord.updateFavorites Intervals is " + intervals.getAllNoteNames());
 		if ( ! intervals.hasNotes() )
 		{
 			return; //Shouldn't ever get here.
@@ -267,13 +277,11 @@ public class Choordinates extends JFrame {
 		
 		if ( current_id.compareTo( mCurrentFavorites ) == 0)
 		{
-			return; //No update required.
+			//return; //No update required.
 		}
 		
 		mCurrentFavorites = current_id;
-		/*  SPATTERS wonky here.  Fix!
 		mPanelFav.loadFavorites(mCurrentFavorites, root_note, intervals);
-		*/
 	}
 	
 	private void addFavorite()
@@ -293,8 +301,12 @@ public class Choordinates extends JFrame {
 		
 		IntervalChord interval_chord = mPanelNeck.getSearchChord();
 		
-		choord_data.addFavorite( chord_shape, interval_chord );
+		ToneChord tuning = choord_data.getCurrentTuning();
 		
+		UUID id = choord_data.addFavorite( chord_shape, interval_chord );
+		
+		System.out.println("Adding favorite to group: " + tuning.getAllNoteNames() + " interval " + interval_chord.getAllNoteNames() + " groupd_id " + id.toString());
+
 		setPanelFavSize();
 		mPanelFav.addFavorite(mPanelNeck.getRootNote(),
 								mPanelNeck.getSearchChord(),
@@ -565,8 +577,7 @@ public class Choordinates extends JFrame {
         		int id = mComboTuning.getSelectedIndex();
         		ChoordData.getInstance().setCurrentTuning(id);
         		ChoordData.getInstance().write();
-
-        		updateFavorites();
+        		searchByChord();
         		refreshFretPanels();
         		refresh();
         	}
@@ -644,11 +655,15 @@ public class Choordinates extends JFrame {
             public void valueChanged(ListSelectionEvent e) {
             	if (!mRefreshing)
             	{
-            		ChoordData choord_data = ChoordData.getInstance();
                     if (!e.getValueIsAdjusting()) { // Check if selection is finalized
+                		ChoordData choord_data = ChoordData.getInstance();
+
+                    	System.out.println("Index is now " + mListChordChord.getSelectedIndex());
                     	choord_data.setCurrentChord( mListChordChord.getSelectedIndex());
-                		ChoordData.getInstance().write();
-                		updateFavorites();
+                		choord_data.write();
+                		System.out.println("Selected chord is " + choord_data.getChord( mListChordChord.getSelectedIndex()).getAllNoteNames());
+                		System.out.println("Currrent chord now " + choord_data.getChord( choord_data.getCurrentChord()).getAllNoteNames());
+                		searchByChord();
                     	refresh();
                     }
             	}
@@ -660,6 +675,20 @@ public class Choordinates extends JFrame {
 		mTabbedPane.addTab("Notes", null, panelNotesSelect, null);
 		
 		mTextNotesNotes = new JTextField();
+		mTextNotesNotes.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				searchByNotes();
+			}
+		});
+		mTextNotesNotes.addFocusListener(new FocusListener() {
+            @Override
+            public void focusGained(FocusEvent e) {}
+          
+            @Override
+            public void focusLost(FocusEvent e) {
+                searchByNotes();
+            }
+        });
 		panelNotesSelect.add(mTextNotesNotes);
 		mTextNotesNotes.setColumns(10);
 		

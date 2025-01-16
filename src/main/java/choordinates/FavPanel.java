@@ -63,13 +63,16 @@ public class FavPanel extends JPanel {
 		mFavList.clear();
 	}
 
-	public void loadFavorites( UUID group_id, ToneNote roote_note, IntervalChord chord )
+	public void loadFavorites( UUID group_id, ToneNote roote_note, IntervalChord interval_chord )
 	{
+		ToneChord tuning = ChoordData.getInstance().getCurrentTuning();
+		System.out.println("Loading favorites from group: " + tuning.getAllNoteNames() + " interval " + interval_chord.getAllNoteNames() + " groupd_id " + group_id.toString());
+
 		flush();
 		HashMap<UUID, ChordShape>  favs = ChoordData.getInstance().getFavoriteGroup( group_id ).getFavorites();
 		for (ChordShape chord_shape : favs.values()) 
 		{
-			addFavorite( roote_note, chord, chord_shape );
+			addFavorite( roote_note, interval_chord, chord_shape );
 		}
 	}
 	

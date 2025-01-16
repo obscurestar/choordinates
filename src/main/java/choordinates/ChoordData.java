@@ -90,6 +90,7 @@ public class ChoordData {
 	{
 		//Creates group if it does not exist, returns UUID of favorite.
 		FavGroup group = getFavoriteGroup(group_id);
+		System.out.println("AddFavorite");
 		return group.addFavorite(fav);
 	}
 	
