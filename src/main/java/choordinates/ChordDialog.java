@@ -63,7 +63,11 @@ public class ChordDialog extends JDialog
 		//setUndecorated(true);
 
 		setTitle("Chord Dictionary");
-		setBounds(150, 150, 490, 258);
+		
+		//setBounds(150, 150, 490, 258);
+		int[] bounds = ChoordData.getInstance().getPreferences().getChordRect();
+		setBounds( bounds[0], bounds[1], bounds[2], bounds[3] );
+
 		getContentPane().setLayout(new BorderLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		getContentPane().add(contentPanel, BorderLayout.CENTER);
@@ -353,7 +357,7 @@ public class ChordDialog extends JDialog
     	
     	choord_data.getPreferences().setChordRect( getBounds() );
     	
-    	if (confirm_write)
+    	if (confirm_write && !ChoordData.CLOSING) //Don't double-save on app close.
     	{
     		choord_data.write();
     		refreshMain();

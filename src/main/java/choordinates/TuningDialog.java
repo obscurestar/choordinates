@@ -52,7 +52,10 @@ public class TuningDialog extends JDialog
         });
 
 		setTitle("Tunings");
-		setBounds(180, 180, 320, 211);
+		//setBounds(180, 180, 320, 211);
+		int[] bounds = ChoordData.getInstance().getPreferences().getTuningRect();
+		setBounds( bounds[0], bounds[1], bounds[2], bounds[3] );
+
 		JPanel contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 
@@ -237,7 +240,7 @@ public class TuningDialog extends JDialog
     	
         choord_data.getPreferences().setTuningRect( getBounds() );
        
-    	if (confirm_write)
+    	if (confirm_write && !ChoordData.CLOSING)  //Don't write twice when closing app.
     	{
     		choord_data.write();
     		refreshMain();

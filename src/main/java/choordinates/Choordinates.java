@@ -1,6 +1,5 @@
 package choordinates;
 
-
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
@@ -86,7 +85,7 @@ public class Choordinates extends JFrame {
 		});
 	}
 
-	public void searchByChord()
+	public void searchByChord(boolean alert)
 	{
 		ChoordData choord_data = ChoordData.getInstance();
 		String root_name = mTextRootNote.getText();
@@ -100,7 +99,10 @@ public class Choordinates extends JFrame {
 		}
         catch (IllegalArgumentException exception)
         {
-        	alert(null, exception.getMessage());
+        	if(alert)
+        	{
+        		alert(null, exception.getMessage());
+        	}
         	return;
 		}
 		
@@ -176,7 +178,7 @@ public class Choordinates extends JFrame {
 		return first_match;
 	}
 	
-	private void searchByNotes()
+	private void searchByNotes(boolean alert)
 	{
 		ToneChord tone_chord;
 		
@@ -186,7 +188,10 @@ public class Choordinates extends JFrame {
         }
         catch (IllegalArgumentException exception)
         {
-        	alert(null, exception.getMessage());
+        	if (alert)
+        	{
+        		alert(null, exception.getMessage());
+        	}
         	return;
         }
 				
@@ -199,7 +204,7 @@ public class Choordinates extends JFrame {
 		updateFavorites();
 	}
 	
-	private void searchByFrets()
+	private void searchByFrets(boolean alert)
 	{
 		/*TODO really should override insertString and replace on the text box
 		 * And build in a validator but let's do the easy thing for V 1.
@@ -218,7 +223,10 @@ public class Choordinates extends JFrame {
 			try {
 			    fret_num = Integer.parseInt(fret_num_str);
 			} catch (NumberFormatException e) {
-				alert(null,  "Fret number must be between 0 and 18");
+				if( alert )
+				{
+					alert(null,  "Fret number must be between 0 and 18");
+				}
 			}
 		}
 		
@@ -244,22 +252,22 @@ public class Choordinates extends JFrame {
 		updateFavorites();
 	}
 	
-	private void search()
+	private void search(boolean alert)
 	{
 		int tab_no = mTabbedPane.getSelectedIndex();
 			//TODO WARNING!  Just raw associating numbers of tabs.  Fix this!
 		
 		if (tab_no <= 0)
 		{
-			searchByChord();
+			searchByChord(alert);
 		}
 		else if (tab_no == 1)
 		{
-			searchByNotes();
+			searchByNotes(alert);
 		}
 		else
 		{
-			searchByFrets();
+			searchByFrets(alert);
 		}
 	}
 	
@@ -500,7 +508,9 @@ public class Choordinates extends JFrame {
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
+            	ChoordData.CLOSING = true;
             	ChoordData.getInstance().getPreferences().setMainRect( getBounds() );
+            	ChoordData.getInstance().write();
             }
         });
         
@@ -594,7 +604,10 @@ public class Choordinates extends JFrame {
 		mnHelp.add(mntmHelpfile);
 
 //Create the content pane
-		setBounds(100, 100, 499, 449);
+		//setBounds(100, 100, 499, 449);
+		int[] bounds = ChoordData.getInstance().getPreferences().getMainRect();
+		setBounds( bounds[0], bounds[1], bounds[2], bounds[3] );
+		
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 
@@ -627,7 +640,7 @@ public class Choordinates extends JFrame {
         		int id = mComboTuning.getSelectedIndex();
         		ChoordData.getInstance().setCurrentTuning(id);
         		ChoordData.getInstance().write();
-        		searchByChord();
+        		searchByChord(true);
         		refreshFretPanels();
         		refresh();
         	}
@@ -671,7 +684,7 @@ public class Choordinates extends JFrame {
 		gbc_mTextRootNote.gridy = 0;
 		mTextRootNote.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				searchByChord();
+				searchByChord( true );
 			}
 		});
 		mTextRootNote.addFocusListener(new FocusListener() {
@@ -680,7 +693,7 @@ public class Choordinates extends JFrame {
           
             @Override
             public void focusLost(FocusEvent e) {
-                searchByChord();
+                searchByChord( false );
             }
         });
 		panelChordSelect.add(mTextRootNote, gbc_mTextRootNote);
@@ -710,7 +723,7 @@ public class Choordinates extends JFrame {
 
                     	choord_data.setCurrentChord( mListChordChord.getSelectedIndex());
                 		choord_data.write();
-                		searchByChord();
+                		searchByChord( false );
                     	refresh();
                     }
             	}
@@ -724,7 +737,7 @@ public class Choordinates extends JFrame {
 		mTextNotesNotes = new JTextField();
 		mTextNotesNotes.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				searchByNotes();
+				searchByNotes( true );
 			}
 		});
 		mTextNotesNotes.addFocusListener(new FocusListener() {
@@ -733,7 +746,7 @@ public class Choordinates extends JFrame {
           
             @Override
             public void focusLost(FocusEvent e) {
-                searchByNotes();
+                searchByNotes( false );
             }
         });
 		panelNotesSelect.add(mTextNotesNotes);
@@ -770,7 +783,7 @@ public class Choordinates extends JFrame {
 		gbc_mTextFretsNum.gridy = 1;
 		mTextFretsNum.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				searchByFrets();
+				searchByFrets( true );
 			}
 		});
 		mTextFretsNum.addFocusListener(new FocusListener() {
@@ -779,7 +792,7 @@ public class Choordinates extends JFrame {
           
             @Override
             public void focusLost(FocusEvent e) {
-                searchByFrets();
+                searchByFrets( false );
             }
         });
 		panelFretsNum.add(mTextFretsNum, gbc_mTextFretsNum);
@@ -839,7 +852,7 @@ public class Choordinates extends JFrame {
 		JButton btnSearch = new JButton("Search");
 		btnSearch.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				search();
+				search( true );
 			}
 		});
 		GridBagConstraints gbc_btnSearch = new GridBagConstraints();

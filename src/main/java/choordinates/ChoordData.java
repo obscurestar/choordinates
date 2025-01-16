@@ -13,6 +13,7 @@ import java.io.File;
 import java.io.IOException;
 
 public class ChoordData {
+	public static boolean CLOSING = false;
 	//TODO:  Probably a better filepath.
 	@JsonIgnore
 	private static final String mJsonFile ="choordinates.json";

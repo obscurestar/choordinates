@@ -7,7 +7,6 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.ActionEvent;
 
-
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
@@ -29,31 +28,32 @@ public class PreferencesDialog extends JDialog {
 	private JTextField mTextPanes;
 	private JCheckBox mChckbxLefty;
 
-	
 	/**
 	 * Create the dialog.
 	 */
 	public PreferencesDialog() {
 		setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
-		
-		setBounds(100, 100, 187, 261);
+
+		//setBounds(100, 100, 187, 261);
+		int[] bounds = ChoordData.getInstance().getPreferences().getPrefRect();
+		setBounds( bounds[0], bounds[1], bounds[2], bounds[3] );
+
 		getContentPane().setLayout(new BorderLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		getContentPane().add(contentPanel, BorderLayout.CENTER);
 		GridBagLayout gbl_contentPanel = new GridBagLayout();
-		gbl_contentPanel.columnWidths = new int[]{0, 0, 0, 0};
-		gbl_contentPanel.rowHeights = new int[]{0, 0, 0, 0, 0, 0};
-		gbl_contentPanel.columnWeights = new double[]{0.0, 0.0, 1.0, Double.MIN_VALUE};
-		gbl_contentPanel.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
-		
-        addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(WindowEvent e) {
-            	ChoordData.getInstance().getPreferences().setPrefRect( getBounds() );
-            }
-        });
-        
-        
+		gbl_contentPanel.columnWidths = new int[] { 0, 0, 0, 0 };
+		gbl_contentPanel.rowHeights = new int[] { 0, 0, 0, 0, 0, 0 };
+		gbl_contentPanel.columnWeights = new double[] { 0.0, 0.0, 1.0, Double.MIN_VALUE };
+		gbl_contentPanel.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE };
+
+		addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosing(WindowEvent e) {
+				ChoordData.getInstance().getPreferences().setPrefRect(getBounds());
+			}
+		});
+
 		contentPanel.setLayout(gbl_contentPanel);
 		{
 			JLabel lblNewLabel = new JLabel("Lefty");
@@ -83,7 +83,7 @@ public class PreferencesDialog extends JDialog {
 		}
 		{
 			mTextNeck = new JTextField();
-			mTextNeck.setText(String.valueOf( ChoordData.getInstance().getPreferences().getNeckLength() ) );
+			mTextNeck.setText(String.valueOf(ChoordData.getInstance().getPreferences().getNeckLength()));
 			GridBagConstraints gbc_textField = new GridBagConstraints();
 			gbc_textField.insets = new Insets(0, 0, 5, 0);
 			gbc_textField.fill = GridBagConstraints.HORIZONTAL;
@@ -102,7 +102,7 @@ public class PreferencesDialog extends JDialog {
 		}
 		{
 			mTextPanes = new JTextField();
-			mTextPanes.setText( String.valueOf( ChoordData.getInstance().getPreferences().getPanelLength() ) );
+			mTextPanes.setText(String.valueOf(ChoordData.getInstance().getPreferences().getPanelLength()));
 			GridBagConstraints gbc_textField_1 = new GridBagConstraints();
 			gbc_textField_1.fill = GridBagConstraints.HORIZONTAL;
 			gbc_textField_1.gridx = 2;
@@ -118,13 +118,11 @@ public class PreferencesDialog extends JDialog {
 				JButton okButton = new JButton("OK");
 				okButton.setActionCommand("OK");
 				buttonPane.add(okButton);
-				okButton.addActionListener(new ActionListener()
-				{
-		            @Override
-		            public void actionPerformed(ActionEvent e)
-		            {
-		            	closeWindow(true);
-		            }
+				okButton.addActionListener(new ActionListener() {
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						closeWindow(true);
+					}
 				});
 				getRootPane().setDefaultButton(okButton);
 			}
@@ -132,37 +130,53 @@ public class PreferencesDialog extends JDialog {
 				JButton cancelButton = new JButton("Cancel");
 				cancelButton.setActionCommand("Cancel");
 				buttonPane.add(cancelButton);
-				cancelButton.addActionListener(new ActionListener()
-				{
-		            @Override
-		            public void actionPerformed(ActionEvent e)
-		            {
-		            	ChoordData.read();
-		        		setVisible(false);
-		            }
+				cancelButton.addActionListener(new ActionListener() {
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						ChoordData.read();
+						closeWindow(false);
+					}
 				});
 			}
 		}
 		setVisible(true);
 	}
 
-	private void closeWindow(boolean save)
-	{
-		if (save)
-		{
-	    	ChoordData choord_data = ChoordData.getInstance();
-	        
-	    	choord_data.getPreferences().setLefty(mChckbxLefty.isSelected());
-	    	
-			try
-			{
-				choord_data.getPreferences().setNeckLength( (int)Integer.valueOf( mTextNeck.getText() ) );
-				choord_data.getPreferences().setPanelLength( (int)Integer.valueOf( mTextPanes.getText() ) );
+	private void closeWindow(boolean save) {
+		if (save) {
+			ChoordData choord_data = ChoordData.getInstance();
+			Preferences prefs = choord_data.getPreferences();
+
+			boolean changed = false;
+			boolean l_orig = choord_data.getPreferences().getLefty();
+			boolean lefty = mChckbxLefty.isSelected();
+
+			if (l_orig != lefty)
+				changed = true;
+
+			prefs.setLefty(lefty);
+
+			try {
+				int orig = prefs.getNeckLength();
+				int got = (int) Integer.valueOf(mTextNeck.getText());
+
+				if (orig != got)
+					changed = true;
+				prefs.setNeckLength(got);
+
+				orig = prefs.getPanelLength();
+				got = (int) Integer.valueOf(mTextPanes.getText());
+
+				if (orig != got)
+					changed = true;
+				prefs.setPanelLength(got);
+			} catch (NumberFormatException err) {
+				// Silently fail
 			}
-			catch (NumberFormatException err)
-			{
-				//Silently fail
-			}	
+			if (changed && !ChoordData.CLOSING) {
+				Choordinates.alert("Preferences Changed", "Restart required to apply changes.");
+			}
+
 			choord_data.write();
 		}
 		setVisible(false);

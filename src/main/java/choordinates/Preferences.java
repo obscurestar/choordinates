@@ -18,13 +18,13 @@ public class Preferences {
 	private int mPanelFrets = 6;
 
 	@JsonProperty("main_bounds")
-	private int[] mMainRect = new int[] {100, 100, 499, 449};
+	private int[] mMainRect;
 	@JsonProperty("tuning_bounds")
-	private int[] mTuningRect = new int[] {180, 180, 320, 211};
+	private int[] mTuningRect;
 	@JsonProperty("chords_bounds")
-	private int[] mChordRect = new int[] {150, 150, 490, 258};
+	private int[] mChordRect;
 	@JsonProperty("preferences_bounds")
-	private int[] mPrefRect = new int[] {100, 100, 187, 261};
+	private int[] mPrefRect;
 	
 	@JsonIgnore
 	public int[] getMainRect()
@@ -114,5 +114,13 @@ public class Preferences {
 	public ImageIcon getIcon()
 	{
 		return mIcon;
+	}
+	
+	Preferences()
+	{
+		mMainRect = new int[] {100, 100, 499, 449};
+		mTuningRect = new int[] {180, 180, 320, 211};
+		mChordRect = new int[] {150, 150, 490, 258};
+		mPrefRect = new int[] {100, 100, 187, 261};
 	}
 }
