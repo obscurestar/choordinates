@@ -14,12 +14,13 @@ public class BrowserWindow {
 		}
 	}
 	
-	public BrowserWindow(String filename, String url)
+	public BrowserWindow(String url, String filename)
 	{
 		//Attempts to open remote file.  On failure, attempts to open local.
-		if( !launchBrowser(url) )
+		if( !launchBrowser(filename) )
 		{
-			Choordinates.alert("Browser disallowed", "Local helpfile at\n" + System.getProperty("user.dir") + "choordinates.html");
+			if( !launchBrowser("file://"+filename))
+			Choordinates.alert("Get Help At", filename + "\nor\n" + url);
 		}
 	}
 	

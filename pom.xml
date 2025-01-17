@@ -52,6 +52,7 @@
       <resource>
         <directory>resources</directory>
         <includes>
+          <include>resources</include>
           <include>choordinates.json</include>
           <include>choordinates.html</include>
           <include>choordinates64.png</include>
@@ -107,7 +108,7 @@
 	          </execution>
 	        </executions>
 	        <configuration>
-              <appendAssemblyId>false</appendAssemblyId> 
+              <appendAssemblyId>false</appendAssemblyId>
               <archive>
                 <manifest>
                   <mainClass>com.obscurestar.choordinates.Choordinates</mainClass>
@@ -127,6 +128,7 @@
 	          <manifest>
 	            <addClasspath>true</addClasspath>
 	            <classpathPrefix>lib/</classpathPrefix>
+              	<!-- <classpathLayoutType>repository</classpathLayoutType> -->
 	            <mainClass>com.obscurestar.choordinates.Choordinates</mainClass>
 	          </manifest>
 	        </archive>

@@ -472,9 +472,9 @@ public class Choordinates extends JFrame {
 		 */
 		ChoordData.read();  //Initialize data structures from JSON file.
 		
-        //this is new since JDK 9
 		
-        final Taskbar taskbar = Taskbar.getTaskbar();
+        //this is new since JDK 9		
+        Taskbar taskbar = Taskbar.getTaskbar();
 
         try {
             taskbar.setIconImage(ChoordData.getInstance().getPreferences().getIcon().getImage());
@@ -596,8 +596,8 @@ public class Choordinates extends JFrame {
 
 		JMenuItem mntmHelpfile = new JMenuItem("Choordinates Help");
 		mntmHelpfile.addActionListener(e -> {
-			new BrowserWindow("https://raw.githubusercontent.com/obscurestar/choordinates/refs/heads/main/", 
-					 System.getProperty("user.dir") + "choordinates.html");
+			new BrowserWindow("https://raw.githubusercontent.com/obscurestar/choordinates/refs/heads/main/choordinates.html", 
+					 ChoordData.getInstance().getHelpFile() );
 		});
 		mnHelp.add(mntmHelpfile);
 

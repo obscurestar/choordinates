@@ -2,13 +2,20 @@ package com.obscurestar.choordinates;
 
 import javax.swing.ImageIcon;
 import java.awt.Rectangle;
+import java.io.IOException;
+import java.io.InputStream;
+import javax.imageio.ImageIO;
+import javax.swing.UIManager;
+import java.awt.image.BufferedImage;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public class Preferences {
 	@JsonIgnore
-	private ImageIcon mIcon = new ImageIcon("resources/choordinates64.png");
+	private static ImageIcon mIcon;
+	@JsonIgnore
+	private String mFilename;
 
 	@JsonProperty("left_handed")
 	private boolean mLefty = false;
@@ -114,6 +121,62 @@ public class Preferences {
 	public ImageIcon getIcon()
 	{
 		return mIcon;
+	}
+	
+	@JsonIgnore
+	public void loadIcon( )
+	{
+		String filename = "choordinates64.png";
+		mIcon = null;
+		boolean got_stream = true;
+		
+        ClassLoader classloader = ClassLoader.getSystemClassLoader();
+
+        // Load the image from the JAR file
+        InputStream input_stream = null;
+        try
+        {
+        	input_stream = classloader.getResourceAsStream( filename );
+        }
+        catch ( NullPointerException e )
+        {
+        }
+        
+        if (input_stream == null) {
+        	got_stream = false;
+        }
+        
+        if (got_stream) //Found it in the jar.
+        {
+	        try
+	        {
+	        	BufferedImage image = ImageIO.read(input_stream);
+	        	mIcon = new ImageIcon(image);
+	        }
+	        catch ( IOException e )
+	        {
+	        	mIcon = null;
+	        }
+        }
+        
+        if (mIcon == null || mIcon.getImage() == null)
+        {
+        	//Try getting from directory instead. (development mode)
+            mIcon = new ImageIcon( "resources/" + filename );
+        }
+        
+        if (mIcon == null || mIcon.getImage() == null)
+        {
+        	System.out.println("You failed! You get NOTHING!");
+            mIcon = new ImageIcon( );
+        }
+      
+        try
+        {
+        	//Suppress compiler whinging.
+        	input_stream.close();
+        }
+        catch (IOException e){}
 	}
 	
 	Preferences()
