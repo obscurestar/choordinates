@@ -9,7 +9,7 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-//import java.awt.Taskbar;
+import java.awt.Taskbar;
 
 import com.obscurestar.choordinates.FretPanel.Select;
 
@@ -41,7 +41,6 @@ import java.util.UUID;
 import javax.swing.BoxLayout;
 
 public class Choordinates extends JFrame {
-	private ChoordData mChoordData = ChoordData.getInstance();
 	private static final long serialVersionUID = 1L;
 	private boolean mRefreshing;
 	
@@ -471,17 +470,17 @@ public class Choordinates extends JFrame {
 		/*DANGER!  Do not get an instance of chorddata here.
 		 * The lambdas will make you cry.
 		 */
-		mChoordData = ChoordData.read();  //Initialize data structures from JSON file.
+		ChoordData.read();  //Initialize data structures from JSON file.
 		
         //this is new since JDK 9
-		/*
+		
         final Taskbar taskbar = Taskbar.getTaskbar();
 
         try {
             taskbar.setIconImage(ChoordData.getInstance().getPreferences().getIcon().getImage());
-        } catch (final UnsupportedOperationException e) {
-        } catch (final SecurityException e) {
-        }*/
+        } catch (final UnsupportedOperationException | SecurityException e) {
+            //Don't care if we can't set the icon just do some empty catches.
+        }
 
 		setIconImage(ChoordData.getInstance().getPreferences().getIcon().getImage());
 
