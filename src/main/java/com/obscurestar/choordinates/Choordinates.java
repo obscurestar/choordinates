@@ -41,7 +41,7 @@ import java.util.UUID;
 import javax.swing.BoxLayout;
 
 public class Choordinates extends JFrame {
-
+	private ChoordData mChoordData = ChoordData.getInstance();
 	private static final long serialVersionUID = 1L;
 	private boolean mRefreshing;
 	
@@ -471,7 +471,7 @@ public class Choordinates extends JFrame {
 		/*DANGER!  Do not get an instance of chorddata here.
 		 * The lambdas will make you cry.
 		 */
-		ChoordData.read();   //Initialize data structures from JSON file.
+		mChoordData = ChoordData.read();  //Initialize data structures from JSON file.
 		
         //this is new since JDK 9
 		/*
