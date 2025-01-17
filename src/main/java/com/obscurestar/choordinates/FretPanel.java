@@ -746,7 +746,8 @@ public class FretPanel extends JPanel implements MouseListener, MouseMotionListe
     			&& mFavCallback != null )
     	{
     		boolean right_click = false;
-    		if (e.getButton() == MouseEvent.BUTTON3 )
+    		if (e.getButton() == MouseEvent.BUTTON3 
+    				|| (e.isAltDown()))
     		{
     			right_click = true;
     		}
