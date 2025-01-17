@@ -5,7 +5,8 @@
 
   <groupId>com.obscurestar.choordinates</groupId>
   <artifactId>choordinates</artifactId>
-  <version>1.0-SNAPSHOT</version>
+  <!-- <version>1.0-SNAPSHOT</version> !-->
+  <version>1.0</version>
 
   <name>choordinates</name>
   <url>https://github.com/obscurestar/choordinates</url>
@@ -47,6 +48,16 @@
   </dependencies>
 
   <build>
+    <resources>
+      <resource>
+        <directory>resources</directory>
+        <includes>
+          <include>choordinates.json</include>
+          <include>choordinates.html</include>
+          <include>choordinates64.png</include>
+        </includes>
+      </resource>
+    </resources>
     <pluginManagement><!-- lock down plugins versions to avoid using Maven defaults (may be moved to parent pom) -->
       <plugins>
         <!-- clean lifecycle, see https://maven.apache.org/ref/current/maven-core/lifecycles.html#clean_Lifecycle -->

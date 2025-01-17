@@ -16,7 +16,7 @@ public class ChoordData {
 	public static boolean CLOSING = false;
 	//TODO:  Probably a better filepath.
 	@JsonIgnore
-	private static final String mJsonFile ="choordinates.json";
+	private static final String mJsonFile ="resources/choordinates.json";
 	@JsonIgnore
 	private static ChoordData mInstance;
 	

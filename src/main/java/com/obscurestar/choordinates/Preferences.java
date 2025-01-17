@@ -8,7 +8,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public class Preferences {
 	@JsonIgnore
-	private ImageIcon mIcon = new ImageIcon("choordinates64.png");
+	private ImageIcon mIcon = new ImageIcon("resources/choordinates64.png");
 
 	@JsonProperty("left_handed")
 	private boolean mLefty = false;
