@@ -1,4 +1,4 @@
-package choordinates;
+package com.obscurestar.choordinates;
 
 public class Tests {
 	private static final String mIntervalString = "-1 1 2♭ 2 3♭ 3 4 5♭ 5 6♭ 6 7♭ 7";

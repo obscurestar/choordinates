@@ -1,4 +1,4 @@
-package choordinates;
+package com.obscurestar.choordinates;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -9,9 +9,9 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.awt.Taskbar;
+//import java.awt.Taskbar;
 
-import choordinates.FretPanel.Select;
+import com.obscurestar.choordinates.FretPanel.Select;
 
 import javax.swing.JMenuBar;
 import javax.swing.JMenu;
@@ -311,10 +311,8 @@ public class Choordinates extends JFrame {
 		}
 		
 		IntervalChord interval_chord = mPanelNeck.getSearchChord();
-		
-		ToneChord tuning = choord_data.getCurrentTuning();
-		
-		UUID id = choord_data.addFavorite( chord_shape, interval_chord );
+				
+		choord_data.addFavorite( chord_shape, interval_chord );
 		
 		setPanelFavSize();
 		mPanelFav.addFavorite(mPanelNeck.getRootNote(),
@@ -476,13 +474,14 @@ public class Choordinates extends JFrame {
 		ChoordData.read();   //Initialize data structures from JSON file.
 		
         //this is new since JDK 9
+		/*
         final Taskbar taskbar = Taskbar.getTaskbar();
 
         try {
             taskbar.setIconImage(ChoordData.getInstance().getPreferences().getIcon().getImage());
         } catch (final UnsupportedOperationException e) {
         } catch (final SecurityException e) {
-        }
+        }*/
 
 		setIconImage(ChoordData.getInstance().getPreferences().getIcon().getImage());
 
@@ -640,7 +639,7 @@ public class Choordinates extends JFrame {
         		int id = mComboTuning.getSelectedIndex();
         		ChoordData.getInstance().setCurrentTuning(id);
         		ChoordData.getInstance().write();
-        		searchByChord(true);
+        		searchByChord(false);
         		refreshFretPanels();
         		refresh();
         	}

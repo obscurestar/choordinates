@@ -1,4 +1,4 @@
-package choordinates;
+package com.obscurestar.choordinates;
 
 import java.awt.*;
 import java.awt.event.*;

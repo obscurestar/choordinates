@@ -1,4 +1,4 @@
-package choordinates;
+package com.obscurestar.choordinates;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;

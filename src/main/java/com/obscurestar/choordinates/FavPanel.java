@@ -1,13 +1,12 @@
-package choordinates;
+package com.obscurestar.choordinates;
 
 //import java.util.ArrayList;
 //import java.util.HashMap;
 import java.util.UUID;
 import javax.swing.JPanel;
 import java.util.HashMap;
-import java.util.UUID;
 
-import choordinates.FretPanel.Select;
+import com.obscurestar.choordinates.FretPanel.Select;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 
@@ -34,9 +33,9 @@ public class FavPanel extends JPanel {
 	
 	private void setFavCallbacks()
 	{
-		for( int i=0;i<mFavList.size();++i )
+		for ( UUID key : mFavList.keySet() )
 		{
-			mFavList.get(i).setCallback(mCallback);
+			mFavList.get(key).setCallback(mCallback);
 		}
 	}
 	
@@ -65,8 +64,6 @@ public class FavPanel extends JPanel {
 
 	public void loadFavorites( UUID group_id, ToneNote roote_note, IntervalChord interval_chord )
 	{
-		ToneChord tuning = ChoordData.getInstance().getCurrentTuning();
-
 		flush();
 		HashMap<UUID, ChordShape>  favs = ChoordData.getInstance().getFavoriteGroup( group_id ).getFavorites();
 		for (ChordShape chord_shape : favs.values()) 

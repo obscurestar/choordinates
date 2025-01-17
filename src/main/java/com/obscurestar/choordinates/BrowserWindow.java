@@ -1,4 +1,4 @@
-package choordinates;
+package com.obscurestar.choordinates;
 
 import java.awt.Desktop;
 import java.net.URI;

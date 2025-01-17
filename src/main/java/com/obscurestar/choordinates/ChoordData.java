@@ -1,4 +1,4 @@
-package choordinates;
+package com.obscurestar.choordinates;
 
 import java.util.ArrayList;
 import java.util.HashMap;

@@ -1,4 +1,4 @@
-package choordinates;
+package com.obscurestar.choordinates;
 
 import javax.swing.ImageIcon;
 import java.awt.Rectangle;

@@ -1,5 +1,4 @@
-package choordinates;
-
+package com.obscurestar.choordinates;
 
 import javax.swing.JDialog;
 import javax.swing.JPanel;

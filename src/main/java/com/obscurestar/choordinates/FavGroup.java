@@ -1,4 +1,4 @@
-package choordinates;
+package com.obscurestar.choordinates;
 
 import java.util.HashMap;
 import java.util.UUID;
