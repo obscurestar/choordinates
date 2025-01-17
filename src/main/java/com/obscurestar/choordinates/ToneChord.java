@@ -1,6 +1,9 @@
 package com.obscurestar.choordinates;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import java.util.ArrayList;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 
 //Note chords extend the abstract Chord class to represent notes on an A-Gb scale
@@ -20,8 +23,21 @@ public class ToneChord extends AbstractChord {
 	@JsonIgnore
 	public ToneChord( ToneNote root, IntervalChord intervals)
 	{		
-		mName = root.getName().toUpperCase() + " " + intervals.getName() //C minor Seventh
-		+ " (" + root.getName().toUpperCase() + intervals.getSymbol() + ") -";  //(Cm7)
+		String root_name = root.getName().toUpperCase();
+		mName = root_name + " " + intervals.getName() //C minor Seventh
+		+ " (" + root_name + intervals.getSymbol() + ") -";  //(Cm7)
+		
+		ArrayList<String> aliases = intervals.getAliases();
+		
+		if (aliases.size() > 0)
+		{
+			mName += " AKA";
+			
+			for (String alias:aliases)
+			{
+				mName += " " + root_name + alias;
+			}
+		}
 		
 		int root_semitones = intervals.getNote(0).getOctaveSemitone();
 		

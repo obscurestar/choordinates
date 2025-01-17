@@ -5,6 +5,7 @@ import java.awt.BorderLayout;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.border.EmptyBorder;
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
@@ -130,8 +131,9 @@ public class ChordDialog extends JDialog
 			 	panelChordDict.add(mTextName, gbc_mTextName);
 			 	mTextName.setToolTipText("Name of the chord eg: Major, minor, dominant, 7th");
 			 	mTextName.setColumns(10);
-
-				 panelChordDict.add(mListChords, gbc_mListChords);
+			 	
+		        JScrollPane scrollListChords = new JScrollPane(mListChords);
+				 panelChordDict.add(scrollListChords, gbc_mListChords);
 			}
 			{
 				JLabel lblSymbol = new JLabel("Symbol");

@@ -2,6 +2,7 @@ package com.obscurestar.choordinates;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -727,7 +728,8 @@ public class Choordinates extends JFrame {
             	}
             }
         });
-		panelChordSelect.add(mListChordChord, gbc_mListChordChord);
+        JScrollPane scrollListChord = new JScrollPane(mListChordChord);
+		panelChordSelect.add(scrollListChord, gbc_mListChordChord);
 //Select by NOTES pane		
 		JPanel panelNotesSelect = new JPanel();
 		mTabbedPane.addTab("Notes", null, panelNotesSelect, null);
@@ -825,7 +827,8 @@ public class Choordinates extends JFrame {
 		gbc_listMatches.fill = GridBagConstraints.BOTH;
 		gbc_listMatches.gridx = 2;
 		gbc_listMatches.gridy = 1;
-		contentPane.add(mListMatches, gbc_listMatches);
+        JScrollPane scrollListMatches = new JScrollPane(mListMatches);
+		contentPane.add(scrollListMatches, gbc_listMatches);
 
 //Favorite shape components.
 		JLabel lblFavorites = new JLabel("Favorite Shapes");
