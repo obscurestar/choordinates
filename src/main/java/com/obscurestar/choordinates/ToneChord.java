@@ -27,18 +27,6 @@ public class ToneChord extends AbstractChord {
 		mName = root_name + " " + intervals.getName() //C minor Seventh
 		+ " (" + root_name + intervals.getSymbol() + ") -";  //(Cm7)
 		
-		ArrayList<String> aliases = intervals.getAliases();
-		
-		if (aliases.size() > 0)
-		{
-			mName += " AKA";
-			
-			for (String alias:aliases)
-			{
-				mName += " " + root_name + alias;
-			}
-		}
-		
 		int root_semitones = intervals.getNote(0).getOctaveSemitone();
 		
 		for (int i=0; i < intervals.getNumNotes(); ++i)

@@ -16,11 +16,12 @@ public class BrowserWindow {
 	
 	public BrowserWindow(String url, String filename)
 	{
-		//Attempts to open remote file.  On failure, attempts to open local.
-		if( !launchBrowser(filename) )
+		//Attempts to open helpfile.  On fail just gives directory path.
+		url = url.replaceAll(" ", "%20");
+
+		if( !launchBrowser(url) )
 		{
-			if( !launchBrowser("file://"+filename))
-			Choordinates.alert("Get Help At", filename + "\nor\n" + url);
+			Choordinates.alert("Helpfile at", filename);
 		}
 	}
 	

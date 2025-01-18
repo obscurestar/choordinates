@@ -395,7 +395,7 @@ public class ChordDialog extends JDialog
         DefaultListModel<String> listModel = new DefaultListModel<>();
 
         for (int i=0;i < choord_data.getNumChords(); ++i) {
-            listModel.addElement(choord_data.getChord(i).getName());
+            listModel.addElement(choord_data.getChord(i).getLongName());
         }
 
         // Set the list model to the JList

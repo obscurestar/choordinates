@@ -65,7 +65,7 @@ public abstract class AbstractChord
 	public String getName() {
 		return mName;
 	}
-
+	
 	@JsonIgnore
 	public ArrayList<String> getAllNoteNames()
 	{

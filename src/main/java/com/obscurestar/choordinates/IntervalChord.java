@@ -112,6 +112,34 @@ public class IntervalChord extends AbstractChord
 	}
 
 	@JsonIgnore
+	public String getLongName() {
+		String name = mName;
+		
+		if (mSymbol.length() > 0)
+		{
+			name += " ( " + mSymbol + " )";
+		}
+		
+		if (mAliases.size() > 0 && mAliases.get(0).compareTo( "" ) != 0)
+		{
+			name += " AKA";
+			
+			int count=1;
+			for (String alias:mAliases)
+			{
+				name += " " + alias;
+				if (count < mAliases.size())
+				{
+					name += ",";
+				}
+				count++;
+			}
+		}
+		return name;
+	}
+
+
+	@JsonIgnore
 	public ArrayList<String> getAllChordNames() {
 		// Return all names for this chord (preferred first)
 		ArrayList<String> notes = getAliases();

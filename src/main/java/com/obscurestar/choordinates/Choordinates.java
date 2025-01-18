@@ -414,7 +414,7 @@ public class Choordinates extends JFrame {
         int chord_id = choord_data.getCurrentChord();
 
         for (int i=0;i < choord_data.getNumChords(); ++i) {
-            listModel.addElement(choord_data.getChord(i).getName());
+            listModel.addElement(choord_data.getChord(i).getLongName());
         }
 
         // Set the list model to the JList
@@ -597,7 +597,7 @@ public class Choordinates extends JFrame {
 
 		JMenuItem mntmHelpfile = new JMenuItem("Choordinates Help");
 		mntmHelpfile.addActionListener(e -> {
-			new BrowserWindow("https://raw.githubusercontent.com/obscurestar/choordinates/refs/heads/main/choordinates.html", 
+			new BrowserWindow("file://" + ChoordData.getInstance().getHelpFile(), 
 					 ChoordData.getInstance().getHelpFile() );
 		});
 		mnHelp.add(mntmHelpfile);
@@ -822,31 +822,22 @@ public class Choordinates extends JFrame {
 		mListMatches = new JList<String>();
 		GridBagConstraints gbc_listMatches = new GridBagConstraints();
 		gbc_listMatches.gridwidth = 2;
-		gbc_listMatches.gridheight = 2;
+		gbc_listMatches.gridheight = 1;
 		gbc_listMatches.insets = new Insets(0, 0, 5, 0);
 		gbc_listMatches.fill = GridBagConstraints.BOTH;
 		gbc_listMatches.gridx = 2;
 		gbc_listMatches.gridy = 1;
         JScrollPane scrollListMatches = new JScrollPane(mListMatches);
 		contentPane.add(scrollListMatches, gbc_listMatches);
-
-//Favorite shape components.
-		JLabel lblFavorites = new JLabel("Favorite Shapes");
-		GridBagConstraints gbc_lblFavorites = new GridBagConstraints();
-		gbc_lblFavorites.gridwidth = 2;
-		gbc_lblFavorites.insets = new Insets(0, 0, 5, 0);
-		gbc_lblFavorites.gridx = 2;
-		gbc_lblFavorites.gridy = 3;
-		contentPane.add(lblFavorites, gbc_lblFavorites);
 				
 		mPanelFav = new FavPanel();
 		GridBagConstraints gbc_mFavPanel = new GridBagConstraints();
 		gbc_mFavPanel.gridwidth = 2;
 		gbc_mFavPanel.insets = new Insets(0, 0, 5, 0);
-		gbc_mFavPanel.gridheight = 2;
+		gbc_mFavPanel.gridheight = 4;
 		gbc_mFavPanel.fill = GridBagConstraints.BOTH;
 		gbc_mFavPanel.gridx = 2;
-		gbc_mFavPanel.gridy = 4;
+		gbc_mFavPanel.gridy = 2;
 		contentPane.add(mPanelFav, gbc_mFavPanel);
 
 //Search button		
