@@ -1,7 +1,5 @@
 package com.obscurestar.choordinates;
 
-//import java.util.ArrayList;
-//import java.util.HashMap;
 import java.util.UUID;
 import javax.swing.JPanel;
 import java.util.HashMap;
@@ -9,12 +7,16 @@ import java.util.HashMap;
 import com.obscurestar.choordinates.FretPanel.Select;
 import java.awt.Dimension;
 import java.awt.GridLayout;
+import java.awt.BorderLayout;
+import javax.swing.JLabel;
+import javax.swing.SwingConstants;
 
 public class FavPanel extends JPanel {
 	private static final long serialVersionUID = 1L;
 	//ArrayList<FretPanel> mFavList = new ArrayList<FretPanel>();
 	HashMap<UUID, FretPanel> mFavList = new HashMap<UUID, FretPanel>();
 	FavHandler mCallback;
+	JPanel mFavPanel;
 
 	public void setFavHandler(FavHandler callback)
 	{	
@@ -48,15 +50,15 @@ public class FavPanel extends JPanel {
 			cols = (int) Math.sqrt(mFavList.size() * panel_aspect_ratio);
 		}
 
-		setLayout(new GridLayout(0, cols, 0, 0));
-		revalidate();
-		repaint();
+		mFavPanel.setLayout(new GridLayout(0, cols, 0, 0));
+		mFavPanel.revalidate();
+		mFavPanel.repaint();
 	}
 
 	public void flush() {
 		if (mFavList.size() > 0) {
 			for (FretPanel fav : mFavList.values()) {
-				remove(fav);
+				mFavPanel.remove(fav);
 			}
 		}
 		mFavList.clear();
@@ -97,9 +99,9 @@ public class FavPanel extends JPanel {
 		setFavCallback(fret_panel);
 
 		mFavList.put(chord_shape.getUUID(),fret_panel);
-		add(fret_panel);
+		mFavPanel.add(fret_panel);
 
-		adjustLayout(this.getSize());
+		adjustLayout(mFavPanel.getSize());
 	}
 	
 	public void deleteFavorite( UUID fav_id, IntervalChord key )
@@ -111,9 +113,9 @@ public class FavPanel extends JPanel {
 			{
 				ChoordData choord_data = ChoordData.getInstance();
 				
-				remove ( mFavList.get(fav_id) );
+				mFavPanel.remove ( mFavList.get(fav_id) );
 				mFavList.remove( fav_id );
-				adjustLayout(this.getSize());
+				adjustLayout(mFavPanel.getSize());
 				choord_data.getFavoriteGroup( key ).deleteFavorite(fav_id);
 				choord_data.write();
 			}
@@ -126,8 +128,15 @@ public class FavPanel extends JPanel {
 	}
 
 	FavPanel() {
-		setLayout(new GridLayout(0, 2, 0, 0));
+		setLayout(new BorderLayout(0, 0));
+		
+		JLabel lblNewLabel = new JLabel("Favorite Shapes");
+		lblNewLabel.setHorizontalAlignment(SwingConstants.CENTER);
+		lblNewLabel.setVerticalAlignment(SwingConstants.TOP);
+		add(lblNewLabel, BorderLayout.NORTH);
+		
+		mFavPanel = new JPanel();
+		add(mFavPanel, BorderLayout.CENTER);
 		setVisible(true);
-		// setSize(400, 400);
 	}
 }

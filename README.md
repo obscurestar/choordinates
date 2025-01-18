@@ -12,6 +12,8 @@ cd to directory choordinates.jar is in
 java -Xdiag -run choordinates.jar
 
 
+Build uses apache Maven
+
 User Help and data are stored in
 
 ~/Library/Application Support/com.obscurestar.choordinates on Mac,
