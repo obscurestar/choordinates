@@ -10,7 +10,7 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.awt.Taskbar;
+//import java.awt.Taskbar;
 
 import com.obscurestar.choordinates.FretPanel.Select;
 
@@ -473,7 +473,7 @@ public class Choordinates extends JFrame {
 		 */
 		ChoordData.read();  //Initialize data structures from JSON file.
 		
-		
+		/*
         //this is new since JDK 9		
         Taskbar taskbar = Taskbar.getTaskbar();
 
@@ -482,7 +482,7 @@ public class Choordinates extends JFrame {
         } catch (final UnsupportedOperationException | SecurityException e) {
             //Don't care if we can't set the icon just do some empty catches.
         }
-
+*/
 		setIconImage(ChoordData.getInstance().getPreferences().getIcon().getImage());
 
 		//SPATTERS debug TODO put in real test harness.
