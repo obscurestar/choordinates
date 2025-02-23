@@ -574,11 +574,11 @@ public class FretPanel extends JPanel implements MouseListener, MouseMotionListe
     	for (int x=0; x<mNumDrawFrets; ++x)
     	{	
        		//Draw the string labels
-    		int fret_no = mFirstFret+x;
-    		if ( (mFirstFret == 0 || mFirstFret == 12) && x != 0)
+    		int fret_no = mFirstFret+x-1;
+    		/*if ( (mFirstFret == 0 || mFirstFret == 12) && x != 0)
     		{
     			fret_no--;
-    		}
+    		}*/
 
     		if (Arrays.binarySearch(labeled_frets, fret_no) >= 0)
     		{
